@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "247817746985",
+    "project_id": "haulease-4dbb3",
+    "storage_bucket": "haulease-4dbb3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:247817746985:android:3ce1a79962ab1afb35ba38",
+        "android_client_info": {
+          "package_name": "com.example.haulease"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVt28oa4GryHLgjKAmY1GH1nJe2z58JJQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
