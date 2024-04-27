@@ -7,10 +7,12 @@ data class Consignor(
   var id: Int,
   var username: String,
   var avatar: String,
+  var contact: String,
   var email: String,
   var password: String,
   var address: String,
   var company: String,
   var companyEmail: String,
-  var companyAddress: String
+  var companyAddress: String,
+  var role: String
 )

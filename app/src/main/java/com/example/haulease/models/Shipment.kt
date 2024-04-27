@@ -7,5 +7,7 @@ data class Shipment(
   var id: Int,
   var status: String,
   var origin: String,
-  var destination: String
+  var destination: String,
+  var receiverName: String,
+  var receiverContact: String
 )

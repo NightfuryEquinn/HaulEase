@@ -3,41 +3,43 @@ package com.example.haulease
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.haulease.ui.theme.HaulEaseTheme
+import com.example.haulease.viewmodels.LoadingVM
+import com.example.haulease.views.ForgotScreen
+import com.example.haulease.views.LoadingScreen
+import com.example.haulease.views.LoginScreen
 
 class MainActivity : ComponentActivity() {
+  // Get loading view model
+  private val loadingVM by viewModels<LoadingVM>()
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
       HaulEaseTheme {
-        // A surface container using the 'background' color from the theme
-        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-          Greeting("Android")
+        Surface(
+          modifier = Modifier.fillMaxSize(),
+          color = MaterialTheme.colorScheme.background
+        ) {
+          // Observe the loading progress
+          val loadingProgress by loadingVM.loadingProgress.collectAsState()
+
+//          if (loadingProgress < 1.0f) {
+//            LoadingScreen(loadingProgress)
+//          } else {
+           MainScreen()
+//          }
         }
       }
     }
-  }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-  Text(
-    text = "Hello $name!",
-    modifier = modifier
-  )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-  HaulEaseTheme {
-    Greeting("Android")
   }
 }
