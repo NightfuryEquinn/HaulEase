@@ -1,4 +1,4 @@
-package com.example.haulease.navigations
+package com.example.haulease.navigations.routes
 
 sealed class UserRoutes(val routes: String) {
   data object Dashboard: UserRoutes("Dashboard")

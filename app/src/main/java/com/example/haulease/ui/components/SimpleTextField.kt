@@ -22,7 +22,7 @@ import com.example.haulease.R
 
 @Composable
 fun SimpleTextField(
-  modifier: Modifier = Modifier,
+  modifier: Modifier,
   inputText: MutableState<String>,
   onValueChange: (String) -> Unit,
   label: String,

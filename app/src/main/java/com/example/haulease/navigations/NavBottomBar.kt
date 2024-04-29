@@ -1,27 +1,31 @@
 package com.example.haulease.navigations
 
-import com.example.haulease.R
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.LocalShipping
 
 object NavBottomBar {
   val BottomBarItems = listOf(
     BottomBarItem(
       title = "DASHBOARD",
-      image = R.drawable.dashboard,
+      image = Icons.Filled.Dashboard,
       route = "Dashboard"
     ),
     BottomBarItem(
       title = "SHIPMENT",
-      image = R.drawable.box,
+      image = Icons.Filled.LocalShipping,
       route = "Shipment"
     ),
     BottomBarItem(
       title = "HISTORY",
-      image = R.drawable.history,
+      image = Icons.Filled.History,
       route = "History"
     ),
     BottomBarItem(
       title = "PROFILE",
-      image = R.drawable.profile,
+      image = Icons.Filled.AccountCircle,
       route = "Profile"
     ),
   )

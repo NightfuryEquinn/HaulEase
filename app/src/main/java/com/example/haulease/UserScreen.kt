@@ -9,7 +9,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.haulease.navigations.UserRoutes
+import com.example.haulease.navigations.BottomNavBar
+import com.example.haulease.navigations.routes.UserRoutes
+import com.example.haulease.views.user.DashboardScreen
+import com.example.haulease.views.user.HistoryScreen
+import com.example.haulease.views.user.ProfileScreen
+import com.example.haulease.views.user.ShipmentScreen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -21,7 +26,7 @@ fun UserScreen() {
       UserNavHost(navCtrl = navCtrl)
     },
     bottomBar = {
-
+      BottomNavBar(navCtrl = navCtrl)
     }
   )
 }
@@ -56,24 +61,32 @@ fun UserNavHost(navCtrl: NavHostController) {
       )
     }
   ) {
-    composable("Start") {
+    composable("start") {
       navCtrl.navigate(UserRoutes.Dashboard.routes)
     }
 
     composable(UserRoutes.Dashboard.routes) {
-
+      DashboardScreen(
+        navCtrl = navCtrl
+      )
     }
 
     composable(UserRoutes.Shipment.routes) {
-
+      ShipmentScreen(
+        navCtrl = navCtrl
+      )
     }
 
     composable(UserRoutes.History.routes) {
-
+      HistoryScreen(
+        navCtrl = navCtrl
+      )
     }
 
     composable(UserRoutes.Profile.routes) {
-
+      ProfileScreen(
+        navCtrl = navCtrl
+      )
     }
   }
 }

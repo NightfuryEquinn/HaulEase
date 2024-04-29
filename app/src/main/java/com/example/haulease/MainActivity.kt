@@ -7,16 +7,11 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.example.haulease.ui.theme.HaulEaseTheme
 import com.example.haulease.viewmodels.LoadingVM
-import com.example.haulease.views.ForgotScreen
-import com.example.haulease.views.LoadingScreen
-import com.example.haulease.views.LoginScreen
 
 class MainActivity : ComponentActivity() {
   // Get loading view model
@@ -36,7 +31,7 @@ class MainActivity : ComponentActivity() {
 //          if (loadingProgress < 1.0f) {
 //            LoadingScreen(loadingProgress)
 //          } else {
-           MainScreen()
+           UserScreen()
 //          }
         }
       }

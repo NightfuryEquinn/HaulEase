@@ -1,4 +1,4 @@
-package com.example.haulease.navigations
+package com.example.haulease.navigations.routes
 
 sealed class SharedRoutes(val routes: String) {
   data object Login: SharedRoutes("Login")

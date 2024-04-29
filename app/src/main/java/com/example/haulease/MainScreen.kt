@@ -9,7 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.haulease.navigations.SharedRoutes
+import com.example.haulease.navigations.routes.SharedRoutes
 import com.example.haulease.views.ForgotScreen
 import com.example.haulease.views.LoginScreen
 import com.example.haulease.views.RegisterScreen
@@ -36,25 +36,25 @@ fun MainNavHost(navCtrl: NavHostController) {
     startDestination = "start",
     enterTransition = {
       slideIntoContainer(
-        AnimatedContentTransitionScope.SlideDirection.Left,
+        AnimatedContentTransitionScope.SlideDirection.Up,
         animationSpec = tween(500)
       )
     },
     exitTransition = {
       slideOutOfContainer(
-        AnimatedContentTransitionScope.SlideDirection.Right,
+        AnimatedContentTransitionScope.SlideDirection.Down,
         animationSpec = tween(500)
       )
     },
     popEnterTransition = {
       slideIntoContainer(
-        AnimatedContentTransitionScope.SlideDirection.Left,
+        AnimatedContentTransitionScope.SlideDirection.Up,
         animationSpec = tween(500)
       )
     },
     popExitTransition = {
       slideOutOfContainer(
-        AnimatedContentTransitionScope.SlideDirection.Right,
+        AnimatedContentTransitionScope.SlideDirection.Down,
         animationSpec = tween(500)
       )
     }
@@ -64,7 +64,9 @@ fun MainNavHost(navCtrl: NavHostController) {
     }
 
     composable(SharedRoutes.Login.routes) {
-      LoginScreen(navCtrl = navCtrl)
+      LoginScreen(
+        navCtrl = navCtrl
+      )
     }
 
     composable(SharedRoutes.Register.routes) {
