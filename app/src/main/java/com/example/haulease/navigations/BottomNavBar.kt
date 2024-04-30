@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.compose.md_theme_light_background
+import com.example.compose.md_theme_light_surfaceTint
 import com.example.haulease.R
 
 @Composable
@@ -49,10 +51,9 @@ fun BottomNavBar(navCtrl: NavHostController) {
           Icon(
             imageVector = navBarItem.image,
             contentDescription = navBarItem.title,
-            tint = if (currentRoute == navBarItem.route) Color(0xFFFCA111) else Color.Unspecified,
+            tint = if (currentRoute == navBarItem.route) md_theme_light_background else Color.Unspecified,
             modifier = Modifier
               .align(Alignment.CenterVertically)
-
           )
         },
 
@@ -60,7 +61,6 @@ fun BottomNavBar(navCtrl: NavHostController) {
           Text(
             text = navBarItem.title,
             style = TextStyle(
-              color = if (currentRoute == navBarItem.route) Color(0xFFFCA111) else Color.Unspecified,
               fontFamily = FontFamily(Font(R.font.squada))
             ),
             modifier = Modifier
@@ -73,7 +73,7 @@ fun BottomNavBar(navCtrl: NavHostController) {
         colors = NavigationBarItemColors(
           selectedIconColor = Color.Unspecified,
           selectedTextColor = Color.Unspecified,
-          selectedIndicatorColor = Color(0xFFFFFFFF),
+          selectedIndicatorColor = md_theme_light_surfaceTint,
           unselectedIconColor = Color.Unspecified,
           unselectedTextColor = Color.Unspecified,
           disabledIconColor = Color.Unspecified,

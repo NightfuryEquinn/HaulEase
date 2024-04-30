@@ -38,25 +38,25 @@ fun UserNavHost(navCtrl: NavHostController) {
     startDestination = "start",
     enterTransition = {
       slideIntoContainer(
-        AnimatedContentTransitionScope.SlideDirection.Left,
+        AnimatedContentTransitionScope.SlideDirection.Up,
         animationSpec = tween(500)
       )
     },
     exitTransition = {
       slideOutOfContainer(
-        AnimatedContentTransitionScope.SlideDirection.Right,
+        AnimatedContentTransitionScope.SlideDirection.Down,
         animationSpec = tween(500)
       )
     },
     popEnterTransition = {
       slideIntoContainer(
-        AnimatedContentTransitionScope.SlideDirection.Left,
+        AnimatedContentTransitionScope.SlideDirection.Up,
         animationSpec = tween(500)
       )
     },
     popExitTransition = {
       slideOutOfContainer(
-        AnimatedContentTransitionScope.SlideDirection.Right,
+        AnimatedContentTransitionScope.SlideDirection.Down,
         animationSpec = tween(500)
       )
     }

@@ -2,13 +2,12 @@ package com.example.haulease.ui.components
 
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,16 +36,16 @@ fun SimpleViewBox(
   name: String? = null,
   status: String? = null,
 ) {
-  Box(
+  Column(
     modifier = modifier
+      .padding(12.dp)
   ) {
     Row(
-      modifier = rowModifier,
-      horizontalArrangement = Arrangement.SpaceBetween
+      modifier = rowModifier
     ) {
       Image(
         painter = image,
-        contentDescription = "Placeholder",
+        contentDescription = null,
         modifier = Modifier
           .clip(shape = RoundedCornerShape((2.5).dp))
           .size(125.dp),
@@ -59,53 +58,46 @@ fun SimpleViewBox(
         modifier = Modifier
           .fillMaxWidth()
       ) {
-        Column() {
+        Text(
+          text = if (id != null) "ID: $id" else "Name: $name",
+          style = TextStyle(
+            fontFamily = FontFamily(Font(R.font.libre)),
+            fontSize = 16.sp
+          )
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        if (status != null) {
           Text(
-            text = if (id != null) "ID: $id" else "Name: $name",
+            text = status,
             style = TextStyle(
               fontFamily = FontFamily(Font(R.font.libre)),
-              fontSize = 16.sp
-            )
-          )
-
-          Spacer(modifier = Modifier.height(10.dp))
-
-          if (status != null) {
-            Text(
-              text = status,
-              style = TextStyle(
-                fontFamily = FontFamily(Font(R.font.libre)),
-                fontSize = 12.sp
-              )
-            )
-          }
-        }
-
-        // Custom spacing depends on status is null or not
-        if (status != null) {
-          Spacer(modifier = Modifier.height(40.dp))
-        } else {
-          Spacer(modifier = Modifier.height(52.dp))
-        }
-
-        Button(
-          onClick = {
-            Log.d("Simple Box", "View Details")
-          },
-          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
-          shape = RoundedCornerShape(5.dp),
-          modifier = Modifier
-            .fillMaxWidth()
-        ) {
-          Text(
-            text = "View Details",
-            style = TextStyle(
-              fontFamily = FontFamily(Font(R.font.squada)),
-              fontSize = 20.sp,
+              fontSize = 12.sp
             )
           )
         }
       }
+    }
+    
+    Spacer(modifier = Modifier.height(10.dp))
+
+    Button(
+      onClick = {
+        Log.d("Simple Box", "View Details")
+      },
+      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
+      shape = RoundedCornerShape(5.dp),
+      modifier = Modifier
+        .fillMaxWidth()
+    ) {
+      Text(
+        text = "View Details",
+        style = TextStyle(
+          fontFamily = FontFamily(Font(R.font.squada)),
+          fontSize = 20.sp,
+        )
+      )
     }
   }
 }

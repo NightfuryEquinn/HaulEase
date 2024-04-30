@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.haulease.R
 import com.example.haulease.ui.components.SimpleDataBox
+import com.example.haulease.ui.components.SimpleEmptyBox
 import com.example.haulease.ui.components.SimpleViewBox
 
 @Composable
@@ -80,8 +81,7 @@ fun DashboardScreen(
           .fillMaxSize()
           .background(Color(0xFFE5E5E5)),
         rowModifier = Modifier
-          .fillMaxSize()
-          .padding(12.dp),
+          .fillMaxSize(),
         image = painterResource(id = R.drawable.image),
         id = "100001",
         status = "En-route to Harbor"
@@ -100,17 +100,16 @@ fun DashboardScreen(
 
       Spacer(modifier = Modifier.height(10.dp))
 
-      SimpleViewBox(
+      SimpleEmptyBox(
         modifier = Modifier
           .clip(shape = RoundedCornerShape(5.dp))
+          .height(150.dp)
           .fillMaxSize()
           .background(Color(0xFFE5E5E5)),
-        rowModifier = Modifier
-          .fillMaxSize()
-          .padding(12.dp),
-        image = painterResource(id = R.drawable.image),
-        id = "100001",
-        status = "Arrived at Harbor"
+        colModifier = Modifier
+          .fillMaxSize(),
+        image = painterResource(id = R.drawable.close),
+        name = "No Pending Payment"
       )
 
       Spacer(modifier = Modifier.height(30.dp))
