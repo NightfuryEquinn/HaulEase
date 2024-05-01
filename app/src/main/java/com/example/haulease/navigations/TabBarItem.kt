@@ -1,5 +1,5 @@
 package com.example.haulease.navigations
 
-data class TabItem(
+data class TabBarItem(
   val title: String,
 )

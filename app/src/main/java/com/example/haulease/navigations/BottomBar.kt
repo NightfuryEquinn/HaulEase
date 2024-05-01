@@ -6,7 +6,7 @@ import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.LocalShipping
 
-object NavBottomBar {
+object BottomBar {
   val BottomBarItems = listOf(
     BottomBarItem(
       title = "DASHBOARD",

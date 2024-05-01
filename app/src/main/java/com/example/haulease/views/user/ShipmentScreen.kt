@@ -1,6 +1,7 @@
 package com.example.haulease.views.user
 
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -15,6 +18,7 @@ import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -30,15 +34,38 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.compose.md_theme_light_onSecondaryContainer
 import com.example.haulease.R
-import com.example.haulease.navigations.TabItemBar
+import com.example.haulease.navigations.TabBar
+import com.example.haulease.ui.components.SimpleTabCol
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ShipmentScreen(
   navCtrl: NavHostController
 ) {
+  val data = listOf(
+    Triple(R.drawable.image, "100001", "En-route to Harbor"),
+    Triple(R.drawable.image, "100002", "En-route to Harbor"),
+    Triple(R.drawable.image, "100003", "En-route to Harbor")
+  )
+
   var selectedTabIndex by remember { mutableIntStateOf(0) }
+  val pagerState = rememberPagerState {
+    TabBar.TabItems.size
+  }
+
+  // Link tab index to pager
+  LaunchedEffect(selectedTabIndex) {
+    pagerState.animateScrollToPage(selectedTabIndex)
+  }
+
+  // Link pager to tab index with direct selection
+  LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
+    if (!pagerState.isScrollInProgress) {
+      selectedTabIndex = pagerState.currentPage
+    }
+  }
+
   Column(
     modifier = Modifier
       .fillMaxWidth()
@@ -68,8 +95,9 @@ fun ShipmentScreen(
         .clip(shape = RoundedCornerShape(5.dp))
         .fillMaxWidth(),
       edgePadding = 0.dp,
+
     ) {
-      TabItemBar.TabItems.forEachIndexed { index, tabItem ->
+      TabBar.TabItems.forEachIndexed { index, tabItem ->
         Tab(
           selected = index == selectedTabIndex,
           onClick = {
@@ -87,6 +115,20 @@ fun ShipmentScreen(
         )
       }
     }
+    
+    HorizontalPager(
+      state = pagerState,
+      modifier = Modifier
+        .fillMaxWidth()
+        .weight(1f)
+    ) {
+      when (selectedTabIndex) {
+        0 -> SimpleTabCol(data)
+        1 -> SimpleTabCol(data)
+        2 -> SimpleTabCol(data)
+        3 -> SimpleTabCol(data)
+      }
+    }
 
     Button(
       onClick = {
@@ -95,7 +137,7 @@ fun ShipmentScreen(
       modifier = Modifier
         .fillMaxWidth()
         .align(Alignment.CenterHorizontally),
-      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE5E5E5)),
+      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
       shape = RoundedCornerShape(5.dp),
     ) {
       Text(
@@ -103,9 +145,11 @@ fun ShipmentScreen(
         style = TextStyle(
           fontFamily = FontFamily(Font(R.font.squada)),
           fontSize = 24.sp,
-          color = md_theme_light_onSecondaryContainer
+          color = Color(0xFFE5E5E5)
         )
       )
     }
+
+    Spacer(modifier = Modifier.padding(bottom = 52.dp))
   }
 }
