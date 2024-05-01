@@ -86,5 +86,9 @@ fun MainNavHost(navCtrl: NavHostController) {
         }
       )
     }
+
+    composable("UserScreen") {
+      UserScreen()
+    }
   }
 }

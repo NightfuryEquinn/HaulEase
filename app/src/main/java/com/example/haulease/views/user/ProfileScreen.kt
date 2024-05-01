@@ -3,6 +3,7 @@ package com.example.haulease.views.user
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -105,23 +107,47 @@ fun ProfileScreen(
         desc = "none"
       )
 
-      Button(
-        onClick = {
-          Log.d("Profile", "Edit Profile")
-        },
+      Row(
         modifier = Modifier
           .fillMaxWidth()
-          .padding(end = 160.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
-        shape = RoundedCornerShape(5.dp),
       ) {
-        Text(
-          text = "Edit Profile",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.squada)),
-            fontSize = 24.sp,
+        Button(
+          onClick = {
+            Log.d("Profile", "Edit Profile")
+          },
+          modifier = Modifier
+            .fillMaxWidth(),
+          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
+          shape = RoundedCornerShape(5.dp),
+        ) {
+          Text(
+            text = "Edit Profile",
+            style = TextStyle(
+              fontFamily = FontFamily(Font(R.font.squada)),
+              fontSize = 24.sp,
+            )
           )
-        )
+        }
+
+        Spacer(modifier = Modifier.width(20.dp))
+
+        Button(
+          onClick = {
+            Log.d("Profile", "Log Out")
+          },
+          modifier = Modifier
+            .fillMaxWidth(),
+          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
+          shape = RoundedCornerShape(5.dp),
+        ) {
+          Text(
+            text = "Log Out",
+            style = TextStyle(
+              fontFamily = FontFamily(Font(R.font.squada)),
+              fontSize = 24.sp,
+            )
+          )
+        }
       }
 
       Spacer(modifier = Modifier.padding(bottom = 52.dp))
