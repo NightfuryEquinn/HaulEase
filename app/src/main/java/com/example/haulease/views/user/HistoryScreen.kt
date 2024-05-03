@@ -2,7 +2,9 @@ package com.example.haulease.views.user
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -36,21 +39,26 @@ fun HistoryScreen(
       .fillMaxWidth()
       .padding(30.dp)
   ) {
-    Image(
-      painter = painterResource(id = R.drawable.logo_nobg),
-      contentDescription = "HaulEase_Logo",
-      modifier = Modifier.size(100.dp)
-    )
-
-    Spacer(modifier = Modifier.height(16.dp))
-
-    Text(
-      text = "My History",
-      style = TextStyle(
-        fontFamily = FontFamily(Font(R.font.squada)),
-        fontSize = 48.sp
+    Row(
+      modifier = Modifier
+        .fillMaxWidth(),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+      Image(
+        painter = painterResource(id = R.drawable.logo_nobg),
+        contentDescription = "HaulEase_Logo",
+        modifier = Modifier.size(100.dp)
       )
-    )
+
+      Text(
+        text = "History",
+        style = TextStyle(
+          fontFamily = FontFamily(Font(R.font.squada)),
+          fontSize = 48.sp
+        )
+      )
+    }
 
     Spacer(modifier = Modifier.height(16.dp))
 

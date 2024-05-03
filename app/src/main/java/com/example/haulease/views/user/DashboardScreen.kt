@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -40,21 +41,26 @@ fun DashboardScreen(
       .fillMaxWidth()
       .padding(30.dp)
   ) {
-    Image(
-      painter = painterResource(id = R.drawable.logo_nobg),
-      contentDescription = "HaulEase_Logo",
-      modifier = Modifier.size(100.dp)
-    )
-
-    Spacer(modifier = Modifier.height(16.dp))
-
-    Text(
-      text = "Dashboard",
-      style = TextStyle(
-        fontFamily = FontFamily(Font(R.font.squada)),
-        fontSize = 48.sp
+    Row(
+      modifier = Modifier
+        .fillMaxWidth(),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+      Image(
+        painter = painterResource(id = R.drawable.logo_nobg),
+        contentDescription = "HaulEase_Logo",
+        modifier = Modifier.size(100.dp)
       )
-    )
+
+      Text(
+        text = "Dashboard",
+        style = TextStyle(
+          fontFamily = FontFamily(Font(R.font.squada)),
+          fontSize = 48.sp
+        )
+      )
+    }
 
     Spacer(modifier = Modifier.height(16.dp))
 

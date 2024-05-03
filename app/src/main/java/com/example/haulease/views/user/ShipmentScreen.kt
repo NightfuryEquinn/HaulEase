@@ -3,7 +3,9 @@ package com.example.haulease.views.user
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -71,21 +73,26 @@ fun ShipmentScreen(
       .fillMaxWidth()
       .padding(30.dp)
   ) {
-    Image(
-      painter = painterResource(id = R.drawable.logo_nobg),
-      contentDescription = "HaulEase_Logo",
-      modifier = Modifier.size(100.dp)
-    )
-
-    Spacer(modifier = Modifier.height(16.dp))
-
-    Text(
-      text = "My Shipment",
-      style = TextStyle(
-        fontFamily = FontFamily(Font(R.font.squada)),
-        fontSize = 48.sp
+    Row(
+      modifier = Modifier
+        .fillMaxWidth(),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+      Image(
+        painter = painterResource(id = R.drawable.logo_nobg),
+        contentDescription = "HaulEase_Logo",
+        modifier = Modifier.size(100.dp)
       )
-    )
+
+      Text(
+        text = "Shipment",
+        style = TextStyle(
+          fontFamily = FontFamily(Font(R.font.squada)),
+          fontSize = 48.sp
+        )
+      )
+    }
 
     Spacer(modifier = Modifier.height(16.dp))
 
