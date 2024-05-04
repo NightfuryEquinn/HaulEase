@@ -16,9 +16,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 
 @Composable
 fun SimpleTabCol(
+  navCtrl: NavHostController,
   data: List<Triple<Int, String, String>>
 ) {
   Column(
@@ -29,6 +31,7 @@ fun SimpleTabCol(
   ) {
     data.forEachIndexed { _, (imageId, id, status) ->
       SimpleViewBox(
+        navCtrl = navCtrl,
         modifier = Modifier
           .clip(shape = RoundedCornerShape(5.dp))
           .fillMaxSize()

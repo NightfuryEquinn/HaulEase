@@ -1,6 +1,5 @@
 package com.example.haulease.views.user
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.haulease.R
 import com.example.haulease.navigations.TabBar
+import com.example.haulease.navigations.routes.UserInnerRoutes
 import com.example.haulease.ui.components.SimpleTabCol
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -130,16 +130,16 @@ fun ShipmentScreen(
         .weight(1f)
     ) {
       when (selectedTabIndex) {
-        0 -> SimpleTabCol(data)
-        1 -> SimpleTabCol(data)
-        2 -> SimpleTabCol(data)
-        3 -> SimpleTabCol(data)
+        0 -> SimpleTabCol(navCtrl, data)
+        1 -> SimpleTabCol(navCtrl, data)
+        2 -> SimpleTabCol(navCtrl, data)
+        3 -> SimpleTabCol(navCtrl, data)
       }
     }
 
     Button(
       onClick = {
-        Log.d("Shipment", "Create Shipment")
+        navCtrl.navigate(UserInnerRoutes.CreateShipment.routes)
       },
       modifier = Modifier
         .fillMaxWidth()

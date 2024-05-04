@@ -99,13 +99,19 @@ fun UserNavHost(navCtrl: NavHostController) {
     // User Inner Routes
     composable(UserInnerRoutes.ShipmentDetail.routes) {
       ShipmentDetailScreen(
-        navCtrl = navCtrl
+        navCtrl = navCtrl,
+        onBack = {
+          navCtrl.popBackStack()
+        }
       )
     }
 
     composable(UserInnerRoutes.CargoDetail.routes) {
       CargoDetailScreen(
-        navCtrl = navCtrl
+        navCtrl = navCtrl,
+        onBack = {
+          navCtrl.popBackStack()
+        }
       )
     }
 
@@ -123,7 +129,10 @@ fun UserNavHost(navCtrl: NavHostController) {
 
     composable(UserInnerRoutes.Payment.routes) {
       PaymentScreen(
-        navCtrl = navCtrl
+        navCtrl = navCtrl,
+        onBack = {
+          navCtrl.popBackStack()
+        }
       )
     }
 

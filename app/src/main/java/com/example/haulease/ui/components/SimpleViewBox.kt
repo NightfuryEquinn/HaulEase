@@ -1,6 +1,5 @@
 package com.example.haulease.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,17 +24,24 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.haulease.R
+import com.example.haulease.navigations.routes.UserInnerRoutes
 
 @Composable
 fun SimpleViewBox(
+  navCtrl: NavHostController,
   modifier: Modifier,
   rowModifier: Modifier,
   image: Painter,
+  imageSize: Int? = 125,
   id: String? = null,
   name: String? = null,
   status: String? = null,
 ) {
+  val currentRoute = navCtrl.currentBackStackEntryAsState().value?.destination?.route
+
   Column(
     modifier = modifier
       .padding(12.dp)
@@ -48,7 +54,7 @@ fun SimpleViewBox(
         contentDescription = null,
         modifier = Modifier
           .clip(shape = RoundedCornerShape((2.5).dp))
-          .size(125.dp),
+          .size(imageSize!!.dp),
         contentScale = ContentScale.Crop
       )
 
@@ -84,7 +90,11 @@ fun SimpleViewBox(
 
     Button(
       onClick = {
-        Log.d("Simple Box", "View Details")
+        if (currentRoute == UserInnerRoutes.ShipmentDetail.routes) {
+          navCtrl.navigate(UserInnerRoutes.CargoDetail.routes)
+        } else {
+          navCtrl.navigate(UserInnerRoutes.ShipmentDetail.routes)
+        }
       },
       colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
       shape = RoundedCornerShape(5.dp),

@@ -69,6 +69,7 @@ fun HistoryScreen(
         .weight(1f)
     ) {
       SimpleViewBox(
+        navCtrl = navCtrl,
         modifier = Modifier
           .clip(shape = RoundedCornerShape(5.dp))
           .fillMaxSize()
@@ -83,6 +84,7 @@ fun HistoryScreen(
       Spacer(modifier = Modifier.height(20.dp))
 
       SimpleViewBox(
+        navCtrl = navCtrl,
         modifier = Modifier
           .clip(shape = RoundedCornerShape(5.dp))
           .fillMaxSize()

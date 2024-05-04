@@ -1,6 +1,5 @@
 package com.example.haulease.views.user.inner
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,11 +27,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.haulease.R
+import com.example.haulease.navigations.routes.UserInnerRoutes
 import com.example.haulease.ui.components.SimplePaymentBox
 
 @Composable
 fun PaymentScreen(
-  navCtrl: NavHostController
+  navCtrl: NavHostController,
+  onBack: () -> Unit
 ) {
   Column(
     modifier = Modifier
@@ -127,7 +128,10 @@ fun PaymentScreen(
 
     Button(
       onClick = {
-        Log.d("Payment", "Back")
+        onBack()
+        navCtrl.navigate(UserInnerRoutes.ShipmentDetail.routes) {
+          launchSingleTop = true
+        }
       },
       modifier = Modifier
         .fillMaxWidth()

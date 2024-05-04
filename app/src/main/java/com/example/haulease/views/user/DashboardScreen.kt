@@ -82,6 +82,7 @@ fun DashboardScreen(
       Spacer(modifier = Modifier.height(10.dp))
 
       SimpleViewBox(
+        navCtrl = navCtrl,
         modifier = Modifier
           .clip(shape = RoundedCornerShape(5.dp))
           .fillMaxSize()
