@@ -288,8 +288,8 @@ fun ShipmentDetailScreen(
           )
         )
       }
-
-      Spacer(modifier = Modifier.padding(bottom = 100.dp))
     }
+
+    Spacer(modifier = Modifier.padding(bottom = 52.dp))
   }
 }

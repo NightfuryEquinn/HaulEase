@@ -100,6 +100,7 @@ fun LoginScreen(
         username.value = newValue
       },
       label = "Username",
+      isSingle = true
     )
 
     Spacer(modifier = Modifier.height(8.dp))
@@ -114,6 +115,7 @@ fun LoginScreen(
       },
       label = "Password",
       isSensitive = true,
+      isSingle = true
     )
 
     Spacer(modifier = Modifier.height(32.dp))

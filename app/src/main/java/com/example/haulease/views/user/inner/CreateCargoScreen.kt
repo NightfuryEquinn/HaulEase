@@ -5,7 +5,8 @@ import androidx.navigation.NavHostController
 
 @Composable
 fun CreateCargoScreen(
-  navCtrl: NavHostController
+  navCtrl: NavHostController,
+  onBack: () -> Unit
 ) {
 
 }

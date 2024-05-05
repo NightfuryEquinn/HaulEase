@@ -117,13 +117,19 @@ fun UserNavHost(navCtrl: NavHostController) {
 
     composable(UserInnerRoutes.CreateShipment.routes) {
       CreateShipmentScreen(
-        navCtrl = navCtrl
+        navCtrl = navCtrl,
+        onBack = {
+          navCtrl.popBackStack()
+        }
       )
     }
 
     composable(UserInnerRoutes.CreateCargo.routes) {
       CreateCargoScreen(
-        navCtrl = navCtrl
+        navCtrl = navCtrl,
+        onBack = {
+          navCtrl.popBackStack()
+        }
       )
     }
 

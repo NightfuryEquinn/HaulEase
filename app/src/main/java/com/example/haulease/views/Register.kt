@@ -140,6 +140,7 @@ fun RegisterScreen(
           username.value = newValue
         },
         label = "Username",
+        isSingle = true
       )
 
       Spacer(modifier = Modifier.height(8.dp))
@@ -153,6 +154,7 @@ fun RegisterScreen(
           password.value = newValue
         },
         label = "Password",
+        isSingle = true
       )
 
       Spacer(modifier = Modifier.height(8.dp))
@@ -166,6 +168,7 @@ fun RegisterScreen(
           confirmPassword.value = newValue
         },
         label = "Confirm Password",
+        isSingle = true
       )
 
       Spacer(modifier = Modifier.height(8.dp))
@@ -179,6 +182,7 @@ fun RegisterScreen(
           email.value = newValue
         },
         label = "Email",
+        isSingle = true
       )
 
       Spacer(modifier = Modifier.height(8.dp))
@@ -192,6 +196,7 @@ fun RegisterScreen(
           address.value = newValue
         },
         label = "Residential Address",
+        maxLines = 5
       )
 
       Spacer(modifier = Modifier.height(8.dp))
@@ -240,6 +245,7 @@ fun RegisterScreen(
           companyName.value = newValue
         },
         label = "Company Name (optional)",
+        isSingle = true
       )
 
       Spacer(modifier = Modifier.height(8.dp))
@@ -253,6 +259,7 @@ fun RegisterScreen(
           companyEmail.value = newValue
         },
         label = "Company Email (optional)",
+        isSingle = true
       )
 
       Spacer(modifier = Modifier.height(8.dp))
@@ -266,6 +273,7 @@ fun RegisterScreen(
           companyAddress.value = newValue
         },
         label = "Company Address (optional)",
+        maxLines = 5
       )
     }
 
