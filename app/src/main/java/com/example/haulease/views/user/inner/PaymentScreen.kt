@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -56,7 +57,8 @@ fun PaymentScreen(
         text = "Payment",
         style = TextStyle(
           fontFamily = FontFamily(Font(R.font.squada)),
-          fontSize = 48.sp
+          fontSize = 48.sp,
+          textAlign = TextAlign.End
         )
       )
     }

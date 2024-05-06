@@ -11,22 +11,26 @@ object BottomBar {
     BottomBarItem(
       title = "DASHBOARD",
       image = Icons.Filled.Dashboard,
-      route = "Dashboard"
+      route = "Dashboard",
+      adminRoute = "AdminDashboard"
     ),
     BottomBarItem(
       title = "SHIPMENT",
       image = Icons.Filled.LocalShipping,
-      route = "Shipment"
+      route = "Shipment",
+      adminRoute = "AdminShipment"
     ),
     BottomBarItem(
       title = "HISTORY",
       image = Icons.Filled.History,
-      route = "History"
+      route = "History",
+      adminRoute = "AdminHistory"
     ),
     BottomBarItem(
       title = "PROFILE",
       image = Icons.Filled.AccountCircle,
-      route = "Profile"
+      route = "Profile",
+      adminRoute = "AdminProfile"
     ),
   )
 }
