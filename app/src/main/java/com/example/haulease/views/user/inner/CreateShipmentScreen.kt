@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.haulease.R
-import com.example.haulease.navigations.routes.UserInnerRoutes
 import com.example.haulease.navigations.routes.UserRoutes
+import com.example.haulease.ui.components.SimpleCargoBox
 import com.example.haulease.ui.components.SimpleTextField
 
 @Composable
@@ -47,11 +47,17 @@ fun CreateShipmentScreen(
   val origin = remember { mutableStateOf("") }
   val dest = remember { mutableStateOf("") }
 
+  val cargoList: List<Pair<Int, String>> = listOf(
+    R.drawable.image to "100001",
+    R.drawable.image to "100002",
+  )
+
   // Validations
   val allFieldsNotEmpty = name.value.isNotBlank()
       && contact.value.isNotBlank()
       && origin.value.isNotBlank()
       && dest.value.isNotBlank()
+      && (cargoList.size >= 1)
 
   val originOrDest = origin.value.isNotBlank() && dest.value.isNotBlank()
 
@@ -181,15 +187,21 @@ fun CreateShipmentScreen(
         )
       )
 
-      Spacer(modifier = Modifier.height(20.dp))
+      Spacer(modifier = Modifier.height(10.dp))
 
-      // List of cargos component
+      cargoList.forEachIndexed { _, (imageId, id) ->
+        SimpleCargoBox(
+          navCtrl = navCtrl,
+          image = painterResource(id = imageId),
+          id = id
+        )
+      }
 
       Spacer(modifier = Modifier.height(20.dp))
 
       Button(
         onClick = {
-          navCtrl.navigate(UserInnerRoutes.CreateCargo.routes)
+          navCtrl.navigate("CreateCargo?type=&weight=&length=&width=&height=&desc=&image=")
         },
         modifier = Modifier
           .fillMaxWidth(),
@@ -225,6 +237,7 @@ fun CreateShipmentScreen(
           .weight(0.35f),
         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
         shape = RoundedCornerShape(5.dp),
+        enabled = allFieldsNotEmpty // && cargoListNotEmpty
       ) {
         Text(
           text = "Place",

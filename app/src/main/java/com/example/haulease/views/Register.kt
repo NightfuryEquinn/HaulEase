@@ -60,6 +60,7 @@ fun RegisterScreen(
   val companyEmail = remember { mutableStateOf("") }
   val companyAddress = remember { mutableStateOf("") }
 
+  // Get image selection context
   val imageContext = LocalContext.current
   val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
     image.value = uri

@@ -48,7 +48,6 @@ android {
 }
 
 dependencies {
-
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.lifecycle.runtime.ktx)
   implementation(libs.androidx.activity.compose)
@@ -91,4 +90,12 @@ dependencies {
 
   // Accompanist Remember Permissions
   implementation(libs.accompanist.permissions)
+
+  // For Compose Dialogs
+  implementation(libs.core)
+  implementation(libs.date.time)
+  implementation(libs.list)
+
+  // For View Model
+  implementation(libs.androidx.lifecycle.viewmodel.compose)
 }

@@ -29,7 +29,8 @@ fun SimpleTextField(
   isSensitive: Boolean = false,
   isEnabled: Boolean = false,
   isSingle: Boolean = false,
-  maxLines: Int = 1
+  maxLines: Int = 1,
+  onlyNumber: Boolean = false
 ) {
   // Access keyboard and focus manager
   val keyboardCtrl = LocalSoftwareKeyboardController.current
@@ -55,7 +56,7 @@ fun SimpleTextField(
       maxLines = maxLines,
       textStyle = TextStyle.Default.copy(fontFamily = FontFamily(Font(R.font.libre))),
       keyboardOptions = KeyboardOptions.Default.copy(
-        keyboardType = KeyboardType.Text,
+        keyboardType = if (onlyNumber) KeyboardType.Number else KeyboardType.Text,
         imeAction = ImeAction.Done
       ),
       keyboardActions = KeyboardActions(
