@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.haulease.R
+import com.example.haulease.ui.components.SimpleDataBox
 
 @Composable
 fun AdminDashboardScreen(
@@ -64,7 +66,68 @@ fun AdminDashboardScreen(
         .verticalScroll(rememberScrollState())
         .weight(1f)
     ) {
+      Row(
+        modifier = Modifier
+          .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+      ) {
+        SimpleDataBox(
+          image = painterResource(id = R.drawable.ship),
+          label = "Shipment Received",
+          dataValue = 30,
+          backgroundColor = Color(0xFFE5E5E5)
+        )
 
+        SimpleDataBox(
+          image = painterResource(id = R.drawable.container),
+          label = "Cargo Transported",
+          dataValue = 324,
+        )
+      }
+
+      Spacer(modifier = Modifier.height(10.dp))
+
+      Row(
+        modifier = Modifier
+          .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+      ) {
+        SimpleDataBox(
+          image = painterResource(id = R.drawable.weight),
+          label = "Weight Shipped (kg)",
+          dataValue = 395,
+        )
+
+        SimpleDataBox(
+          image = painterResource(id = R.drawable.assets),
+          label = "Total Income (RM)",
+          dataValue = 13430,
+          backgroundColor = Color(0xFFE5E5E5)
+        )
+      }
+
+      Spacer(modifier = Modifier.height(10.dp))
+
+      Row(
+        modifier = Modifier
+          .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+      ) {
+        SimpleDataBox(
+          image = painterResource(id = R.drawable.active_users),
+          label = "Total Active Users",
+          dataValue = 45,
+          backgroundColor = Color(0xFFE5E5E5)
+        )
+
+        SimpleDataBox(
+          image = painterResource(id = R.drawable.completed),
+          label = "Total Shipment Done",
+          dataValue = 243,
+        )
+      }
+
+      Spacer(modifier = Modifier.padding(bottom = 60.dp))
     }
   }
 }

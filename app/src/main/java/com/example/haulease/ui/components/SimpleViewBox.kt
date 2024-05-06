@@ -27,7 +27,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.haulease.R
+import com.example.haulease.navigations.routes.AdminInnerRoutes
 import com.example.haulease.navigations.routes.UserInnerRoutes
+import com.example.haulease.navigations.routes.UserRoutes
 
 @Composable
 fun SimpleViewBox(
@@ -90,10 +92,16 @@ fun SimpleViewBox(
 
     Button(
       onClick = {
-        if (currentRoute == UserInnerRoutes.ShipmentDetail.routes) {
-          navCtrl.navigate(UserInnerRoutes.CargoDetail.routes)
-        } else {
-          navCtrl.navigate(UserInnerRoutes.ShipmentDetail.routes)
+        when (currentRoute) {
+          UserInnerRoutes.ShipmentDetail.routes -> {
+            navCtrl.navigate(UserInnerRoutes.CargoDetail.routes)
+          }
+          UserRoutes.Shipment.routes -> {
+            navCtrl.navigate(UserInnerRoutes.ShipmentDetail.routes)
+          }
+          else -> {
+            navCtrl.navigate(AdminInnerRoutes.AdminShipmentDetail.routes)
+          }
         }
       },
       colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
