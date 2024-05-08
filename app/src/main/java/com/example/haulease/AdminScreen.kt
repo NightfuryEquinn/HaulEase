@@ -6,9 +6,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.haulease.navigations.AdminBottomNavBar
 import com.example.haulease.navigations.routes.AdminInnerRoutes
 import com.example.haulease.navigations.routes.AdminRoutes
@@ -103,13 +105,54 @@ fun AdminNavHost(navCtrl: NavHostController) {
 
     composable(AdminInnerRoutes.AdminCargoDetail.routes) {
       AdminCargoDetailScreen(
-        navCtrl = navCtrl
+        navCtrl = navCtrl,
+        onBack = {
+          navCtrl.popBackStack()
+        }
       )
     }
 
-    composable(AdminInnerRoutes.AdminEditCargo.routes) {
+    composable(
+      route = "EditCargo?type={type}&weight={weight}&length={length}&width={width}&height={height}",
+      arguments = listOf(
+        navArgument("type") {
+          type = NavType.StringType
+          nullable = true
+        },
+        navArgument("weight") {
+          type = NavType.StringType
+          nullable = true
+        },
+        navArgument("length") {
+          type = NavType.StringType
+          nullable = true
+        },
+        navArgument("width") {
+          type = NavType.StringType
+          nullable = true
+        },
+        navArgument("height") {
+          type = NavType.StringType
+          nullable = true
+        },
+      )
+    ) { backStackEntry ->
+      val cargoType = backStackEntry.arguments?.getString("type")
+      val cargoWeight = backStackEntry.arguments?.getString("weight")
+      val cargoLength = backStackEntry.arguments?.getString("length")
+      val cargoWidth = backStackEntry.arguments?.getString("width")
+      val cargoHeight = backStackEntry.arguments?.getString("height")
+
       AdminEditCargoScreen(
-        navCtrl = navCtrl
+        navCtrl = navCtrl,
+        onBack = {
+          navCtrl.popBackStack()
+        },
+        cargoType = "ASDAS",
+        cargoWeight = cargoWeight!!,
+        cargoLength = cargoLength!!,
+        cargoWidth = cargoWidth!!,
+        cargoHeight = cargoHeight!!,
       )
     }
   }

@@ -16,6 +16,12 @@ object InputValidation {
     return password.length >= 8
   }
 
+  // Function to validate phone number between 10 to 15
+  fun isValidContact(contact: String): Boolean {
+    val digits = contact.filter { it.isDigit() }
+    return digits.length in 10..15
+  }
+
   // Function to validate is integer, double, big decimal or not
   fun isValidInt(theInt: String): Boolean {
     val isInt = theInt.toIntOrNull()

@@ -149,12 +149,17 @@ fun CreateCargoScreen(
         onClick = {
           listOptionState.show()
         },
-        colors = ButtonDefaults.buttonColors(Color(0xFF14213D)),
         modifier = Modifier
-          .fillMaxWidth()
+          .fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(Color(0xFF14213D)),
+        shape = RoundedCornerShape(5.dp),
       ) {
         Text(
-          text = if(displayOption == "") " - Select Cargo Type -" else displayOption,
+          text = when {
+            displayOption.isNotBlank() -> displayOption
+            cargoType.isNotBlank() -> cargoType
+            else -> " - Select Cargo Type - "
+          },
           style = TextStyle(
             color = Color(0xFFE5E5E5),
             fontFamily = FontFamily(Font(R.font.librebold))

@@ -10,7 +10,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import com.example.haulease.map.TrackingMap
 import com.example.haulease.ui.theme.HaulEaseTheme
 import com.example.haulease.viewmodels.LoadingVM
 
@@ -32,7 +31,7 @@ class MainActivity : ComponentActivity() {
 //          if (loadingProgress < 1.0f) {
 //            LoadingScreen(loadingProgress)
 //          } else {
-           TrackingMap()
+           AdminScreen()
 //          }
         }
       }

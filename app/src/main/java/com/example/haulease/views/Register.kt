@@ -53,6 +53,7 @@ fun RegisterScreen(
   val password = remember { mutableStateOf("") }
   val confirmPassword = remember { mutableStateOf("") }
   val email = remember { mutableStateOf("") }
+  val contact = remember { mutableStateOf("")}
   val address = remember { mutableStateOf("") }
   val image = remember { mutableStateOf<Uri?>(null) }
 
@@ -69,11 +70,13 @@ fun RegisterScreen(
   // Validations
   val isEmailValid by remember { mutableStateOf(InputValidation.isValidEmail(email.value))}
   val isPasswordValid by remember { mutableStateOf(InputValidation.isValidPassword(password.value))}
+  val isContactValid by remember { mutableStateOf(InputValidation.isValidContact(contact.value)) }
 
   val allFieldsNotEmpty = username.value.isNotBlank()
       && password.value.isNotBlank()
       && confirmPassword.value.isNotBlank()
       && email.value.isNotBlank()
+      && contact.value.isNotBlank()
       && address.value.isNotBlank()
       && (image.value != null)
 
@@ -192,6 +195,20 @@ fun RegisterScreen(
         modifier = Modifier
           .fillMaxWidth()
           .padding(vertical = 8.dp),
+        inputText = contact,
+        onValueChange = { newValue ->
+          contact.value = newValue
+        },
+        label = "Contact Number",
+        isSingle = true
+      )
+
+      Spacer(modifier = Modifier.height(8.dp))
+
+      SimpleTextField(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(vertical = 8.dp),
         inputText = address,
         onValueChange = { newValue ->
           address.value = newValue
@@ -300,7 +317,7 @@ fun RegisterScreen(
         .padding(horizontal = 80.dp),
       colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
       shape = RoundedCornerShape(5.dp),
-      enabled = isEmailValid && isPasswordValid && allFieldsNotEmpty
+      enabled = isEmailValid && isPasswordValid && isContactValid && allFieldsNotEmpty
     ) {
       Text(
         text = "Register",
