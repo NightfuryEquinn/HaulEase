@@ -1,8 +1,11 @@
 package com.example.haulease.map
 
+import android.annotation.SuppressLint
 import android.location.Address
 import android.location.Geocoder
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +32,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -42,6 +47,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Random
 
+@SuppressLint("MissingPermission")
 @OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun TrackingMap() {
@@ -52,6 +58,7 @@ fun TrackingMap() {
   var actualAddress by remember { mutableStateOf<Address?>(null) }
   val focusManager = LocalFocusManager.current
   val random = Random()
+  val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
 
   fun updateShipmentLocation() {
     val latitude = 2.9975 + random.nextDouble() * (3.2975 - 2.9975)
@@ -107,6 +114,32 @@ fun TrackingMap() {
     }
   }
 
+  fun getCurrentLocation() {
+    fusedLocationClient.lastLocation
+      .addOnSuccessListener { location ->
+        if (location != null) {
+          val latLng = LatLng(location.latitude, location.longitude)
+          addMarkers(latLng)
+          map?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+        } else {
+          Toast.makeText(context, "Unable to fetch current location", Toast.LENGTH_SHORT).show()
+        }
+      }
+      .addOnFailureListener { e ->
+        Toast.makeText(context, "Error getting current location: ${e.message}", Toast.LENGTH_SHORT).show()
+        e.printStackTrace()
+      }
+  }
+
+  val requestPermissionLaunch =
+    rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+      if (isGranted) {
+        getCurrentLocation()
+      } else {
+        Toast.makeText(context, "Location permission denied", Toast.LENGTH_SHORT).show()
+      }
+    }
+
   AndroidView(
     modifier = Modifier.fillMaxSize(),
     factory = { ctx ->
@@ -114,6 +147,7 @@ fun TrackingMap() {
         onCreate(null)
         getMapAsync { googleMap ->
           map = googleMap
+          getCurrentLocation()
           map?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(4.2105, 101.9758), 10f))
         }
       }
@@ -148,13 +182,19 @@ fun TrackingMap() {
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    Button(onClick = { checkLocation() }) {
+    Button(
+      onClick = {
+        checkLocation()
+      }
+    ) {
       Text("Check Location")
     }
   }
 
   // Update every 30 minutes
   LaunchedEffect(true) {
+    requestPermissionLaunch.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+
     while (true) {
       updateShipmentLocation()
       delay(1 * 60 * 1000)

@@ -1,6 +1,11 @@
 package com.example.haulease.views.user.inner
 
-import android.util.Log
+import android.annotation.SuppressLint
+import android.location.Address
+import android.location.Geocoder
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,11 +23,15 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -30,21 +39,52 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.example.haulease.R
 import com.example.haulease.navigations.routes.UserRoutes
 import com.example.haulease.ui.components.SimpleCargoBox
 import com.example.haulease.ui.components.SimpleTextField
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
+@SuppressLint("MissingPermission")
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun CreateShipmentScreen(
   navCtrl: NavHostController,
   onBack: () -> Unit
 ) {
+  // Map variables
+  val context = LocalContext.current
+  val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+
+  var map: GoogleMap? by remember { mutableStateOf(null) }
+  var oriMarker: Marker? by remember { mutableStateOf(null) }
+  var destMarker: Marker? by remember { mutableStateOf(null) }
+
+  var userOrigin = remember { mutableStateOf("") }
+  var userDest = remember { mutableStateOf("") }
+
+  var liveAddress by remember { mutableStateOf("") }
+  var originAddress by remember { mutableStateOf<Address?>(null) }
+  var destAddress by remember { mutableStateOf<Address?>(null) }
+
   // State variables
   val name = remember { mutableStateOf("") }
   val contact = remember { mutableStateOf("") }
-  val origin = remember { mutableStateOf("") }
+  val origin = remember { mutableStateOf(liveAddress) }
   val dest = remember { mutableStateOf("") }
 
   val cargoList: List<Pair<Int, String>> = listOf(
@@ -60,6 +100,124 @@ fun CreateShipmentScreen(
       && (cargoList.size >= 1)
 
   val originOrDest = origin.value.isNotBlank() && dest.value.isNotBlank()
+
+  // Add markers on map
+  fun addMarkers(latLng: LatLng? = null) {
+    // Remove previous markers
+    oriMarker?.remove()
+    destMarker?.remove()
+
+    map?.let {
+      if (originAddress != null) {
+        val theOrigin = LatLng(originAddress!!.latitude, originAddress!!.longitude)
+        oriMarker = it.addMarker(MarkerOptions().position(theOrigin).title("Origin"))
+      }
+
+      if (destAddress != null) {
+        val theDest = LatLng(destAddress!!.latitude, destAddress!!.longitude)
+        destMarker = it.addMarker(MarkerOptions().position(theDest).title("Destination"))
+      }
+
+      // Zoom to live location
+      if (latLng != null) {
+        it.addMarker(MarkerOptions().position(latLng).title("Current"))
+        it.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+      }
+    }
+
+    // Zoom to review two locations, if origin and destination address are present
+    if (originAddress != null && destAddress != null) {
+      val builder = LatLngBounds.Builder()
+      builder.include(LatLng(originAddress!!.latitude, originAddress!!.longitude))
+      builder.include(LatLng(destAddress!!.latitude, destAddress!!.longitude))
+
+      val bounds = builder.build()
+      val padding = 100
+
+      map?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
+    }
+  }
+
+  // Check actual location on map for inputted origin and destination address
+  fun getActualAddresses(parsedOri: String, parsedDest: String) {
+    GlobalScope.launch(Dispatchers.Main) {
+      val geocoder = Geocoder(context)
+      val originRes = parsedOri.let {
+        geocoder.getFromLocationName(it, 1)
+      }
+      val destRes = parsedDest.let {
+        geocoder.getFromLocationName(it, 1)
+      }
+
+      if (!originRes.isNullOrEmpty() && !destRes.isNullOrEmpty()) {
+        val originArr: List<Address> = originRes
+        val destArr: List<Address> = destRes
+
+        userOrigin.value = originArr[0].getAddressLine(0)
+        userDest.value = destArr[0].getAddressLine(0)
+
+        originAddress = originArr[0]
+        destAddress = destArr[0]
+
+        addMarkers()
+      } else {
+        Toast.makeText(context, "Invalid address error", Toast.LENGTH_SHORT).show()
+      }
+    }
+  }
+
+  // Check user input location
+  fun checkLocation() {
+    if (userOrigin.value.isNotBlank() && userDest.value.isNotBlank()) {
+      getActualAddresses(userOrigin.value, userDest.value)
+    } else {
+      Toast.makeText(context, "Please enter address for origin and destination.", Toast.LENGTH_LONG).show()
+    }
+  }
+
+  // Get user live location
+  fun getCurrentLocation() {
+    fusedLocationClient.lastLocation
+      .addOnSuccessListener { location ->
+        if (location != null) {
+          val latLng = LatLng(location.latitude, location.longitude)
+          map?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+
+          // Convert live location to address
+          GlobalScope.launch(Dispatchers.Main) {
+            val geocoder = Geocoder(context)
+            val liveRes = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+
+            if (!liveRes.isNullOrEmpty()) {
+              val liveArr: List<Address> = liveRes
+
+              liveAddress = liveArr[0].getAddressLine(0)
+              originAddress = liveArr[0]
+
+              addMarkers(latLng)
+            } else {
+              Toast.makeText(context, "Failed to fetch live location", Toast.LENGTH_SHORT).show()
+            }
+          }
+        } else {
+          Toast.makeText(context, "Unable to fetch current location", Toast.LENGTH_SHORT).show()
+        }
+      }
+      .addOnFailureListener { e ->
+        Toast.makeText(context, "Error getting current location: ${e.message}", Toast.LENGTH_SHORT).show()
+        e.printStackTrace()
+      }
+  }
+
+  // Request for permission
+  val requestPermissionLaunch =
+    rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+      if (isGranted) {
+        getCurrentLocation()
+      } else {
+        Toast.makeText(context, "Location permission denied", Toast.LENGTH_SHORT).show()
+      }
+    }
 
   Column(
     modifier = Modifier
@@ -128,9 +286,10 @@ fun CreateShipmentScreen(
         modifier = Modifier
           .fillMaxWidth()
           .padding(vertical = 8.dp),
-        inputText = origin,
+        inputText = userOrigin,
         onValueChange = { newValue ->
           origin.value = newValue
+          userOrigin.value = newValue
         },
         label = "Origin Address",
         maxLines = 5
@@ -142,9 +301,10 @@ fun CreateShipmentScreen(
         modifier = Modifier
           .fillMaxWidth()
           .padding(vertical = 8.dp),
-        inputText = dest,
+        inputText = userDest,
         onValueChange = { newValue ->
           dest.value = newValue
+          userDest.value = newValue
         },
         label = "Destination Address",
         maxLines = 5
@@ -154,7 +314,7 @@ fun CreateShipmentScreen(
 
       Button(
         onClick = {
-          Log.d("Create Shipment", "Check origin or destination address")
+          checkLocation()
         },
         modifier = Modifier
           .fillMaxWidth()
@@ -175,7 +335,26 @@ fun CreateShipmentScreen(
 
       Spacer(modifier = Modifier.height(8.dp))
 
-      // TODO MapView
+      AndroidView(
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(400.dp)
+          .clip(shape = RoundedCornerShape(5.dp)),
+        factory = { ctx ->
+          MapView(ctx).apply {
+            onCreate(null)
+            getMapAsync { googleMap ->
+              map = googleMap
+              requestPermissionLaunch.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+          }
+        },
+        update = { mapView ->
+          mapView.getMapAsync { googleMap ->
+            map = googleMap
+          }
+        }
+      )
 
       Spacer(modifier = Modifier.height(25.dp))
 
