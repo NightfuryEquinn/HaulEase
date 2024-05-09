@@ -9,5 +9,7 @@ data class Shipment(
   var origin: String,
   var destination: String,
   var receiverName: String,
-  var receiverContact: String
+  var receiverContact: String,
+  var paymentId: Int,
+  var trackingId: Int
 )

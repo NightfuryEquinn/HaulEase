@@ -1,6 +1,12 @@
 package com.example.haulease.views.admin.inner
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.location.Address
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +29,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -38,19 +46,121 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.example.haulease.R
 import com.example.haulease.ui.components.SimpleViewBox
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.list.ListDialog
 import com.maxkeppeler.sheets.list.models.ListOption
 import com.maxkeppeler.sheets.list.models.ListSelection
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
+@SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminShipmentDetailScreen(
   navCtrl: NavHostController
 ) {
+  // Map variables
+  val context = LocalContext.current
+  val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+
+  var map: GoogleMap? by remember { mutableStateOf(null) }
+  var simMovement = 0.0
+  var shipmentMarker: Marker? by remember { mutableStateOf(null) }
+  var updateTime by remember { mutableStateOf("") }
+
+  val trackingCoordinates by remember { mutableStateOf(LatLng(2.9975, 101.3749)) }
+  val originAddress by remember { mutableStateOf<Address?>(null) }
+  val destAddress by remember { mutableStateOf<Address?>(null) }
+
+  // Add markers on map
+  fun addMarkers(latLng: LatLng) {
+    // Remove shipment marker
+    shipmentMarker?.remove()
+
+    map?.let {
+      if (originAddress != null) {
+        val theOrigin = LatLng(originAddress!!.latitude, originAddress!!.longitude)
+        it.addMarker(MarkerOptions().position(theOrigin).title("Origin"))
+      }
+
+      if (destAddress != null) {
+        val theDest = LatLng(destAddress!!.latitude, destAddress!!.longitude)
+        it.addMarker(MarkerOptions().position(theDest).title("Destination"))
+      }
+
+      shipmentMarker = it.addMarker(MarkerOptions().position(latLng).title("Shipment"))
+    }
+  }
+
+  // Update shipment as simulation within Selangor
+  fun updateShipmentLocation() {
+    val latitude = trackingCoordinates.latitude + simMovement * (3.2975 - 2.9975)
+    val longitude = trackingCoordinates.longitude + simMovement * (101.7349 - 101.3749)
+
+    val newLocation = LatLng(latitude, longitude)
+    addMarkers(newLocation)
+
+    map?.animateCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 12.5f))
+
+    simMovement += 0.025
+
+    updateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+  }
+
+  // Convert address to coordinates and place markers
+  fun convertOriDestToCoordinates(oriAddress: Address, destAddress: Address) {
+    val oriLatLng = LatLng(oriAddress.latitude, oriAddress.longitude)
+    val destLatLng = LatLng(destAddress.latitude, destAddress.longitude)
+
+    addMarkers(oriLatLng)
+    addMarkers(destLatLng)
+  }
+
+  // Get user live location
+  fun getCurrentLocation() {
+    fusedLocationClient.lastLocation
+      .addOnSuccessListener { location ->
+        if (location != null) {
+          val latLng = LatLng(location.latitude, location.longitude)
+          map?.addMarker(MarkerOptions().position(latLng).title("Current"))
+        } else {
+          Toast.makeText(context, "Unable to fetch current location", Toast.LENGTH_SHORT).show()
+        }
+      }
+      .addOnFailureListener { e ->
+        Toast.makeText(context, "Error getting current location: ${e.message}", Toast.LENGTH_SHORT).show()
+        e.printStackTrace()
+      }
+  }
+
+  // Request for permission
+  val requestPermissionLaunch =
+    rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+      if (isGranted) {
+        getCurrentLocation()
+      } else {
+        Toast.makeText(context, "Location permission denied", Toast.LENGTH_SHORT).show()
+      }
+    }
+
   // Option dialog for shipment status
   var displayOption by remember { mutableStateOf("") }
   val listOptionState = rememberUseCaseState(onFinishedRequest = { Log.d("Dialog", "Change Status")})
@@ -235,16 +345,35 @@ fun AdminShipmentDetailScreen(
       Spacer(modifier = Modifier.height(5.dp))
 
       Text(
-        text = "Last updated at 01/01/2024 4:40p.m.",
+        text = "Last updated at $updateTime",
         style = TextStyle(
           fontFamily = FontFamily(Font(R.font.libre)),
           fontSize = 12.sp,
         )
       )
 
-      Spacer(modifier = Modifier.height(25.dp))
+      Spacer(modifier = Modifier.height(10.dp))
 
-      // TODO MapView
+      AndroidView(
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(400.dp)
+          .clip(shape = RoundedCornerShape(5.dp)),
+        factory = { ctx ->
+          MapView(ctx).apply {
+            onCreate(null)
+            getMapAsync { googleMap ->
+              map = googleMap
+              requestPermissionLaunch.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+          }
+        },
+        update = { mapView ->
+          mapView.getMapAsync { googleMap ->
+            map = googleMap
+          }
+        }
+      )
 
       Spacer(modifier = Modifier.height(25.dp))
 
@@ -294,5 +423,25 @@ fun AdminShipmentDetailScreen(
     }
 
     Spacer(modifier = Modifier.padding(bottom = 52.dp))
+  }
+
+  LaunchedEffect(true) {
+    requestPermissionLaunch.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+
+    getCurrentLocation()
+
+    if (originAddress != null && destAddress != null) {
+      convertOriDestToCoordinates(originAddress!!, destAddress!!)
+    }
+
+    flow {
+      while (true) {
+        emit(Unit)
+        delay(1 * 15 * 1000)
+      }
+    }
+      .flowOn(Dispatchers.IO)
+      .onEach { updateShipmentLocation() }
+      .launchIn(this)
   }
 }

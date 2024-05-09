@@ -59,7 +59,6 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
@@ -70,7 +69,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @SuppressLint("MissingPermission")
-@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun ShipmentDetailScreen(
   navCtrl: NavHostController,
@@ -119,7 +117,7 @@ fun ShipmentDetailScreen(
 
     map?.animateCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 12.5f))
 
-    simMovement += 0.25
+    simMovement += 0.025
 
     updateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
   }
@@ -437,10 +435,10 @@ fun ShipmentDetailScreen(
       convertOriDestToCoordinates(originAddress!!, destAddress!!)
     }
 
-    flow<Unit> {
+    flow {
       while (true) {
         emit(Unit)
-        delay(1 * 25 * 1000)
+        delay(1 * 15 * 1000)
       }
     }
       .flowOn(Dispatchers.IO)

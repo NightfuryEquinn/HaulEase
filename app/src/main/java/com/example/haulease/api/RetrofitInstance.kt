@@ -12,7 +12,19 @@ object RetrofitInstance {
       .build()
   }
 
-  val api: HaulEaseApi by lazy {
-    retrofit.create(HaulEaseApi::class.java)
+  val getApi: Get by lazy {
+    retrofit.create(Get::class.java)
+  }
+
+  val postApi: Post by lazy {
+    retrofit.create(Post::class.java)
+  }
+
+  val putApi: Put by lazy {
+    retrofit.create(Put::class.java)
+  }
+
+  val deleteApi: Delete by lazy {
+    retrofit.create(Delete::class.java)
   }
 }

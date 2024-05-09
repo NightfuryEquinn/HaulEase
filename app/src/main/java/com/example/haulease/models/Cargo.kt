@@ -11,5 +11,8 @@ data class Cargo(
   var width: Double,
   var height: Double,
   var image: String,
-  var description: String
+  var description: String,
+  var consignorId: Int,
+  var shipmentId: Int,
+  var cargoId: Int
 )

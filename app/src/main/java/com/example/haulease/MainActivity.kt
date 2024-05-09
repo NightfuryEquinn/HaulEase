@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.example.haulease.ui.theme.HaulEaseTheme
 import com.example.haulease.viewmodels.LoadingVM
+import com.example.haulease.views.LoadingScreen
 
 class MainActivity : ComponentActivity() {
   // Get loading view model
@@ -28,11 +29,11 @@ class MainActivity : ComponentActivity() {
           // Observe the loading progress
           val loadingProgress by loadingVM.loadingProgress.collectAsState()
 
-//          if (loadingProgress < 1.0f) {
-//            LoadingScreen(loadingProgress)
-//          } else {
-           UserScreen()
-//          }
+          if (loadingProgress < 1.0f) {
+            LoadingScreen(loadingProgress)
+          } else {
+           MainScreen()
+          }
         }
       }
     }
