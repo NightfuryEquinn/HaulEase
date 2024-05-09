@@ -74,8 +74,8 @@ fun CreateShipmentScreen(
   var oriMarker: Marker? by remember { mutableStateOf(null) }
   var destMarker: Marker? by remember { mutableStateOf(null) }
 
-  var userOrigin = remember { mutableStateOf("") }
-  var userDest = remember { mutableStateOf("") }
+  val userOrigin = remember { mutableStateOf("") }
+  val userDest = remember { mutableStateOf("") }
 
   var liveAddress by remember { mutableStateOf("") }
   var originAddress by remember { mutableStateOf<Address?>(null) }
@@ -192,6 +192,7 @@ fun CreateShipmentScreen(
               val liveArr: List<Address> = liveRes
 
               liveAddress = liveArr[0].getAddressLine(0)
+              userOrigin.value = liveAddress
               originAddress = liveArr[0]
 
               addMarkers(latLng)
