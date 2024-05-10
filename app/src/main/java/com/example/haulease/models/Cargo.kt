@@ -14,5 +14,5 @@ data class Cargo(
   var description: String,
   var consignorId: Int,
   var shipmentId: Int,
-  var cargoId: Int
+  var truckId: Int?
 )

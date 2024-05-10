@@ -11,8 +11,8 @@ data class Consignor(
   var email: String,
   var password: String,
   var address: String,
-  var company: String,
-  var companyEmail: String,
-  var companyAddress: String,
+  var company: String?,
+  var companyEmail: String?,
+  var companyAddress: String?,
   var role: String
 )

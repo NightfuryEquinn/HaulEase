@@ -1,7 +1,6 @@
 package com.example.haulease.views
 
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -17,11 +16,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,19 +37,24 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.haulease.R
 import com.example.haulease.navigations.routes.SharedRoutes
 import com.example.haulease.ui.components.SimpleTextField
-import com.example.haulease.validations.InputValidation
+import com.example.haulease.viewmodels.RegisterState
+import com.example.haulease.viewmodels.RegisterVM
 
 @Composable
 fun RegisterScreen(
   navCtrl: NavHostController,
-  onBack: () -> Unit
+  onBack: () -> Unit,
+  registerVM: RegisterVM = viewModel()
 ) {
+  val context = LocalContext.current
+
   // State variables
   val username = remember { mutableStateOf("") }
   val password = remember { mutableStateOf("") }
@@ -55,22 +62,20 @@ fun RegisterScreen(
   val email = remember { mutableStateOf("") }
   val contact = remember { mutableStateOf("")}
   val address = remember { mutableStateOf("") }
-  val image = remember { mutableStateOf<Uri?>(null) }
+  var image by remember { mutableStateOf<Uri?>(null) }
 
-  val companyName = remember { mutableStateOf("") }
+  val company = remember { mutableStateOf("") }
   val companyEmail = remember { mutableStateOf("") }
   val companyAddress = remember { mutableStateOf("") }
 
   // Get image selection context
   val imageContext = LocalContext.current
   val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-    image.value = uri
+    image = uri
   }
 
   // Validations
-  val isEmailValid by remember { mutableStateOf(InputValidation.isValidEmail(email.value))}
-  val isPasswordValid by remember { mutableStateOf(InputValidation.isValidPassword(password.value))}
-  val isContactValid by remember { mutableStateOf(InputValidation.isValidContact(contact.value)) }
+  val isPasswordMatches = password.value == confirmPassword.value
 
   val allFieldsNotEmpty = username.value.isNotBlank()
       && password.value.isNotBlank()
@@ -78,7 +83,10 @@ fun RegisterScreen(
       && email.value.isNotBlank()
       && contact.value.isNotBlank()
       && address.value.isNotBlank()
-      && (image.value != null)
+      && (image != null)
+
+  // Observer
+  val registerState by registerVM.registerState.collectAsState()
 
   Column(
     modifier = Modifier
@@ -158,7 +166,8 @@ fun RegisterScreen(
           password.value = newValue
         },
         label = "Password",
-        isSingle = true
+        isSingle = true,
+        isSensitive = true
       )
 
       Spacer(modifier = Modifier.height(8.dp))
@@ -172,7 +181,8 @@ fun RegisterScreen(
           confirmPassword.value = newValue
         },
         label = "Confirm Password",
-        isSingle = true
+        isSingle = true,
+        isSensitive = true
       )
 
       Spacer(modifier = Modifier.height(8.dp))
@@ -200,7 +210,8 @@ fun RegisterScreen(
           contact.value = newValue
         },
         label = "Contact Number",
-        isSingle = true
+        isSingle = true,
+        onlyNumber = true
       )
 
       Spacer(modifier = Modifier.height(8.dp))
@@ -221,11 +232,11 @@ fun RegisterScreen(
 
       Image(
         painter =
-        if (image.value != null) {
+        if (image != null) {
           rememberAsyncImagePainter(
             model = ImageRequest.Builder(imageContext)
               .crossfade(false)
-              .data(image.value)
+              .data(image)
               .build(),
             filterQuality = FilterQuality.High
           )
@@ -258,9 +269,9 @@ fun RegisterScreen(
         modifier = Modifier
           .fillMaxWidth()
           .padding(vertical = 8.dp),
-        inputText = companyName,
+        inputText = company,
         onValueChange = { newValue ->
-          companyName.value = newValue
+          company.value = newValue
         },
         label = "Company Name (optional)",
         isSingle = true
@@ -307,25 +318,52 @@ fun RegisterScreen(
 
     Spacer(modifier = Modifier.height(8.dp))
 
-    Button(
-      onClick = {
-        Log.d("Register", "Register Button")
-      },
-      modifier = Modifier
-        .fillMaxWidth()
-        .align(Alignment.CenterHorizontally)
-        .padding(horizontal = 80.dp),
-      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
-      shape = RoundedCornerShape(5.dp),
-      enabled = isEmailValid && isPasswordValid && isContactValid && allFieldsNotEmpty
-    ) {
-      Text(
-        text = "Register",
-        style = TextStyle(
-          fontFamily = FontFamily(Font(R.font.squada)),
-          fontSize = 24.sp,
+    when (registerState) {
+      is RegisterState.SUCCESS -> {
+        navCtrl.navigate(SharedRoutes.Login.routes) {
+          launchSingleTop = true
+        }
+      }
+      is RegisterState.LOADING -> {
+        LinearProgressIndicator(
+          modifier = Modifier
+            .align(Alignment.CenterHorizontally)
         )
-      )
+      }
+      is RegisterState.INITIAL -> {
+        Button(
+          onClick = {
+            registerVM.registerConsignor(
+              username = username.value,
+              password = password.value,
+              email = email.value,
+              contact = contact.value,
+              address = address.value,
+              avatar = image!!,
+              company = company.value,
+              companyEmail = companyEmail.value,
+              companyAddress = companyAddress.value,
+              context = context
+            )
+          },
+          modifier = Modifier
+            .fillMaxWidth()
+            .align(Alignment.CenterHorizontally)
+            .padding(horizontal = 80.dp),
+          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
+          shape = RoundedCornerShape(5.dp),
+          enabled = allFieldsNotEmpty && isPasswordMatches
+        ) {
+          Text(
+            text = "Register",
+            style = TextStyle(
+              fontFamily = FontFamily(Font(R.font.squada)),
+              fontSize = 24.sp,
+            )
+          )
+        }
+      }
+      else -> {}
     }
   }
 }

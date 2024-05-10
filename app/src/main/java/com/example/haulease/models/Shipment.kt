@@ -10,6 +10,6 @@ data class Shipment(
   var destination: String,
   var receiverName: String,
   var receiverContact: String,
-  var paymentId: Int,
-  var trackingId: Int
+  var paymentId: Int?,
+  var trackingId: Int?
 )

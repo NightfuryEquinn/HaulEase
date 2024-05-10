@@ -27,14 +27,17 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.haulease.R
 import com.example.haulease.navigations.routes.SharedRoutes
 import com.example.haulease.ui.components.SimpleTextField
+import com.example.haulease.viewmodels.LoginVM
 
 @Composable
 fun LoginScreen(
-  navCtrl: NavHostController
+  navCtrl: NavHostController,
+  loginVM: LoginVM = viewModel()
 ) {
   // State variables
   val username = remember { mutableStateOf("") }
