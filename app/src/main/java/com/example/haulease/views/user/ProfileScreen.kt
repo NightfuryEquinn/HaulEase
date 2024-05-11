@@ -1,6 +1,5 @@
 package com.example.haulease.views.user
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -31,14 +29,21 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.haulease.R
+import com.example.haulease.models.Consignor
+import com.example.haulease.navigations.routes.SharedRoutes
 import com.example.haulease.ui.components.SimpleLabelDesc
+import com.example.haulease.viewmodels.user.ProfileVM
 
 @Composable
 fun ProfileScreen(
-  navCtrl: NavHostController
+  navCtrl: NavHostController,
+  profileVM: ProfileVM = viewModel()
 ) {
+  val theUserProfile: Consignor? = profileVM.getConsignorProfile()
+
   Column(
     modifier = Modifier
       .fillMaxWidth()
@@ -86,82 +91,61 @@ fun ProfileScreen(
 
       Spacer(modifier = Modifier.height(20.dp))
 
-      SimpleLabelDesc(
-        label = "Username",
-        desc = "John Doe"
-      )
+      if (theUserProfile != null) {
+        SimpleLabelDesc(
+          label = "Username",
+          desc = theUserProfile.username
+        )
 
-      SimpleLabelDesc(
-        label = "Email",
-        desc = "john.doe.2024@gmail.com"
-      )
+        SimpleLabelDesc(
+          label = "Email",
+          desc = theUserProfile.email
+        )
 
-      SimpleLabelDesc(
-        label = "Residential Address",
-        desc = "C-27-07, Parkhill Residence, MRANTI Park, Bukit Jalil, 57000 Kuala Lumpur, Kuala Lumpur"
-      )
+        SimpleLabelDesc(
+          label = "Residential Address",
+          desc = theUserProfile.address
+        )
 
-      SimpleLabelDesc(
-        label = "Company Name",
-        desc = "none"
-      )
+        SimpleLabelDesc(
+          label = "Company Name",
+          desc = theUserProfile.company ?: "none"
+        )
 
-      SimpleLabelDesc(
-        label = "Company Email",
-        desc = "none"
-      )
+        SimpleLabelDesc(
+          label = "Company Email",
+          desc = theUserProfile.companyEmail ?: "none"
+        )
 
-      SimpleLabelDesc(
-        label = "Company Address",
-        desc = "none"
-      )
-
-      Row(
-        modifier = Modifier
-          .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-      ) {
-        Button(
-          onClick = {
-            Log.d("Profile", "Edit Profile")
-          },
-          modifier = Modifier
-            .weight(0.5f),
-          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
-          shape = RoundedCornerShape(5.dp),
-        ) {
-          Text(
-            text = "Edit Profile",
-            style = TextStyle(
-              fontFamily = FontFamily(Font(R.font.squada)),
-              fontSize = 24.sp,
-            )
-          )
-        }
-
-        Spacer(modifier = Modifier.width(20.dp))
-
-        Button(
-          onClick = {
-            Log.d("Profile", "Log Out")
-          },
-          modifier = Modifier
-            .weight(0.5f),
-          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
-          shape = RoundedCornerShape(5.dp),
-        ) {
-          Text(
-            text = "Log Out",
-            style = TextStyle(
-              fontFamily = FontFamily(Font(R.font.squada)),
-              fontSize = 24.sp,
-              color = Color(0xFFE5E5E5)
-            )
-          )
-        }
+        SimpleLabelDesc(
+          label = "Company Address",
+          desc = theUserProfile.companyAddress ?: "none"
+        )
       }
 
-      Spacer(modifier = Modifier.padding(bottom = 52.dp))
+      Button(
+        onClick = {
+          profileVM.logoutConsignor()
+          navCtrl.navigate(SharedRoutes.Login.routes) {
+            launchSingleTop = true
+          }
+        },
+        modifier = Modifier
+          .fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
+        shape = RoundedCornerShape(5.dp),
+      ) {
+        Text(
+          text = "Log Out",
+          style = TextStyle(
+            fontFamily = FontFamily(Font(R.font.squada)),
+            fontSize = 24.sp,
+            color = Color(0xFFE5E5E5)
+          )
+        )
+      }
     }
+
+    Spacer(modifier = Modifier.padding(bottom = 52.dp))
   }
 }

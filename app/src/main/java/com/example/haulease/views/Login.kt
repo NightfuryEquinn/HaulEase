@@ -1,6 +1,5 @@
 package com.example.haulease.views
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -13,13 +12,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -30,8 +33,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.haulease.R
+import com.example.haulease.navigations.routes.AdminRoutes
 import com.example.haulease.navigations.routes.SharedRoutes
+import com.example.haulease.navigations.routes.UserRoutes
 import com.example.haulease.ui.components.SimpleTextField
+import com.example.haulease.viewmodels.LoginState
 import com.example.haulease.viewmodels.LoginVM
 
 @Composable
@@ -39,12 +45,17 @@ fun LoginScreen(
   navCtrl: NavHostController,
   loginVM: LoginVM = viewModel()
 ) {
+  val context = LocalContext.current
+
   // State variables
-  val username = remember { mutableStateOf("") }
+  val email = remember { mutableStateOf("") }
   val password = remember { mutableStateOf("") }
 
   // Validations
-  val allFieldsNotEmpty = username.value.isNotBlank() && password.value.isNotBlank()
+  val allFieldsNotEmpty = email.value.isNotBlank() && password.value.isNotBlank()
+
+  // Observer
+  val loginState by loginVM.loginState.collectAsState()
 
   Column(
     modifier = Modifier
@@ -98,11 +109,11 @@ fun LoginScreen(
       modifier = Modifier
         .fillMaxWidth()
         .padding(vertical = 8.dp),
-      inputText = username,
+      inputText = email,
       onValueChange = { newValue ->
-        username.value = newValue
+        email.value = newValue
       },
-      label = "Username",
+      label = "Email",
       isSingle = true
     )
 
@@ -133,25 +144,49 @@ fun LoginScreen(
 
     Spacer(modifier = Modifier.height(8.dp))
 
-    Button(
-      onClick = {
-        Log.d("Login", "Login Button")
-      },
-      modifier = Modifier
-        .fillMaxWidth()
-        .align(Alignment.CenterHorizontally)
-        .padding(horizontal = 80.dp),
-      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
-      shape = RoundedCornerShape(5.dp),
-      enabled = allFieldsNotEmpty
-    ) {
-      Text(
-        text = "Login",
-        style = TextStyle(
-          fontFamily = FontFamily(Font(R.font.squada)),
-          fontSize = 24.sp,
+    when (loginState) {
+      is LoginState.SUCCESS -> {
+        navCtrl.navigate(UserRoutes.Dashboard.routes) {
+          launchSingleTop = true
+        }
+      }
+      is LoginState.SUCCESSADMIN -> {
+        navCtrl.navigate(AdminRoutes.AdminDashboard.routes) {
+          launchSingleTop = true
+        }
+      }
+      is LoginState.LOADING -> {
+        LinearProgressIndicator(
+          modifier = Modifier
+            .align(Alignment.CenterHorizontally)
         )
-      )
+      }
+      is LoginState.INITIAL -> {
+        Button(
+          onClick = {
+            loginVM.loginConsignor(
+              email.value,
+              password.value,
+              context
+            )
+          },
+          modifier = Modifier
+            .fillMaxWidth()
+            .align(Alignment.CenterHorizontally)
+            .padding(horizontal = 80.dp),
+          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
+          shape = RoundedCornerShape(5.dp),
+          enabled = allFieldsNotEmpty
+        ) {
+          Text(
+            text = "Login",
+            style = TextStyle(
+              fontFamily = FontFamily(Font(R.font.squada)),
+              fontSize = 24.sp,
+            )
+          )
+        }
+      }
     }
 
     Spacer(modifier = Modifier.height(16.dp))

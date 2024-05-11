@@ -23,7 +23,6 @@ sealed class RegisterState {
 }
 
 class RegisterVM: ViewModel() {
-  private val fireAuth = FirebaseAuth.getInstance()
   private val repository: Repository = Repository()
 
   private var avatarUrl: String = ""
@@ -86,7 +85,6 @@ class RegisterVM: ViewModel() {
           }
 
           else -> {
-            // Firebase authentication with email and password
             FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password).await()
 
             if (avatar != null) {
@@ -106,7 +104,7 @@ class RegisterVM: ViewModel() {
                 role = "User"
               )
 
-              // TODO repository.postConsignor(newConsignor)
+              repository.postConsignor(newConsignor)
               Toast.makeText(context, "Account is created. Please login.", Toast.LENGTH_LONG).show()
               _registerState.value = RegisterState.SUCCESS
             } else {

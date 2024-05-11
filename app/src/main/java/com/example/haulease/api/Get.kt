@@ -22,6 +22,17 @@ interface Get {
   @GET("consignor")
   suspend fun getConsignors(): Response<List<Consignor>>
 
+  @GET("consignor/email/{email}/password/{password}")
+  suspend fun checkConsignor(
+    @Path("email") email: String,
+    @Path("password") password: String
+  ): Response<Consignor>
+
+  @GET("consignor/email/{email}")
+  suspend fun checkConsignorEmail(
+    @Path("email") email: String
+  ): Response<Consignor>
+
   @GET("consignor/{consignorId}")
   suspend fun getConsignor(
     @Path("consignorId") consignorId: Int

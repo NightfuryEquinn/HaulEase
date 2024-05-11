@@ -39,6 +39,14 @@ class Repository {
     return RetrofitInstance.getApi.getConsignors()
   }
 
+  suspend fun checkConsignor(email: String, password: String): Response<Consignor> {
+    return RetrofitInstance.getApi.checkConsignor(email, password)
+  }
+
+  suspend fun checkConsignorEmail(email: String): Response<Consignor> {
+    return RetrofitInstance.getApi.checkConsignorEmail(email)
+  }
+
   suspend fun getConsignor(id: Int): Response<Consignor> {
     return RetrofitInstance.getApi.getConsignor(id)
   }

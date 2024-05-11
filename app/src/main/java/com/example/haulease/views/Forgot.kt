@@ -1,6 +1,5 @@
 package com.example.haulease.views
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -13,14 +12,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -28,16 +30,22 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.haulease.R
 import com.example.haulease.navigations.routes.SharedRoutes
 import com.example.haulease.ui.components.SimpleTextField
+import com.example.haulease.viewmodels.ForgotState
+import com.example.haulease.viewmodels.ForgotVM
 
 @Composable
 fun ForgotScreen(
   navCtrl: NavHostController,
-  onBack: () -> Unit
+  onBack: () -> Unit,
+  forgotVM: ForgotVM = viewModel()
 ) {
+  val context = LocalContext.current
+
   // State variables
   val email = remember { mutableStateOf("") }
   val newPassword = remember { mutableStateOf("") }
@@ -47,6 +55,9 @@ fun ForgotScreen(
   val passwordsMatch = newPassword == confirmNewPassword
   val allFieldsNotEmpty = email.value.isNotBlank() && newPassword.value.isNotBlank() && confirmNewPassword.value.isNotBlank()
   val isPasswordValid by remember { mutableStateOf(false) }
+
+  // Observer
+  val forgotState by forgotVM.forgotState.collectAsState()
 
   Column(
     modifier = Modifier
@@ -138,25 +149,45 @@ fun ForgotScreen(
 
     Spacer(modifier = Modifier.height(32.dp))
 
-    Button(
-      onClick = {
-        Log.d("Reset", "Reset Button")
-      },
-      modifier = Modifier
-        .fillMaxWidth()
-        .align(Alignment.CenterHorizontally)
-        .padding(horizontal = 80.dp),
-      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
-      shape = RoundedCornerShape(5.dp),
-      enabled = passwordsMatch && allFieldsNotEmpty && isPasswordValid,
-    ) {
-      Text(
-        text = "Reset",
-        style = TextStyle(
-          fontFamily = FontFamily(Font(R.font.squada)),
-          fontSize = 24.sp,
+    when (forgotState) {
+      is ForgotState.SUCCESS -> {
+        navCtrl.navigate(SharedRoutes.Login.routes) {
+          launchSingleTop = true
+        }
+      }
+      is ForgotState.LOADING -> {
+        LinearProgressIndicator(
+          modifier = Modifier
+            .align(Alignment.CenterHorizontally)
         )
-      )
+      }
+      is ForgotState.INITIAL -> {
+        Button(
+          onClick = {
+            forgotVM.resetConsignor(
+              email.value,
+              newPassword.value,
+              confirmNewPassword.value,
+              context
+            )
+          },
+          modifier = Modifier
+            .fillMaxWidth()
+            .align(Alignment.CenterHorizontally)
+            .padding(horizontal = 80.dp),
+          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
+          shape = RoundedCornerShape(5.dp),
+          enabled = passwordsMatch && allFieldsNotEmpty && isPasswordValid,
+        ) {
+          Text(
+            text = "Reset",
+            style = TextStyle(
+              fontFamily = FontFamily(Font(R.font.squada)),
+              fontSize = 24.sp,
+            )
+          )
+        }
+      }
     }
 
     Spacer(modifier = Modifier.height(16.dp))

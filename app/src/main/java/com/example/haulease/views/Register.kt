@@ -34,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -306,7 +307,19 @@ fun RegisterScreen(
       )
     }
 
-    Spacer(modifier = Modifier.height(32.dp))
+    Spacer(modifier = Modifier.height(24.dp))
+
+    Text(
+      text = "NOTE: Ensure that your details are correct as you will not be able to change them later.",
+      style = TextStyle(
+        fontFamily = FontFamily(Font(R.font.librebold)),
+        fontSize = 12.sp,
+        textDecoration = TextDecoration.Underline,
+        textAlign = TextAlign.Justify
+      )
+    )
+
+    Spacer(modifier = Modifier.height(16.dp))
 
     Image(
       painter = painterResource(id = R.drawable.cargo),
