@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.haulease.R
+import com.example.haulease.models.Shipment
 import com.example.haulease.navigations.TabBar
 import com.example.haulease.ui.components.SimpleTabCol
 
@@ -44,11 +45,7 @@ import com.example.haulease.ui.components.SimpleTabCol
 fun AdminShipmentScreen(
   navCtrl: NavHostController
 ) {
-  val data = listOf(
-    Triple(R.drawable.image, "100001", "En-route to Harbor"),
-    Triple(R.drawable.image, "100002", "En-route to Harbor"),
-    Triple(R.drawable.image, "100003", "En-route to Harbor")
-  )
+  val data: List<Shipment> = emptyList()
 
   var selectedTabIndex by remember { mutableIntStateOf(0) }
   val pagerState = rememberPagerState {

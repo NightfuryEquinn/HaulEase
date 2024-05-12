@@ -93,6 +93,10 @@ class Repository {
     return RetrofitInstance.getApi.getShipments()
   }
 
+  suspend fun getShipmentByConsignor(id: Int): Response<List<Shipment>> {
+    return RetrofitInstance.getApi.getShipmentsByConsignor(id)
+  }
+
   suspend fun getShipment(id: Int): Response<Shipment> {
     return RetrofitInstance.getApi.getShipment(id)
   }

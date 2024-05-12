@@ -14,12 +14,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -30,14 +36,25 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.haulease.R
+import com.example.haulease.models.Shipment
+import com.example.haulease.ui.components.SimpleEmptyBox
 import com.example.haulease.ui.components.SimpleViewBox
+import com.example.haulease.viewmodels.user.HistoryState
 import com.example.haulease.viewmodels.user.HistoryVM
+import kotlinx.coroutines.launch
 
 @Composable
 fun HistoryScreen(
   navCtrl: NavHostController,
   historyVM: HistoryVM = viewModel()
 ) {
+  val context = LocalContext.current
+  val cScope = rememberCoroutineScope()
+  var shipmentsHistory: List<Shipment> = emptyList()
+
+  // Observer
+  val historyState by historyVM.historyState.collectAsState()
+
   Column(
     modifier = Modifier
       .fillMaxWidth()
@@ -73,35 +90,58 @@ fun HistoryScreen(
         .verticalScroll(rememberScrollState())
         .weight(1f)
     ) {
-      SimpleViewBox(
-        navCtrl = navCtrl,
-        modifier = Modifier
-          .clip(shape = RoundedCornerShape(5.dp))
-          .fillMaxSize()
-          .background(Color(0xFFE5E5E5)),
-        rowModifier = Modifier
-          .fillMaxSize(),
-        image = painterResource(id = R.drawable.image),
-        id = "100001",
-        status = "Completed at 01-01-2024"
-      )
+      when (historyState) {
+        is HistoryState.SUCCESS -> {
+          shipmentsHistory.forEach { shipment ->
+            SimpleViewBox(
+              navCtrl = navCtrl,
+              modifier = Modifier
+                .clip(shape = RoundedCornerShape(5.dp))
+                .fillMaxSize()
+                .background(Color(0xFFE5E5E5)),
+              rowModifier = Modifier
+                .fillMaxSize(),
+              image = painterResource(id = R.drawable.shipment_placeholder),
+              id = shipment.id.toString(),
+              status = shipment.status
+            )
 
-      Spacer(modifier = Modifier.height(20.dp))
-
-      SimpleViewBox(
-        navCtrl = navCtrl,
-        modifier = Modifier
-          .clip(shape = RoundedCornerShape(5.dp))
-          .fillMaxSize()
-          .background(Color(0xFFE5E5E5)),
-        rowModifier = Modifier
-          .fillMaxSize(),
-        image = painterResource(id = R.drawable.image),
-        id = "100001",
-        status = "Completed at 01-01-2024"
-      )
+            Spacer(modifier = Modifier.height(20.dp))
+          }
+        }
+        is HistoryState.LOADING -> {
+          LinearProgressIndicator(
+            modifier = Modifier
+              .align(Alignment.CenterHorizontally)
+          )
+        }
+        is HistoryState.INITIAL -> {
+          SimpleEmptyBox(
+            modifier = Modifier
+              .clip(shape = RoundedCornerShape(5.dp))
+              .height(150.dp)
+              .fillMaxSize()
+              .background(Color(0xFFE5E5E5)),
+            colModifier = Modifier
+              .fillMaxSize(),
+            image = painterResource(id = R.drawable.close),
+            name = "Unable to Load Information"
+          )
+        }
+      }
 
       Spacer(modifier = Modifier.padding(bottom = 60.dp))
+    }
+  }
+
+  DisposableEffect(Unit) {
+    val job = cScope.launch {
+      shipmentsHistory = historyVM.loadShipmentsHistory(context)
+    }
+
+    onDispose {
+      job.cancel()
+      historyVM.clearShipmentsHistory()
     }
   }
 }

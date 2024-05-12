@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
           if (loadingProgress < 1.0f) {
             LoadingScreen(loadingProgress)
           } else {
-            MainScreen()
+            UserScreen()
           }
         }
       }

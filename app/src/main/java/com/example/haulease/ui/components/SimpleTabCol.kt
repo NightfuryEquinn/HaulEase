@@ -17,11 +17,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.haulease.R
+import com.example.haulease.models.Shipment
 
 @Composable
 fun SimpleTabCol(
   navCtrl: NavHostController,
-  data: List<Triple<Int, String, String>>
+  datas: List<Shipment>
 ) {
   Column(
     modifier = Modifier
@@ -29,7 +31,7 @@ fun SimpleTabCol(
       .padding(vertical = 8.dp)
       .verticalScroll(rememberScrollState()),
   ) {
-    data.forEachIndexed { _, (imageId, id, status) ->
+    datas.forEach { data ->
       SimpleViewBox(
         navCtrl = navCtrl,
         modifier = Modifier
@@ -38,9 +40,9 @@ fun SimpleTabCol(
           .background(Color(0xFFE5E5E5)),
         rowModifier = Modifier
           .fillMaxSize(),
-        image = painterResource(id = imageId),
-        id = id,
-        status = status
+        image = painterResource(id = R.drawable.shipment_placeholder),
+        id = data.id.toString(),
+        status = data.status
       )
 
       Spacer(modifier = Modifier.height(10.dp))

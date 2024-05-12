@@ -50,6 +50,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.example.haulease.R
 import com.example.haulease.ui.components.SimpleViewBox
+import com.example.haulease.validations.CargoStatus
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -60,7 +61,6 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.list.ListDialog
-import com.maxkeppeler.sheets.list.models.ListOption
 import com.maxkeppeler.sheets.list.models.ListSelection
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -166,15 +166,15 @@ fun AdminShipmentDetailScreen(
   val listOptionState = rememberUseCaseState(onFinishedRequest = { Log.d("Dialog", "Change Status")})
 
   val options = listOf(
-    ListOption(titleText = "Driver on the way for cargo pickup"),
-    ListOption(titleText = "Driver on the way to harbour"),
-    ListOption(titleText = "Cargo arrived at harbour"),
-    ListOption(titleText = "Cargo under inspection and measuring"),
-    ListOption(titleText = "Cargo loaded onto deck"),
-    ListOption(titleText = "Cargo has departed from harbour"),
-    ListOption(titleText = "Cargo has arrived at harbour near destination"),
-    ListOption(titleText = "Cargo is on the way to destination"),
-    ListOption(titleText = "Cargo has arrived"),
+    CargoStatus.status1,
+    CargoStatus.status2,
+    CargoStatus.status3,
+    CargoStatus.status4,
+    CargoStatus.status5,
+    CargoStatus.status6,
+    CargoStatus.status7,
+    CargoStatus.status8,
+    CargoStatus.status9
   )
 
   ListDialog(

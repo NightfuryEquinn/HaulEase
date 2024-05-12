@@ -49,6 +49,11 @@ interface Get {
   @GET("shipment")
   suspend fun getShipments(): Response<List<Shipment>>
 
+  @GET("shipment/consignor/{consignorId}")
+  suspend fun getShipmentsByConsignor(
+    @Path("consignorId") consignorId: Int
+  ): Response<List<Shipment>>
+
   @GET("shipment/{shipmentId}")
   suspend fun getShipment(
     @Path("shipmentId") shipmentId: Int
