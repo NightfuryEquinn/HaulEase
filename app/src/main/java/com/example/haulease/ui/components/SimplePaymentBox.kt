@@ -35,7 +35,8 @@ fun SimplePaymentBox(
   harborUnloadingFees: Double? = null,
   destTruckLoadingFees: Double? = null,
   destTruckTravelFees: Double? = null,
-  onPayClick: () -> Unit
+  onPayClick: () -> Unit,
+  isPaid: Boolean
 ) {
   var totalPayable: Double = 0.0
 
@@ -285,22 +286,24 @@ fun SimplePaymentBox(
 
   Spacer(modifier = Modifier.height(5.dp))
 
-  Button(
-    onClick = {
-      onPayClick()
-    },
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(start = 160.dp),
-    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
-    shape = RoundedCornerShape(5.dp)
-  ) {
-    Text(
-      text = "Pay",
-      style = TextStyle(
-        fontFamily = FontFamily(Font(R.font.squada)),
-        fontSize = 24.sp,
+  if (!isPaid) {
+    Button(
+      onClick = {
+        onPayClick()
+      },
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(start = 160.dp),
+      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
+      shape = RoundedCornerShape(5.dp)
+    ) {
+      Text(
+        text = "Pay",
+        style = TextStyle(
+          fontFamily = FontFamily(Font(R.font.squada)),
+          fontSize = 24.sp,
+        )
       )
-    )
+    }
   }
 }

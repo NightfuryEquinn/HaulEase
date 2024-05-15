@@ -13,7 +13,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.haulease.navigations.BottomNavBar
-import com.example.haulease.navigations.routes.UserInnerRoutes
 import com.example.haulease.navigations.routes.UserRoutes
 import com.example.haulease.views.user.DashboardScreen
 import com.example.haulease.views.user.HistoryScreen
@@ -122,41 +121,75 @@ fun UserNavHost(navCtrl: NavHostController) {
       )
     }
 
-    composable(UserInnerRoutes.CargoDetail.routes) {
-      CargoDetailScreen(
-        navCtrl = navCtrl,
-        onBack = {
-          navCtrl.popBackStack()
-        }
-      )
-    }
-
-    composable(UserInnerRoutes.CreateShipment.routes) {
-      CreateShipmentScreen(
-        navCtrl = navCtrl,
-        onBack = {
-          navCtrl.popBackStack()
-        }
-      )
-    }
-
     composable(
-      route = "CreateCargo?cargoId={cargoId}",
+      route = "CargoDetail?cargoId={cargoId}&shipmentId={shipmentId}",
       arguments = listOf(
         navArgument("cargoId") {
+          type = NavType.StringType
+          nullable = true
+        },
+        navArgument("shipmentId") {
           type = NavType.StringType
           nullable = true
         }
       )
     ) { backStackEntry ->
       val cargoId = backStackEntry.arguments?.getString("cargoId")
+      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
+
+      CargoDetailScreen(
+        navCtrl = navCtrl,
+        onBack = {
+          navCtrl.popBackStack()
+        },
+        cargoId = cargoId!!.toInt(),
+        shipmentId = shipmentId!!.toInt()
+      )
+    }
+
+    composable(
+      route = "CreateShipment?shipmentId={shipmentId}",
+      arguments = listOf(
+        navArgument("shipmentId") {
+          type = NavType.StringType
+          nullable = true
+        }
+      )
+    ) { backStackEntry ->
+      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
+
+      CreateShipmentScreen(
+        navCtrl = navCtrl,
+        onBack = {
+          navCtrl.popBackStack()
+        },
+        shipmentId = shipmentId!!.toInt()
+      )
+    }
+
+    composable(
+      route = "CreateCargo?cargoId={cargoId}&shipmentId={shipmentId}",
+      arguments = listOf(
+        navArgument("cargoId") {
+          type = NavType.StringType
+          nullable = true
+        },
+        navArgument("shipmentId") {
+          type = NavType.StringType
+          nullable = true
+        }
+      )
+    ) { backStackEntry ->
+      val cargoId = backStackEntry.arguments?.getString("cargoId")
+      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
 
       CreateCargoScreen(
         navCtrl = navCtrl,
         onBack = {
           navCtrl.popBackStack()
         },
-        cargoId = cargoId!!.toInt()
+        cargoId = cargoId!!.toInt(),
+        shipmentId = shipmentId!!.toInt()
       )
     }
 

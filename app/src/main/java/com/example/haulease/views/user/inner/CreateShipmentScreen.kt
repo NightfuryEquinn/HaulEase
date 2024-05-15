@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.location.Address
 import android.location.Geocoder
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -67,6 +68,7 @@ import kotlinx.coroutines.launch
 fun CreateShipmentScreen(
   navCtrl: NavHostController,
   onBack: () -> Unit,
+  shipmentId: Int = 0,
   createShipmentVM: CreateShipmentVM = viewModel()
 ) {
   // Map variables
@@ -223,6 +225,13 @@ fun CreateShipmentScreen(
       }
     }
 
+  BackHandler {
+    onBack()
+    navCtrl.navigate(UserRoutes.Shipment.routes) {
+      launchSingleTop = true
+    }
+  }
+
   Column(
     modifier = Modifier
       .fillMaxWidth()
@@ -376,7 +385,7 @@ fun CreateShipmentScreen(
         SimpleCargoBox(
           navCtrl = navCtrl,
           image = painterResource(id = imageId),
-          id = id
+          cargoId = id.toInt()
         )
       }
 
@@ -384,7 +393,7 @@ fun CreateShipmentScreen(
 
       Button(
         onClick = {
-          navCtrl.navigate("CreateCargo?type=&weight=&length=&width=&height=&desc=&image=")
+          navCtrl.navigate("CreateCargo?cargoId=")
         },
         modifier = Modifier
           .fillMaxWidth(),

@@ -1,6 +1,7 @@
 package com.example.haulease.views.user.inner
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -22,9 +23,11 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +48,6 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.haulease.R
-import com.example.haulease.navigations.routes.UserInnerRoutes
 import com.example.haulease.ui.components.SimpleTextField
 import com.example.haulease.validations.InputValidation.isValidInt
 import com.example.haulease.viewmodels.user.inner.CreateCargoVM
@@ -53,6 +55,7 @@ import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.list.ListDialog
 import com.maxkeppeler.sheets.list.models.ListOption
 import com.maxkeppeler.sheets.list.models.ListSelection
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,8 +63,12 @@ fun CreateCargoScreen(
   navCtrl: NavHostController,
   onBack: () -> Unit,
   cargoId: Int = 0,
+  shipmentId: Int,
   createCargoVM: CreateCargoVM = viewModel(),
 ) {
+  val context = LocalContext.current
+  val cScope = rememberCoroutineScope()
+
   // State variables
   var type by remember { mutableStateOf("") }
   val weight = remember { mutableStateOf("") }
@@ -106,6 +113,13 @@ fun CreateCargoScreen(
       displayOption = option.titleText
     },
   )
+
+  BackHandler {
+    onBack()
+    navCtrl.navigate("CreateShipment?shipmentId=$shipmentId") {
+      launchSingleTop = true
+    }
+  }
 
   Column(
     modifier = Modifier
@@ -294,7 +308,7 @@ fun CreateCargoScreen(
       Button(
         onClick = {
           onBack()
-          navCtrl.navigate(UserInnerRoutes.CreateShipment.routes) {
+          navCtrl.navigate("CreateShipment?shipmentId=$shipmentId") {
             launchSingleTop = true
           }
         },
@@ -319,7 +333,7 @@ fun CreateCargoScreen(
       Button(
         onClick = {
           onBack()
-          navCtrl.navigate(UserInnerRoutes.CreateShipment.routes) {
+          navCtrl.navigate("CreateShipment?shipmentId=$shipmentId") {
             launchSingleTop = true
           }
         },
@@ -339,5 +353,15 @@ fun CreateCargoScreen(
     }
 
     Spacer(modifier = Modifier.padding(bottom = 52.dp))
+  }
+
+  DisposableEffect(Unit) {
+    val job = cScope.launch {
+
+    }
+
+    onDispose {
+      job.cancel()
+    }
   }
 }

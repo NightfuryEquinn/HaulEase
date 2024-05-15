@@ -120,7 +120,7 @@ fun DashboardScreen(
               rowModifier = Modifier
                 .fillMaxSize(),
               image = painterResource(id = R.drawable.shipment_placeholder),
-              id = latestShipment?.id.toString(),
+              shipmentId = latestShipment?.id,
               status = latestShipment?.status
             )
           } else {
@@ -160,7 +160,7 @@ fun DashboardScreen(
               rowModifier = Modifier
                 .fillMaxSize(),
               image = painterResource(id = R.drawable.shipment_placeholder),
-              id = latestUnpaidShipment?.shipment?.id.toString(),
+              shipmentId = latestUnpaidShipment?.shipment?.id,
               status = latestUnpaidShipment?.shipment?.status
             )
           } else {

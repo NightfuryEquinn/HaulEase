@@ -35,7 +35,7 @@ import com.example.haulease.R
 fun SimpleCargoBox(
   navCtrl: NavHostController,
   image: Painter,
-  id: String? = null
+  cargoId: Int
 ) {
   // TODO Get cargo details by on id
 
@@ -66,7 +66,7 @@ fun SimpleCargoBox(
           .fillMaxWidth()
       ) {
         Text(
-          text = "ID: $id",
+          text = "ID: $cargoId",
           style = TextStyle(
             fontFamily = FontFamily(Font(R.font.libre)),
             fontSize = 16.sp
@@ -82,7 +82,7 @@ fun SimpleCargoBox(
         ) {
           Button(
             onClick = {
-              navCtrl.navigate("CreateCargo?type=&weight=&length=&width=&height=&desc=&image=")
+              navCtrl.navigate("CreateCargo?cargoId=$cargoId")
             },
             modifier = Modifier
               .height(32.dp)

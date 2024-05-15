@@ -41,7 +41,7 @@ fun SimpleTabCol(
         rowModifier = Modifier
           .fillMaxSize(),
         image = painterResource(id = R.drawable.shipment_placeholder),
-        id = data.id.toString(),
+        shipmentId = data.id,
         status = data.status
       )
 

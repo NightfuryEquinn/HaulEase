@@ -397,7 +397,7 @@ fun AdminShipmentDetailScreen(
           .fillMaxSize(),
         image = painterResource(id = R.drawable.image),
         imageSize = 50,
-        id = "100001",
+        cargoId = 100001,
       )
     }
 

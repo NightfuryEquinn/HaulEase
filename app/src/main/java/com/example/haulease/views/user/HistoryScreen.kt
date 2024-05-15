@@ -102,7 +102,7 @@ fun HistoryScreen(
               rowModifier = Modifier
                 .fillMaxSize(),
               image = painterResource(id = R.drawable.shipment_placeholder),
-              id = shipment.id.toString(),
+              shipmentId = shipment.id,
               status = shipment.status
             )
 

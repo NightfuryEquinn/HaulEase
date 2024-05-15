@@ -44,7 +44,8 @@ fun SimpleViewBox(
   imageSize: Int? = 125,
   fromDatabase: Boolean = false,
   imageFromDatabase: String = "",
-  id: String? = null,
+  shipmentId: Int? = 0,
+  cargoId: Int? = 0,
   name: String? = null,
   status: String? = null,
 ) {
@@ -87,7 +88,11 @@ fun SimpleViewBox(
           .fillMaxWidth()
       ) {
         Text(
-          text = if (id != null) "ID: $id" else "Name: $name",
+          text = when {
+            cargoId != null -> "ID: $cargoId"
+            shipmentId != null -> "ID: $shipmentId"
+            else -> "Name: $name"
+          },
           style = TextStyle(
             fontFamily = FontFamily(Font(R.font.libre)),
             fontSize = 16.sp
@@ -114,10 +119,10 @@ fun SimpleViewBox(
       onClick = {
         when (currentRoute) {
           UserInnerRoutes.ShipmentDetail.routes -> {
-            navCtrl.navigate(UserInnerRoutes.CargoDetail.routes)
+            navCtrl.navigate("CargoDetail?cargoId=$cargoId&shipmentId=$shipmentId")
           }
           UserRoutes.Shipment.routes -> {
-            navCtrl.navigate("ShipmentDetail?shipmentId=$id")
+            navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId")
           }
           else -> {
             navCtrl.navigate(AdminInnerRoutes.AdminShipmentDetail.routes)

@@ -79,7 +79,7 @@ fun AdminHistoryScreen(
         rowModifier = Modifier
           .fillMaxSize(),
         image = painterResource(id = R.drawable.image),
-        id = "100001",
+        shipmentId = 100001,
         status = "Completed at 01-01-2024"
       )
 
@@ -94,7 +94,7 @@ fun AdminHistoryScreen(
         rowModifier = Modifier
           .fillMaxSize(),
         image = painterResource(id = R.drawable.image),
-        id = "100001",
+        shipmentId = 100001,
         status = "Completed at 01-01-2024"
       )
 

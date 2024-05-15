@@ -5,4 +5,6 @@ import com.example.haulease.api.Repository
 
 class CreateCargoVM: ViewModel() {
   private val repository: Repository = Repository()
+
+  // TODO Check if got cargoId parsed
 }

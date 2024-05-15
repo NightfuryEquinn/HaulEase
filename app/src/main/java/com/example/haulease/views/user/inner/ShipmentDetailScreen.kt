@@ -414,7 +414,8 @@ fun ShipmentDetailScreen(
               fromDatabase = true,
               imageFromDatabase = it.image,
               imageSize = 50,
-              id = it.id.toString(),
+              shipmentId = shipmentId,
+              cargoId = it.id,
             )
 
             Spacer(modifier = Modifier.height(5.dp))

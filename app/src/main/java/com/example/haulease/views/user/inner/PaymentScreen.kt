@@ -57,6 +57,7 @@ fun PaymentScreen(
   val context = LocalContext.current
   val cScope = rememberCoroutineScope()
   var thePaymentDetail: Payment? = null
+  var totalCargoFees: Double = 0.0
 
   // Observer
   val paymentState by paymentVM.paymentState.collectAsState()
@@ -122,8 +123,16 @@ fun PaymentScreen(
             harborMeasurementFees = 14.90,
             harborLoadingFees = 25.90,
             onPayClick = {
-
-            }
+              cScope.launch {
+                paymentVM.makePaymentRequest(
+                  paymentId,
+                  1,
+                  (25.90 + 15.90 + 14.90 + 25.90),
+                  context
+                )
+              }
+            },
+            isPaid = thePaymentDetail?.first != 0.0
           )
 
           Spacer(modifier = Modifier.height(25.dp))
@@ -140,10 +149,18 @@ fun PaymentScreen(
           Spacer(modifier = Modifier.height(10.dp))
 
           SimplePaymentBox(
-            totalCargoFees = 93.33,
+            totalCargoFees = totalCargoFees,
             onPayClick = {
-
-            }
+              cScope.launch {
+                paymentVM.makePaymentRequest(
+                  paymentId,
+                  2,
+                  totalCargoFees,
+                  context
+                )
+              }
+            },
+            isPaid = thePaymentDetail?.second != 0.0
           )
 
           Spacer(modifier = Modifier.height(25.dp))
@@ -164,9 +181,23 @@ fun PaymentScreen(
             destTruckLoadingFees = 5.90,
             destTruckTravelFees = 15.90,
             onPayClick = {
-
-            }
+              cScope.launch {
+                paymentVM.makePaymentRequest(
+                  paymentId,
+                  3,
+                  (15.90 + 5.90 + 15.90),
+                  context
+                )
+              }
+            },
+            isPaid = thePaymentDetail?.final != 0.0
           )
+        }
+      }
+      is PaymentState.PAIDSUCCESS -> {
+        onBack()
+        navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId") {
+          launchSingleTop = true
         }
       }
       is PaymentState.LOADING -> {
@@ -222,10 +253,12 @@ fun PaymentScreen(
   DisposableEffect(Unit) {
     val job = cScope.launch {
       paymentVM.loadPaymentDetails(
+        shipmentId,
         paymentId,
         context
       )
       thePaymentDetail = paymentVM.thePaymentDetail
+      totalCargoFees = paymentVM.totalCargoFees
     }
 
     onDispose {

@@ -12,6 +12,7 @@ sealed class PaymentState {
   data object INITIAL : PaymentState()
   data object LOADING : PaymentState()
   data object SUCCESS : PaymentState()
+  data object PAIDSUCCESS : PaymentState()
 }
 
 class PaymentVM: ViewModel() {
@@ -20,6 +21,7 @@ class PaymentVM: ViewModel() {
   private val _paymentState: MutableStateFlow<PaymentState> = MutableStateFlow(PaymentState.INITIAL)
 
   var thePaymentDetail: Payment? = null
+  var totalCargoFees: Double = 0.0
 
   // Set observer value
   val paymentState: MutableStateFlow<PaymentState> = _paymentState
@@ -41,15 +43,88 @@ class PaymentVM: ViewModel() {
     return false
   }
 
+  // Update payment detail
+  private suspend fun updatePaymentDetail(
+    thePaymentId: Int,
+    updatedPaymentDetail: Payment?
+  ): Boolean {
+    if (updatedPaymentDetail != null) {
+      val res = repository.putPayment(thePaymentId, updatedPaymentDetail)
+
+      if (res.code() == 200) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  // Calculate total cargo price
+  private suspend fun calculateCargoPrice(
+    theShipmentId: Int,
+  ): Boolean {
+    val res = repository.getCargosByShipment(theShipmentId)
+
+    res.body()?.let { cargos ->
+      if (res.isSuccessful) {
+        for (cargo in cargos) {
+          val volWeight = cargo.height * cargo.width * cargo.length
+
+          totalCargoFees += if (volWeight < cargo.weight) {
+            cargo.weight
+          } else {
+            volWeight
+          }
+        }
+      }
+
+      return res.isSuccessful
+    }
+
+    return false
+  }
+
+  // Make payment request
+  suspend fun makePaymentRequest(
+    thePaymentId: Int,
+    billingCount: Int,
+    totalPayable: Double,
+    context: android.content.Context
+  ) {
+    val updatedPaymentDetail: Payment? = thePaymentDetail
+
+    if (totalPayable != 0.0) {
+      when (billingCount) {
+        1 -> {
+          updatedPaymentDetail?.first = totalPayable
+        }
+        2 -> {
+          updatedPaymentDetail?.second = totalPayable
+        }
+        3 -> {
+          updatedPaymentDetail?.final = totalPayable
+        }
+      }
+
+      if (updatePaymentDetail(thePaymentId, updatedPaymentDetail)) {
+        Toast.makeText(context, "Payment successful", Toast.LENGTH_LONG).show()
+        _paymentState.value = PaymentState.PAIDSUCCESS
+      } else {
+        Toast.makeText(context, "Failed to make payment", Toast.LENGTH_LONG).show()
+      }
+    }
+  }
+
   // Load payment details
   fun loadPaymentDetails(
+    theShipmentId: Int,
     thePaymentId: Int,
     context: android.content.Context
   ) {
     _paymentState.value = PaymentState.LOADING
 
     viewModelScope.launch {
-      if (getPaymentDetails(thePaymentId)) {
+      if (getPaymentDetails(thePaymentId) && calculateCargoPrice(theShipmentId)) {
         _paymentState.value = PaymentState.SUCCESS
       } else {
         Toast.makeText(context, "Failed to get payment detail", Toast.LENGTH_LONG).show()
@@ -61,16 +136,6 @@ class PaymentVM: ViewModel() {
   // Clear payment details
   fun clearPaymentDetail() {
     thePaymentDetail = null
-  }
-
-  // Calculate total cargo price
-
-  // Make payment request
-  fun makePaymentRequest(
-    thePaymentId: Int,
-    totalPayable: Double,
-    context: android.content.Context
-  ) {
-
+    totalCargoFees = 0.0
   }
 }
