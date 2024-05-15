@@ -59,7 +59,7 @@ class ShipmentVM: ViewModel() {
 
   // Get active shipment orders
   private suspend fun getShipments(): Boolean {
-    val res = repository.getShipmentByConsignor(consignorSessionId)
+    val res = repository.getShipmentsByConsignor(consignorSessionId)
 
     res.body()?.let {
       if (res.isSuccessful) {
@@ -73,6 +73,7 @@ class ShipmentVM: ViewModel() {
     return false
   }
 
+  // Get all shipments for logged in consignor
   fun loadShipments(
     context: android.content.Context
   ) {
@@ -88,6 +89,7 @@ class ShipmentVM: ViewModel() {
     }
   }
 
+  // Clear all shipments
   fun clearShipments() {
     pickupShipment.clear()
     harbourShipment.clear()

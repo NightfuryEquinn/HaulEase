@@ -4,6 +4,9 @@ import com.example.haulease.models.Cargo
 import com.example.haulease.models.Consignor
 import com.example.haulease.models.Payment
 import com.example.haulease.models.Shipment
+import com.example.haulease.models.ShipmentPayment
+import com.example.haulease.models.ShipmentTracking
+import com.example.haulease.models.ShipmentTruck
 import com.example.haulease.models.Tracking
 import com.example.haulease.models.Truck
 import retrofit2.Response
@@ -13,6 +16,11 @@ import retrofit2.http.Path
 interface Get {
   @GET("cargo")
   suspend fun getCargos(): Response<List<Cargo>>
+
+  @GET("cargo/shipment/{shipmentId}")
+  suspend fun getCargosByShipment(
+    @Path("shipmentId") shipmentId: Int
+  ): Response<List<Cargo>>
 
   @GET("cargo/{cargoId}")
   suspend fun getCargo(
@@ -53,6 +61,21 @@ interface Get {
   suspend fun getShipmentsByConsignor(
     @Path("consignorId") consignorId: Int
   ): Response<List<Shipment>>
+
+  @GET("shipment/consignor/{consignorId}/payment")
+  suspend fun getShipmentPayment(
+    @Path("consignorId") consignorId: Int
+  ): Response<List<ShipmentPayment>>
+
+  @GET("shipment/consignor/{consignorId}/tracking")
+  suspend fun getShipmentTracking(
+    @Path("consignorId") consignorId: Int
+  ): Response<List<ShipmentTracking>>
+
+  @GET("shipment/consignor/{consignorId}/truck")
+  suspend fun getShipmentTruck(
+    @Path("consignorId") consignorId: Int
+  ): Response<List<ShipmentTruck>>
 
   @GET("shipment/{shipmentId}")
   suspend fun getShipment(

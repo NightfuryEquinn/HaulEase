@@ -19,6 +19,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -26,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.haulease.R
 import com.example.haulease.navigations.routes.AdminInnerRoutes
 import com.example.haulease.navigations.routes.UserInnerRoutes
@@ -36,8 +40,10 @@ fun SimpleViewBox(
   navCtrl: NavHostController,
   modifier: Modifier,
   rowModifier: Modifier,
-  image: Painter,
+  image: Painter = painterResource(id = R.drawable.image),
   imageSize: Int? = 125,
+  fromDatabase: Boolean = false,
+  imageFromDatabase: String = "",
   id: String? = null,
   name: String? = null,
   status: String? = null,
@@ -51,14 +57,28 @@ fun SimpleViewBox(
     Row(
       modifier = rowModifier
     ) {
-      Image(
-        painter = image,
-        contentDescription = null,
-        modifier = Modifier
-          .clip(shape = RoundedCornerShape((2.5).dp))
-          .size(imageSize!!.dp),
-        contentScale = ContentScale.Crop
-      )
+      if (fromDatabase && imageFromDatabase.isNotEmpty()) {
+        AsyncImage(
+          model = ImageRequest.Builder(LocalContext.current)
+            .data(imageFromDatabase)
+            .crossfade(true)
+            .build(),
+          contentDescription = null,
+          modifier = Modifier
+            .clip(shape = RoundedCornerShape((2.5).dp))
+            .size(imageSize!!.dp),
+          contentScale = ContentScale.Crop
+        )
+      } else {
+        Image(
+          painter = image,
+          contentDescription = null,
+          modifier = Modifier
+            .clip(shape = RoundedCornerShape((2.5).dp))
+            .size(imageSize!!.dp),
+          contentScale = ContentScale.Crop
+        )
+      }
 
       Spacer(modifier = Modifier.width(15.dp))
 
@@ -97,7 +117,7 @@ fun SimpleViewBox(
             navCtrl.navigate(UserInnerRoutes.CargoDetail.routes)
           }
           UserRoutes.Shipment.routes -> {
-            navCtrl.navigate(UserInnerRoutes.ShipmentDetail.routes)
+            navCtrl.navigate("ShipmentDetail?shipmentId=$id")
           }
           else -> {
             navCtrl.navigate(AdminInnerRoutes.AdminShipmentDetail.routes)

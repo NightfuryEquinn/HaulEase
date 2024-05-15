@@ -29,15 +29,18 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.haulease.R
 import com.example.haulease.navigations.routes.UserInnerRoutes
 import com.example.haulease.ui.components.SimpleLabelDesc
+import com.example.haulease.viewmodels.user.inner.CargoDetailVM
 
 @Composable
 fun CargoDetailScreen(
   navCtrl: NavHostController,
-  onBack: () -> Unit
+  onBack: () -> Unit,
+  cargoDetailVM: CargoDetailVM = viewModel()
 ) {
   Column(
     modifier = Modifier

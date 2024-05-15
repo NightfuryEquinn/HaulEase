@@ -4,6 +4,9 @@ import com.example.haulease.models.Cargo
 import com.example.haulease.models.Consignor
 import com.example.haulease.models.Payment
 import com.example.haulease.models.Shipment
+import com.example.haulease.models.ShipmentPayment
+import com.example.haulease.models.ShipmentTracking
+import com.example.haulease.models.ShipmentTruck
 import com.example.haulease.models.Tracking
 import com.example.haulease.models.Truck
 import retrofit2.Response
@@ -14,6 +17,10 @@ class Repository {
    */
   suspend fun getCargos(): Response<List<Cargo>> {
     return RetrofitInstance.getApi.getCargos()
+  }
+
+  suspend fun getCargosByShipment(id: Int): Response<List<Cargo>> {
+    return RetrofitInstance.getApi.getCargosByShipment(id)
   }
 
   suspend fun getCargo(id: Int): Response<Cargo> {
@@ -93,8 +100,20 @@ class Repository {
     return RetrofitInstance.getApi.getShipments()
   }
 
-  suspend fun getShipmentByConsignor(id: Int): Response<List<Shipment>> {
+  suspend fun getShipmentsByConsignor(id: Int): Response<List<Shipment>> {
     return RetrofitInstance.getApi.getShipmentsByConsignor(id)
+  }
+
+  suspend fun getShipmentPayment(id: Int): Response<List<ShipmentPayment>> {
+    return RetrofitInstance.getApi.getShipmentPayment(id)
+  }
+
+  suspend fun getShipmentTracking(id: Int): Response<List<ShipmentTracking>> {
+    return RetrofitInstance.getApi.getShipmentTracking(id)
+  }
+
+  suspend fun getShipmentTruck(id: Int): Response<List<ShipmentTruck>> {
+    return RetrofitInstance.getApi.getShipmentTruck(id)
   }
 
   suspend fun getShipment(id: Int): Response<Shipment> {

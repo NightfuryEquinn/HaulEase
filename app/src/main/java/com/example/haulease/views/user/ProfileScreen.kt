@@ -22,6 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -31,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.haulease.R
 import com.example.haulease.models.Consignor
 import com.example.haulease.navigations.routes.SharedRoutes
@@ -79,19 +83,35 @@ fun ProfileScreen(
         .verticalScroll(rememberScrollState())
         .weight(1f)
     ) {
-      Image(
-        painterResource(id = R.drawable.avatar),
-        contentDescription = null,
-        modifier = Modifier
-          .clip(shape = RoundedCornerShape(5.dp))
-          .fillMaxSize()
-          .height(150.dp)
-          .aspectRatio(1.0f)
-      )
-
-      Spacer(modifier = Modifier.height(20.dp))
-
       if (theUserProfile != null) {
+        if (theUserProfile.avatar.isNotEmpty()) {
+          AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+              .data(theUserProfile.avatar)
+              .crossfade(true)
+              .build(),
+            contentDescription = null,
+            modifier = Modifier
+              .clip(shape = RoundedCornerShape(5.dp))
+              .fillMaxSize()
+              .height(150.dp)
+              .aspectRatio(1.0f),
+            contentScale = ContentScale.Crop
+          )
+        } else {
+          Image(
+            painterResource(id = R.drawable.avatar),
+            contentDescription = null,
+            modifier = Modifier
+              .clip(shape = RoundedCornerShape(5.dp))
+              .fillMaxSize()
+              .height(150.dp)
+              .aspectRatio(1.0f)
+          )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
         SimpleLabelDesc(
           label = "Username",
           desc = theUserProfile.username

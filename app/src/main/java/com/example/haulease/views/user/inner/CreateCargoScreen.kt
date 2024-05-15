@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -47,6 +48,7 @@ import com.example.haulease.R
 import com.example.haulease.navigations.routes.UserInnerRoutes
 import com.example.haulease.ui.components.SimpleTextField
 import com.example.haulease.validations.InputValidation.isValidInt
+import com.example.haulease.viewmodels.user.inner.CreateCargoVM
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.list.ListDialog
 import com.maxkeppeler.sheets.list.models.ListOption
@@ -57,22 +59,17 @@ import com.maxkeppeler.sheets.list.models.ListSelection
 fun CreateCargoScreen(
   navCtrl: NavHostController,
   onBack: () -> Unit,
-  cargoType: String = "",
-  cargoWeight: String = "",
-  cargoLength: String = "",
-  cargoWidth: String = "",
-  cargoHeight: String = "",
-  cargoDesc: String = "",
-  cargoImage: Uri? = null
+  cargoId: Int = 0,
+  createCargoVM: CreateCargoVM = viewModel(),
 ) {
   // State variables
-  var type by remember { mutableStateOf(cargoType) }
-  val weight = remember { mutableStateOf(cargoWeight) }
-  val length = remember { mutableStateOf(cargoLength) }
-  val width = remember { mutableStateOf(cargoWidth) }
-  val height = remember { mutableStateOf(cargoHeight) }
-  val image = remember { mutableStateOf(cargoImage) }
-  val desc = remember { mutableStateOf(cargoDesc)}
+  var type by remember { mutableStateOf("") }
+  val weight = remember { mutableStateOf("") }
+  val length = remember { mutableStateOf("") }
+  val width = remember { mutableStateOf("") }
+  val height = remember { mutableStateOf("") }
+  val image = remember { mutableStateOf<Uri?>(null) }
+  val desc = remember { mutableStateOf("")}
 
   // Get image selection context
   val imageContext = LocalContext.current
@@ -91,7 +88,7 @@ fun CreateCargoScreen(
 
   // Option dialog for priority
   val listOptionState = rememberUseCaseState()
-  var displayOption by remember { mutableStateOf(cargoType) }
+  var displayOption by remember { mutableStateOf("") }
 
   val options = listOf(
     ListOption(titleText = "Light (0 - 25kg)"),
@@ -155,11 +152,7 @@ fun CreateCargoScreen(
         shape = RoundedCornerShape(5.dp),
       ) {
         Text(
-          text = when {
-            displayOption.isNotBlank() -> displayOption
-            cargoType.isNotBlank() -> cargoType
-            else -> " - Select Cargo Type - "
-          },
+          text = displayOption.ifBlank { " - Select Cargo Type - " },
           style = TextStyle(
             color = Color(0xFFE5E5E5),
             fontFamily = FontFamily(Font(R.font.librebold))

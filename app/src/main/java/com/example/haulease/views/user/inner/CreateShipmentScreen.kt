@@ -40,11 +40,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.haulease.R
 import com.example.haulease.navigations.routes.UserRoutes
 import com.example.haulease.ui.components.SimpleCargoBox
 import com.example.haulease.ui.components.SimpleTextField
+import com.example.haulease.viewmodels.user.inner.CreateShipmentVM
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -64,7 +66,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun CreateShipmentScreen(
   navCtrl: NavHostController,
-  onBack: () -> Unit
+  onBack: () -> Unit,
+  createShipmentVM: CreateShipmentVM = viewModel()
 ) {
   // Map variables
   val context = LocalContext.current

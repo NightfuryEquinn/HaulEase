@@ -1,6 +1,5 @@
 package com.example.haulease.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -35,7 +34,8 @@ fun SimplePaymentBox(
   totalCargoFees: Double? = null,
   harborUnloadingFees: Double? = null,
   destTruckLoadingFees: Double? = null,
-  destTruckTravelFees: Double? = null
+  destTruckTravelFees: Double? = null,
+  onPayClick: () -> Unit
 ) {
   var totalPayable: Double = 0.0
 
@@ -87,7 +87,7 @@ fun SimplePaymentBox(
               fontSize = 12.sp
             )
           ) {
-            append("Truck Loading Fees (25kg above): ")
+            append("Truck Loading Fees: ")
           }
           withStyle(
             style = SpanStyle(
@@ -235,7 +235,7 @@ fun SimplePaymentBox(
               fontSize = 12.sp
             )
           ) {
-            append("Truck Loading Fees (25kg above): ")
+            append("Truck Loading Fees: ")
           }
           withStyle(
             style = SpanStyle(
@@ -287,7 +287,7 @@ fun SimplePaymentBox(
 
   Button(
     onClick = {
-      Log.d("Payment", "Pay")
+      onPayClick()
     },
     modifier = Modifier
       .fillMaxWidth()

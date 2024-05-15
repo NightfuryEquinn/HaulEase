@@ -1,10 +1,13 @@
 package com.example.haulease.views.user.inner
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,11 +17,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -26,16 +36,38 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.haulease.R
-import com.example.haulease.navigations.routes.UserInnerRoutes
+import com.example.haulease.models.Payment
+import com.example.haulease.ui.components.SimpleEmptyBox
 import com.example.haulease.ui.components.SimplePaymentBox
+import com.example.haulease.viewmodels.user.inner.PaymentState
+import com.example.haulease.viewmodels.user.inner.PaymentVM
+import kotlinx.coroutines.launch
 
 @Composable
 fun PaymentScreen(
   navCtrl: NavHostController,
-  onBack: () -> Unit
+  onBack: () -> Unit,
+  paymentId: Int = 0,
+  shipmentId: Int,
+  paymentVM: PaymentVM = viewModel()
 ) {
+  val context = LocalContext.current
+  val cScope = rememberCoroutineScope()
+  var thePaymentDetail: Payment? = null
+
+  // Observer
+  val paymentState by paymentVM.paymentState.collectAsState()
+
+  BackHandler {
+    onBack()
+    navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId") {
+      launchSingleTop = true
+    }
+  }
+
   Column(
     modifier = Modifier
       .fillMaxWidth()
@@ -65,65 +97,98 @@ fun PaymentScreen(
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .verticalScroll(rememberScrollState())
-        .weight(1f)
-    ) {
-      Text(
-        text = "Shipment First Billing",
-        style = TextStyle(
-          fontFamily = FontFamily(Font(R.font.squada)),
-          fontSize = 24.sp,
-          color = Color(0xFFFCA111)
+    when (paymentState) {
+      is PaymentState.SUCCESS -> {
+        Column(
+          modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .weight(1f)
+        ) {
+          Text(
+            text = if (thePaymentDetail?.first == 0.0) "Shipment First Billing" else "Shipment First Billing (Done)",
+            style = TextStyle(
+              fontFamily = FontFamily(Font(R.font.squada)),
+              fontSize = 24.sp,
+              color = Color(0xFFFCA111)
+            )
+          )
+
+          Spacer(modifier = Modifier.height(10.dp))
+
+          SimplePaymentBox(
+            originTruckTravelFees = 25.90,
+            originTruckLoadingFees = 15.90,
+            harborMeasurementFees = 14.90,
+            harborLoadingFees = 25.90,
+            onPayClick = {
+
+            }
+          )
+
+          Spacer(modifier = Modifier.height(25.dp))
+
+          Text(
+            text = if (thePaymentDetail?.second == 0.0) "Shipment Second Billing" else "Shipment Second Billing (Done)",
+            style = TextStyle(
+              fontFamily = FontFamily(Font(R.font.squada)),
+              fontSize = 24.sp,
+              color = Color(0xFFFCA111)
+            )
+          )
+
+          Spacer(modifier = Modifier.height(10.dp))
+
+          SimplePaymentBox(
+            totalCargoFees = 93.33,
+            onPayClick = {
+
+            }
+          )
+
+          Spacer(modifier = Modifier.height(25.dp))
+
+          Text(
+            text = if (thePaymentDetail?.final == 0.0) "Shipment Third Billing" else "Shipment Third Billing (Done)",
+            style = TextStyle(
+              fontFamily = FontFamily(Font(R.font.squada)),
+              fontSize = 24.sp,
+              color = Color(0xFFFCA111)
+            )
+          )
+
+          Spacer(modifier = Modifier.height(10.dp))
+
+          SimplePaymentBox(
+            harborUnloadingFees = 15.90,
+            destTruckLoadingFees = 5.90,
+            destTruckTravelFees = 15.90,
+            onPayClick = {
+
+            }
+          )
+        }
+      }
+      is PaymentState.LOADING -> {
+        LinearProgressIndicator(
+          modifier = Modifier
+            .align(Alignment.CenterHorizontally)
         )
-      )
-
-      Spacer(modifier = Modifier.height(10.dp))
-
-      SimplePaymentBox(
-        originTruckTravelFees = 25.0,
-        originTruckLoadingFees = 152.12,
-        harborMeasurementFees = 31.1,
-        harborLoadingFees = 53.2
-      )
-
-      Spacer(modifier = Modifier.height(25.dp))
-
-      Text(
-        text = "Shipment Second Billing",
-        style = TextStyle(
-          fontFamily = FontFamily(Font(R.font.squada)),
-          fontSize = 24.sp,
-          color = Color(0xFFFCA111)
+      }
+      is PaymentState.INITIAL -> {
+        SimpleEmptyBox(
+          modifier = Modifier
+            .clip(shape = RoundedCornerShape(5.dp))
+            .height(150.dp)
+            .fillMaxSize()
+            .background(Color(0xFFE5E5E5))
+            .weight(1f),
+          colModifier = Modifier
+            .fillMaxSize(),
+          image = painterResource(id = R.drawable.close),
+          name = "Unable to Load Information"
         )
-      )
-
-      Spacer(modifier = Modifier.height(10.dp))
-
-      SimplePaymentBox(
-        totalCargoFees = 93.33
-      )
-
-      Spacer(modifier = Modifier.height(25.dp))
-
-      Text(
-        text = "Shipment Third Billing",
-        style = TextStyle(
-          fontFamily = FontFamily(Font(R.font.squada)),
-          fontSize = 24.sp,
-          color = Color(0xFFFCA111)
-        )
-      )
-
-      Spacer(modifier = Modifier.height(10.dp))
-
-      SimplePaymentBox(
-        harborUnloadingFees = 45.0,
-        destTruckLoadingFees = 52.95,
-        destTruckTravelFees = 24.52
-      )
+      }
     }
 
     Spacer(modifier = Modifier.height(30.dp))
@@ -131,7 +196,7 @@ fun PaymentScreen(
     Button(
       onClick = {
         onBack()
-        navCtrl.navigate(UserInnerRoutes.ShipmentDetail.routes) {
+        navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId") {
           launchSingleTop = true
         }
       },
@@ -152,5 +217,20 @@ fun PaymentScreen(
     }
 
     Spacer(modifier = Modifier.padding(bottom = 60.dp))
+  }
+
+  DisposableEffect(Unit) {
+    val job = cScope.launch {
+      paymentVM.loadPaymentDetails(
+        paymentId,
+        context
+      )
+      thePaymentDetail = paymentVM.thePaymentDetail
+    }
+
+    onDispose {
+      job.cancel()
+      paymentVM.clearPaymentDetail()
+    }
   }
 }

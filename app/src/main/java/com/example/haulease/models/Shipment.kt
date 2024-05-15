@@ -12,5 +12,6 @@ data class Shipment(
   var receiverContact: String,
   var consignorId: Int?,
   var paymentId: Int?,
-  var trackingId: Int?
+  var trackingId: Int?,
+  var truckId: Int?
 )

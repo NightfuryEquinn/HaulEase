@@ -29,7 +29,7 @@ class HistoryVM: ViewModel() {
 
   // Get past shipment orders
   private suspend fun getShipmentsHistory(): Boolean {
-    val res = repository.getShipmentByConsignor(consignorSessionId)
+    val res = repository.getShipmentsByConsignor(consignorSessionId)
 
     res.body()?.let {
       if (res.isSuccessful) {
@@ -42,6 +42,7 @@ class HistoryVM: ViewModel() {
     return false
   }
 
+  // Load past shipment orders
   fun loadShipmentsHistory(
     context: android.content.Context
   ): List<Shipment> {
@@ -59,6 +60,7 @@ class HistoryVM: ViewModel() {
     return theShipmentsHistory
   }
 
+  // Clear past shipment orders
   fun clearShipmentsHistory() {
     theShipmentsHistory.clear()
   }

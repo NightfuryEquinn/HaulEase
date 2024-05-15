@@ -12,7 +12,5 @@ data class Cargo(
   var height: Double,
   var image: String,
   var description: String,
-  var consignorId: Int,
-  var shipmentId: Int,
-  var truckId: Int?
+  var shipmentId: Int?,
 )

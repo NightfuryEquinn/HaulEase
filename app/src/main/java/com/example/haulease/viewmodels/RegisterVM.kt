@@ -37,7 +37,7 @@ class RegisterVM: ViewModel() {
     context: android.content.Context
   ): String {
     val storage = FirebaseStorage.getInstance()
-    val storageRef = storage.reference.child("images/${UUID.randomUUID()}.jpg")
+    val storageRef = storage.reference.child("images/profile/${UUID.randomUUID()}.jpg")
     val uploadTask = storageRef.putFile(avatar)
 
     val downloadUrl = try {

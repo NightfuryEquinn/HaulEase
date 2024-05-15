@@ -15,7 +15,6 @@ import androidx.navigation.navArgument
 import com.example.haulease.navigations.BottomNavBar
 import com.example.haulease.navigations.routes.UserInnerRoutes
 import com.example.haulease.navigations.routes.UserRoutes
-import com.example.haulease.validations.InputValidation.isValidUri
 import com.example.haulease.views.user.DashboardScreen
 import com.example.haulease.views.user.HistoryScreen
 import com.example.haulease.views.user.ProfileScreen
@@ -103,12 +102,23 @@ fun UserNavHost(navCtrl: NavHostController) {
     }
 
     // User Inner Routes
-    composable(UserInnerRoutes.ShipmentDetail.routes) {
+    composable(
+      route = "ShipmentDetail?shipmentId={shipmentId}",
+      arguments = listOf(
+        navArgument("shipmentId") {
+          type = NavType.StringType
+          nullable = true
+        }
+      )
+    ) { backStackEntry ->
+      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
+
       ShipmentDetailScreen(
         navCtrl = navCtrl,
         onBack = {
           navCtrl.popBackStack()
-        }
+        },
+        shipmentId = shipmentId!!.toInt()
       )
     }
 
@@ -131,67 +141,48 @@ fun UserNavHost(navCtrl: NavHostController) {
     }
 
     composable(
-      route = "CreateCargo?type={type}&weight={weight}&length={length}&width={width}&height={height}&desc={desc}&image={image}",
+      route = "CreateCargo?cargoId={cargoId}",
       arguments = listOf(
-        navArgument("type") {
-          type = NavType.StringType
-          nullable = true
-        },
-        navArgument("weight") {
-          type = NavType.StringType
-          nullable = true
-        },
-        navArgument("length") {
-          type = NavType.StringType
-          nullable = true
-        },
-        navArgument("width") {
-          type = NavType.StringType
-          nullable = true
-        },
-        navArgument("height") {
-          type = NavType.StringType
-          nullable = true
-        },
-        navArgument("desc") {
-          type = NavType.StringType
-          nullable = true
-        },
-        navArgument("image") {
+        navArgument("cargoId") {
           type = NavType.StringType
           nullable = true
         }
       )
     ) { backStackEntry ->
-      val cargoType = backStackEntry.arguments?.getString("type")
-      val cargoWeight = backStackEntry.arguments?.getString("weight")
-      val cargoLength = backStackEntry.arguments?.getString("length")
-      val cargoWidth = backStackEntry.arguments?.getString("width")
-      val cargoHeight = backStackEntry.arguments?.getString("height")
-      val cargoDesc = backStackEntry.arguments?.getString("desc")
-      val cargoImage = backStackEntry.arguments?.getString("image")
+      val cargoId = backStackEntry.arguments?.getString("cargoId")
 
       CreateCargoScreen(
         navCtrl = navCtrl,
         onBack = {
           navCtrl.popBackStack()
         },
-        cargoType = cargoType!!,
-        cargoWeight = cargoWeight!!,
-        cargoLength = cargoLength!!,
-        cargoWidth = cargoWidth!!,
-        cargoHeight = cargoHeight!!,
-        cargoDesc = cargoDesc!!,
-        cargoImage = isValidUri(cargoImage!!, context)
+        cargoId = cargoId!!.toInt()
       )
     }
 
-    composable(UserInnerRoutes.Payment.routes) {
+    composable(
+      route = "Payment?paymentId={paymentId}&shipmentId={shipmentId}",
+      arguments = listOf(
+        navArgument("paymentId") {
+          type = NavType.StringType
+          nullable = true
+        },
+        navArgument("shipmentId") {
+          type = NavType.StringType
+          nullable = true
+        }
+      )
+    ) { backStackEntry ->
+      val paymentId = backStackEntry.arguments?.getString("paymentId")
+      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
+
       PaymentScreen(
         navCtrl = navCtrl,
         onBack = {
           navCtrl.popBackStack()
-        }
+        },
+        paymentId = paymentId!!.toInt(),
+        shipmentId = shipmentId!!.toInt()
       )
     }
 
