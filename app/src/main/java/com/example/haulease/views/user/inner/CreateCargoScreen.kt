@@ -47,6 +47,8 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.haulease.R
 import com.example.haulease.models.Cargo
+import com.example.haulease.models.TempShipmentCargo
+import com.example.haulease.navigations.routes.UserInnerRoutes
 import com.example.haulease.ui.components.SimpleTextField
 import com.example.haulease.validations.InputValidation.isValidInt
 import com.example.haulease.viewmodels.user.inner.CreateCargoShipmentVM
@@ -54,13 +56,14 @@ import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.list.ListDialog
 import com.maxkeppeler.sheets.list.models.ListOption
 import com.maxkeppeler.sheets.list.models.ListSelection
+import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateCargoScreen(
   navCtrl: NavHostController,
   onBack: () -> Unit,
-  shipmentId: Int?,
+  tempShipmentCargo: TempShipmentCargo,
   createCargoShipmentVM: CreateCargoShipmentVM
 ) {
   val context = LocalContext.current
@@ -112,7 +115,7 @@ fun CreateCargoScreen(
 
   BackHandler {
     onBack()
-    navCtrl.navigate("CreateShipment?shipmentId=$shipmentId") {
+    navCtrl.navigate(UserInnerRoutes.CreateShipment.routes) {
       launchSingleTop = true
     }
   }
@@ -318,7 +321,7 @@ fun CreateCargoScreen(
           )
 
           onBack()
-          navCtrl.navigate("CreateShipment?shipmentId=$shipmentId") {
+          navCtrl.navigate(UserInnerRoutes.CreateShipment.routes) {
             launchSingleTop = true
           }
         },
@@ -343,7 +346,7 @@ fun CreateCargoScreen(
       Button(
         onClick = {
           onBack()
-          navCtrl.navigate("CreateShipment?shipmentId=$shipmentId") {
+          navCtrl.navigate(UserInnerRoutes.CreateShipment.routes) {
             launchSingleTop = true
           }
         },

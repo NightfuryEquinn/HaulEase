@@ -13,12 +13,14 @@ import com.example.haulease.models.Shipment
 import com.example.haulease.models.TempShipmentCargo
 import com.example.haulease.models.Tracking
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDateTime
 import java.util.UUID
 
 
-class CreateCargoShipmentVM: ViewModel() {
+class CreateCargoShipmentVM(): ViewModel() {
   private val repository: Repository = Repository()
 
   private var imageUrl: String = ""
@@ -27,10 +29,12 @@ class CreateCargoShipmentVM: ViewModel() {
   private var newTruckId: Int = 0
 
   // Temp shipment cargo
-  val tempShipmentCargo: TempShipmentCargo = TempShipmentCargo(
+  private val _tempShipmentCargo: MutableStateFlow<TempShipmentCargo> = MutableStateFlow(TempShipmentCargo(
     id = UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
     cargoList = mutableListOf()
-  )
+  ))
+
+  val tempShipmentCargo = _tempShipmentCargo.asStateFlow()
 
   // Upload image to Firebase Storage
   private suspend fun uploadCargoImage(
@@ -158,11 +162,11 @@ class CreateCargoShipmentVM: ViewModel() {
 
   // Append cargo to temp shipment cargo
   fun appendCargo(newCargo: Cargo) {
-    tempShipmentCargo.cargoList.add(newCargo)
+    tempShipmentCargo.value.cargoList.add(newCargo)
   }
 
   // Remove cargo from temp shipment cargo
   fun removeCargo(cargo: Cargo) {
-    tempShipmentCargo.cargoList.remove(cargo)
+    tempShipmentCargo.value.cargoList.remove(cargo)
   }
 }

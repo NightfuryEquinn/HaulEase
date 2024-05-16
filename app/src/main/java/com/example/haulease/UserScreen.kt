@@ -5,14 +5,21 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.haulease.navigations.BottomNavBar
+import com.example.haulease.navigations.routes.UserInnerRoutes
 import com.example.haulease.navigations.routes.UserRoutes
 import com.example.haulease.viewmodels.user.inner.CreateCargoShipmentVM
 import com.example.haulease.views.user.DashboardScreen
@@ -149,47 +156,80 @@ fun UserNavHost(navCtrl: NavHostController) {
       )
     }
 
-    composable(
-      route = "CreateShipment?shipmentId={shipmentId}",
-      arguments = listOf(
-        navArgument("shipmentId") {
-          type = NavType.StringType
-          nullable = true
-        },
-      )
-    ) { backStackEntry ->
-      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
+    navigation(
+      startDestination = "CreateShipment",
+      route = "start"
+    ) {
+      composable(UserInnerRoutes.CreateShipment.routes) { entry ->
+        val viewModel = entry.sharedViewModel<CreateCargoShipmentVM>(navCtrl)
+        val state by viewModel.tempShipmentCargo.collectAsStateWithLifecycle()
 
-      CreateShipmentScreen(
-        navCtrl = navCtrl,
-        onBack = {
-          navCtrl.popBackStack()
-        },
-        shipmentId = shipmentId?.toIntOrNull(),
-        createCargoShipmentVM = createCargoShipmentVM,
-      )
+        CreateShipmentScreen(
+          navCtrl = navCtrl,
+          onBack = {
+            navCtrl.popBackStack()
+          },
+          tempShipmentCargo = state,
+          createCargoShipmentVM = createCargoShipmentVM
+        )
+      }
+
+      composable(UserInnerRoutes.CreateCargo.routes) { entry ->
+        val viewModel = entry.sharedViewModel<CreateCargoShipmentVM>(navCtrl)
+        val state by viewModel.tempShipmentCargo.collectAsStateWithLifecycle()
+
+        CreateCargoScreen(
+          navCtrl = navCtrl,
+          onBack = {
+            navCtrl.popBackStack()
+          },
+          tempShipmentCargo = state,
+          createCargoShipmentVM = createCargoShipmentVM
+        )
+      }
     }
 
-    composable(
-      route = "CreateCargo?shipmentId={shipmentId}",
-      arguments = listOf(
-        navArgument("shipmentId") {
-          type = NavType.StringType
-          nullable = true
-        }
-      )
-    ) { backStackEntry ->
-      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
-
-      CreateCargoScreen(
-        navCtrl = navCtrl,
-        onBack = {
-          navCtrl.popBackStack()
-        },
-        shipmentId = shipmentId?.toIntOrNull(),
-        createCargoShipmentVM = createCargoShipmentVM
-      )
-    }
+//    composable(
+//      route = "CreateShipment?shipmentId={shipmentId}",
+//      arguments = listOf(
+//        navArgument("shipmentId") {
+//          type = NavType.StringType
+//          nullable = true
+//        },
+//      )
+//    ) { backStackEntry ->
+//      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
+//
+//      CreateShipmentScreen(
+//        navCtrl = navCtrl,
+//        onBack = {
+//          navCtrl.popBackStack()
+//        },
+//        shipmentId = shipmentId?.toIntOrNull(),
+//        createCargoShipmentVM = createCargoShipmentVM,
+//      )
+//    }
+//
+//    composable(
+//      route = "CreateCargo?shipmentId={shipmentId}",
+//      arguments = listOf(
+//        navArgument("shipmentId") {
+//          type = NavType.StringType
+//          nullable = true
+//        }
+//      )
+//    ) { backStackEntry ->
+//      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
+//
+//      CreateCargoScreen(
+//        navCtrl = navCtrl,
+//        onBack = {
+//          navCtrl.popBackStack()
+//        },
+//        shipmentId = shipmentId?.toIntOrNull(),
+//        createCargoShipmentVM = createCargoShipmentVM
+//      )
+//    }
 
     composable(
       route = "Payment?paymentId={paymentId}&shipmentId={shipmentId}",
@@ -221,4 +261,15 @@ fun UserNavHost(navCtrl: NavHostController) {
       MainScreen()
     }
   }
+}
+
+@Composable
+inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(
+  navCtrl: NavHostController
+): T {
+  val navGraphRoute = destination.parent?.route ?: return viewModel()
+  val parentEntry = remember(this) {
+    navCtrl.getBackStackEntry(navGraphRoute)
+  }
+  return viewModel(parentEntry)
 }

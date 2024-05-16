@@ -47,6 +47,7 @@ import com.example.haulease.R
 import com.example.haulease.models.Sessions
 import com.example.haulease.models.Shipment
 import com.example.haulease.models.TempShipmentCargo
+import com.example.haulease.navigations.routes.UserInnerRoutes
 import com.example.haulease.navigations.routes.UserRoutes
 import com.example.haulease.ui.components.SimpleCargoBox
 import com.example.haulease.ui.components.SimpleTextField
@@ -66,17 +67,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-@SuppressLint("MissingPermission")
+@SuppressLint("MissingPermission", "StateFlowValueCalledInComposition")
 @OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun CreateShipmentScreen(
   navCtrl: NavHostController,
   onBack: () -> Unit,
-  shipmentId: Int? = 0,
+  tempShipmentCargo: TempShipmentCargo,
   createCargoShipmentVM: CreateCargoShipmentVM
 ) {
   val cScope = rememberCoroutineScope()
-  val tempShipmentCargo: TempShipmentCargo = createCargoShipmentVM.tempShipmentCargo
 
   // Map variables
   val context = LocalContext.current
@@ -397,7 +397,7 @@ fun CreateShipmentScreen(
 
       Button(
         onClick = {
-          navCtrl.navigate("CreateCargo?cargoId=&shipmentId=$shipmentId")
+          navCtrl.navigate(UserInnerRoutes.CreateCargo.routes)
         },
         modifier = Modifier
           .fillMaxWidth(),
