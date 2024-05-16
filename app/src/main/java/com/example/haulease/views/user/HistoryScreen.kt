@@ -92,21 +92,36 @@ fun HistoryScreen(
     ) {
       when (historyState) {
         is HistoryState.SUCCESS -> {
-          shipmentsHistory.forEach { shipment ->
-            SimpleViewBox(
-              navCtrl = navCtrl,
+          if (shipmentsHistory.isEmpty()) {
+            SimpleEmptyBox(
               modifier = Modifier
                 .clip(shape = RoundedCornerShape(5.dp))
+                .height(150.dp)
                 .fillMaxSize()
-                .background(Color(0xFFE5E5E5)),
-              rowModifier = Modifier
+                .background(Color(0xFFE5E5E5))
+                .weight(1f),
+              colModifier = Modifier
                 .fillMaxSize(),
-              image = painterResource(id = R.drawable.shipment_placeholder),
-              shipmentId = shipment.id,
-              status = shipment.status
+              image = painterResource(id = R.drawable.close),
+              name = "No Past History"
             )
+          } else {
+            shipmentsHistory.forEach { shipment ->
+              SimpleViewBox(
+                navCtrl = navCtrl,
+                modifier = Modifier
+                  .clip(shape = RoundedCornerShape(5.dp))
+                  .fillMaxSize()
+                  .background(Color(0xFFE5E5E5)),
+                rowModifier = Modifier
+                  .fillMaxSize(),
+                image = painterResource(id = R.drawable.shipment_placeholder),
+                shipmentId = shipment.id,
+                status = shipment.status
+              )
 
-            Spacer(modifier = Modifier.height(20.dp))
+              Spacer(modifier = Modifier.height(20.dp))
+            }
           }
         }
         is HistoryState.LOADING -> {
@@ -121,7 +136,8 @@ fun HistoryScreen(
               .clip(shape = RoundedCornerShape(5.dp))
               .height(150.dp)
               .fillMaxSize()
-              .background(Color(0xFFE5E5E5)),
+              .background(Color(0xFFE5E5E5))
+              .weight(1f),
             colModifier = Modifier
               .fillMaxSize(),
             image = painterResource(id = R.drawable.close),

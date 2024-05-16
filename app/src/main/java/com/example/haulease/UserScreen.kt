@@ -5,7 +5,7 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.haulease.navigations.BottomNavBar
 import com.example.haulease.navigations.routes.UserRoutes
+import com.example.haulease.viewmodels.user.inner.CreateCargoShipmentVM
 import com.example.haulease.views.user.DashboardScreen
 import com.example.haulease.views.user.HistoryScreen
 import com.example.haulease.views.user.ProfileScreen
@@ -41,7 +42,8 @@ fun UserScreen() {
 
 @Composable
 fun UserNavHost(navCtrl: NavHostController) {
-  val context = LocalContext.current
+  // Shared view model between create cargo and shipment screen
+  val createCargoShipmentVM = viewModel<CreateCargoShipmentVM>()
 
   NavHost(
     navController = navCtrl,
@@ -163,7 +165,8 @@ fun UserNavHost(navCtrl: NavHostController) {
         onBack = {
           navCtrl.popBackStack()
         },
-        shipmentId = shipmentId!!.toInt(),
+        shipmentId = shipmentId?.toIntOrNull(),
+        createCargoShipmentVM = createCargoShipmentVM,
       )
     }
 
@@ -183,7 +186,8 @@ fun UserNavHost(navCtrl: NavHostController) {
         onBack = {
           navCtrl.popBackStack()
         },
-        shipmentId = shipmentId!!.toInt()
+        shipmentId = shipmentId?.toIntOrNull(),
+        createCargoShipmentVM = createCargoShipmentVM
       )
     }
 

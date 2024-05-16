@@ -18,7 +18,7 @@ import com.example.haulease.R
 @Composable
 fun SimpleLabelDesc(
   label: String,
-  desc: String
+  desc: String?
 ) {
   Column(
     modifier = Modifier
@@ -36,7 +36,7 @@ fun SimpleLabelDesc(
     Spacer(modifier = Modifier.height(5.dp))
 
     Text(
-      text = desc,
+      text = desc ?: "",
       style = TextStyle(
         fontFamily = FontFamily(Font(R.font.libre)),
         fontSize = 12.sp,

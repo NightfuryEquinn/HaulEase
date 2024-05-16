@@ -42,13 +42,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.haulease.R
+import com.example.haulease.models.Sessions
+import com.example.haulease.models.Shipment
 import com.example.haulease.models.TempShipmentCargo
 import com.example.haulease.navigations.routes.UserRoutes
 import com.example.haulease.ui.components.SimpleCargoBox
 import com.example.haulease.ui.components.SimpleTextField
+import com.example.haulease.validations.CargoStatus
 import com.example.haulease.viewmodels.user.inner.CreateCargoShipmentVM
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -70,8 +72,8 @@ import kotlinx.coroutines.launch
 fun CreateShipmentScreen(
   navCtrl: NavHostController,
   onBack: () -> Unit,
-  shipmentId: Int,
-  createCargoShipmentVM: CreateCargoShipmentVM = viewModel()
+  shipmentId: Int? = 0,
+  createCargoShipmentVM: CreateCargoShipmentVM
 ) {
   val cScope = rememberCoroutineScope()
   val tempShipmentCargo: TempShipmentCargo = createCargoShipmentVM.tempShipmentCargo
@@ -422,7 +424,27 @@ fun CreateShipmentScreen(
     ) {
       Button(
         onClick = {
-          createCargoShipmentVM.placeShipment(tempShipmentCargo)
+          cScope.launch {
+            originAddress?.let {
+              createCargoShipmentVM.placeShipment(
+                Shipment(
+                  id = 0,
+                  status = CargoStatus.status1.titleText,
+                  origin = origin.value,
+                  destination = dest.value,
+                  receiverName = name.value,
+                  receiverContact = contact.value,
+                  consignorId = Sessions.sessionToken?.toInt(),
+                  paymentId = 0,
+                  trackingId = 0,
+                  truckId = 0
+                ),
+                tempShipmentCargo,
+                it,
+                context
+              )
+            }
+          }
 
           onBack()
           navCtrl.navigate(UserRoutes.Shipment.routes) {

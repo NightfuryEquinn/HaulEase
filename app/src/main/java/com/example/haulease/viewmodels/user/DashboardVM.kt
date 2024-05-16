@@ -38,7 +38,7 @@ class DashboardVM: ViewModel() {
     val res = repository.getShipmentsByConsignor(consignorSessionId)
 
     res.body()?.let {
-      if (res.isSuccessful) {
+      if (res.isSuccessful && it.isNotEmpty()) {
         latestShipment = it.last()
         // Count total shipment of the consignor
         totalShipments = it.size
@@ -55,7 +55,7 @@ class DashboardVM: ViewModel() {
     val res = repository.getShipmentPayment(consignorSessionId)
 
     res.body()?.let {
-      if (res.isSuccessful) {
+      if (res.isSuccessful && it.isNotEmpty()) {
         for (sp in it.reversed()) {
           if (sp.payment.first == 0.0 || sp.payment.second == 0.0 || sp.payment.final == 0.0) {
             latestUnpaidShipment = sp

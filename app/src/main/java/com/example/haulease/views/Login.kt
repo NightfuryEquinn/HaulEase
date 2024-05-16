@@ -33,9 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.haulease.R
-import com.example.haulease.navigations.routes.AdminRoutes
 import com.example.haulease.navigations.routes.SharedRoutes
-import com.example.haulease.navigations.routes.UserRoutes
 import com.example.haulease.ui.components.SimpleTextField
 import com.example.haulease.viewmodels.LoginState
 import com.example.haulease.viewmodels.LoginVM
@@ -146,12 +144,12 @@ fun LoginScreen(
 
     when (loginState) {
       is LoginState.SUCCESS -> {
-        navCtrl.navigate(UserRoutes.Dashboard.routes) {
+        navCtrl.navigate("UserScreen") {
           launchSingleTop = true
         }
       }
       is LoginState.SUCCESSADMIN -> {
-        navCtrl.navigate(AdminRoutes.AdminDashboard.routes) {
+        navCtrl.navigate("AdminScreen") {
           launchSingleTop = true
         }
       }

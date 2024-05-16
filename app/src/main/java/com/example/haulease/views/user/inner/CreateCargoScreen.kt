@@ -42,7 +42,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -61,8 +60,8 @@ import com.maxkeppeler.sheets.list.models.ListSelection
 fun CreateCargoScreen(
   navCtrl: NavHostController,
   onBack: () -> Unit,
-  shipmentId: Int,
-  createCargoShipmentVM: CreateCargoShipmentVM = viewModel()
+  shipmentId: Int?,
+  createCargoShipmentVM: CreateCargoShipmentVM
 ) {
   val context = LocalContext.current
   val cScope = rememberCoroutineScope()

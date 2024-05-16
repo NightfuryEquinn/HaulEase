@@ -1,6 +1,7 @@
 package com.example.haulease.views.user
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,8 +17,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,16 +43,23 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.haulease.R
 import com.example.haulease.models.Consignor
-import com.example.haulease.navigations.routes.SharedRoutes
+import com.example.haulease.ui.components.SimpleEmptyBox
 import com.example.haulease.ui.components.SimpleLabelDesc
+import com.example.haulease.viewmodels.user.ProfileState
 import com.example.haulease.viewmodels.user.ProfileVM
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(
   navCtrl: NavHostController,
   profileVM: ProfileVM = viewModel()
 ) {
-  val theUserProfile: Consignor? = profileVM.getConsignorProfile()
+  val context = LocalContext.current
+  val cScope = rememberCoroutineScope()
+  var theUserProfile: Consignor? = null
+
+  // Observer
+  val profileState by profileVM.profileState.collectAsState()
 
   Column(
     modifier = Modifier
@@ -83,11 +96,11 @@ fun ProfileScreen(
         .verticalScroll(rememberScrollState())
         .weight(1f)
     ) {
-      if (theUserProfile != null) {
-        if (theUserProfile.avatar.isNotEmpty()) {
+      when (profileState) {
+        is ProfileState.SUCCESS -> {
           AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-              .data(theUserProfile.avatar)
+              .data(theUserProfile?.avatar)
               .crossfade(true)
               .build(),
             contentDescription = null,
@@ -98,55 +111,65 @@ fun ProfileScreen(
               .aspectRatio(1.0f),
             contentScale = ContentScale.Crop
           )
-        } else {
-          Image(
-            painterResource(id = R.drawable.avatar),
-            contentDescription = null,
-            modifier = Modifier
-              .clip(shape = RoundedCornerShape(5.dp))
-              .fillMaxSize()
-              .height(150.dp)
-              .aspectRatio(1.0f)
+
+          Spacer(modifier = Modifier.height(20.dp))
+
+          SimpleLabelDesc(
+            label = "Username",
+            desc = theUserProfile?.username
+          )
+
+          SimpleLabelDesc(
+            label = "Email",
+            desc = theUserProfile?.email
+          )
+
+          SimpleLabelDesc(
+            label = "Residential Address",
+            desc = theUserProfile?.address
+          )
+
+          SimpleLabelDesc(
+            label = "Company Name",
+            desc = theUserProfile?.company ?: "none"
+          )
+
+          SimpleLabelDesc(
+            label = "Company Email",
+            desc = theUserProfile?.companyEmail ?: "none"
+          )
+
+          SimpleLabelDesc(
+            label = "Company Address",
+            desc = theUserProfile?.companyAddress ?: "none"
           )
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        SimpleLabelDesc(
-          label = "Username",
-          desc = theUserProfile.username
-        )
-
-        SimpleLabelDesc(
-          label = "Email",
-          desc = theUserProfile.email
-        )
-
-        SimpleLabelDesc(
-          label = "Residential Address",
-          desc = theUserProfile.address
-        )
-
-        SimpleLabelDesc(
-          label = "Company Name",
-          desc = theUserProfile.company ?: "none"
-        )
-
-        SimpleLabelDesc(
-          label = "Company Email",
-          desc = theUserProfile.companyEmail ?: "none"
-        )
-
-        SimpleLabelDesc(
-          label = "Company Address",
-          desc = theUserProfile.companyAddress ?: "none"
-        )
+        is ProfileState.LOADING -> {
+          LinearProgressIndicator(
+            modifier = Modifier
+              .align(Alignment.CenterHorizontally)
+          )
+        }
+        is ProfileState.INITIAL -> {
+          SimpleEmptyBox(
+            modifier = Modifier
+              .clip(shape = RoundedCornerShape(5.dp))
+              .height(150.dp)
+              .fillMaxSize()
+              .background(Color(0xFFE5E5E5))
+              .weight(1f),
+            colModifier = Modifier
+              .fillMaxSize(),
+            image = painterResource(id = R.drawable.close),
+            name = "Unable to Load Information"
+          )
+        }
       }
 
       Button(
         onClick = {
           profileVM.logoutConsignor()
-          navCtrl.navigate(SharedRoutes.Login.routes) {
+          navCtrl.navigate("MainScreen") {
             launchSingleTop = true
           }
         },
@@ -167,5 +190,16 @@ fun ProfileScreen(
     }
 
     Spacer(modifier = Modifier.padding(bottom = 52.dp))
+  }
+
+  DisposableEffect(Unit) {
+    val job = cScope.launch {
+      theUserProfile = profileVM.loadConsignorProfile(context)
+    }
+
+    onDispose {
+      job.cancel()
+      profileVM.clearConsignorProfile()
+    }
   }
 }

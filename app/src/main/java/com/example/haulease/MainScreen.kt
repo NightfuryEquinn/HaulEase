@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.haulease.models.Sessions
 import com.example.haulease.navigations.routes.SharedRoutes
 import com.example.haulease.views.ForgotScreen
 import com.example.haulease.views.LoginScreen
@@ -60,7 +61,13 @@ fun MainNavHost(navCtrl: NavHostController) {
     }
   ) {
     composable("start") {
-      navCtrl.navigate(SharedRoutes.Login.routes)
+      if (Sessions.sessionToken != null && Sessions.sessionRole == "User") {
+        navCtrl.navigate("UserScreen")
+      } else if (Sessions.sessionToken != null && Sessions.sessionRole == "Admin") {
+        navCtrl.navigate("AdminScreen")
+      } else {
+        navCtrl.navigate(SharedRoutes.Login.routes)
+      }
     }
 
     composable(SharedRoutes.Login.routes) {
@@ -89,6 +96,10 @@ fun MainNavHost(navCtrl: NavHostController) {
 
     composable("UserScreen") {
       UserScreen()
+    }
+
+    composable("AdminScreen") {
+      AdminScreen()
     }
   }
 }
