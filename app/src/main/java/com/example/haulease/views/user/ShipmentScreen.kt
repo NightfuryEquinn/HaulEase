@@ -47,7 +47,6 @@ import androidx.navigation.NavHostController
 import com.example.haulease.R
 import com.example.haulease.models.Shipment
 import com.example.haulease.navigations.TabBar
-import com.example.haulease.navigations.routes.UserInnerRoutes
 import com.example.haulease.ui.components.SimpleEmptyBox
 import com.example.haulease.ui.components.SimpleTabCol
 import com.example.haulease.viewmodels.user.ShipmentState
@@ -173,7 +172,7 @@ fun ShipmentScreen(
 
     Button(
       onClick = {
-        navCtrl.navigate(UserInnerRoutes.CreateShipment.routes)
+        navCtrl.navigate("CreateShipment?shipmentId=")
       },
       modifier = Modifier
         .fillMaxWidth()

@@ -23,7 +23,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,23 +47,22 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.haulease.R
+import com.example.haulease.models.Cargo
 import com.example.haulease.ui.components.SimpleTextField
 import com.example.haulease.validations.InputValidation.isValidInt
-import com.example.haulease.viewmodels.user.inner.CreateCargoVM
+import com.example.haulease.viewmodels.user.inner.CreateCargoShipmentVM
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.list.ListDialog
 import com.maxkeppeler.sheets.list.models.ListOption
 import com.maxkeppeler.sheets.list.models.ListSelection
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateCargoScreen(
   navCtrl: NavHostController,
   onBack: () -> Unit,
-  cargoId: Int = 0,
   shipmentId: Int,
-  createCargoVM: CreateCargoVM = viewModel(),
+  createCargoShipmentVM: CreateCargoShipmentVM = viewModel()
 ) {
   val context = LocalContext.current
   val cScope = rememberCoroutineScope()
@@ -79,7 +77,6 @@ fun CreateCargoScreen(
   val desc = remember { mutableStateOf("")}
 
   // Get image selection context
-  val imageContext = LocalContext.current
   val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
     image.value = uri
   }
@@ -243,7 +240,7 @@ fun CreateCargoScreen(
         painter =
         if (image.value != null) {
           rememberAsyncImagePainter(
-            model = ImageRequest.Builder(imageContext)
+            model = ImageRequest.Builder(context)
               .crossfade(false)
               .data(image.value)
               .build(),
@@ -307,6 +304,20 @@ fun CreateCargoScreen(
     ) {
       Button(
         onClick = {
+          createCargoShipmentVM.appendCargo(
+            Cargo(
+              id = 0,
+              type = type,
+              weight = weight.value.toDouble(),
+              length = length.value.toDouble(),
+              width = width.value.toDouble(),
+              height = height.value.toDouble(),
+              image = image.value.toString(),
+              description = desc.value,
+              shipmentId = 0
+            )
+          )
+
           onBack()
           navCtrl.navigate("CreateShipment?shipmentId=$shipmentId") {
             launchSingleTop = true
@@ -353,15 +364,5 @@ fun CreateCargoScreen(
     }
 
     Spacer(modifier = Modifier.padding(bottom = 52.dp))
-  }
-
-  DisposableEffect(Unit) {
-    val job = cScope.launch {
-
-    }
-
-    onDispose {
-      job.cancel()
-    }
   }
 }

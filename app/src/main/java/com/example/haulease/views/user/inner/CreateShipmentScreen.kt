@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,10 +45,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.haulease.R
+import com.example.haulease.models.TempShipmentCargo
 import com.example.haulease.navigations.routes.UserRoutes
 import com.example.haulease.ui.components.SimpleCargoBox
 import com.example.haulease.ui.components.SimpleTextField
-import com.example.haulease.viewmodels.user.inner.CreateShipmentVM
+import com.example.haulease.viewmodels.user.inner.CreateCargoShipmentVM
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -68,9 +70,12 @@ import kotlinx.coroutines.launch
 fun CreateShipmentScreen(
   navCtrl: NavHostController,
   onBack: () -> Unit,
-  shipmentId: Int = 0,
-  createShipmentVM: CreateShipmentVM = viewModel()
+  shipmentId: Int,
+  createCargoShipmentVM: CreateCargoShipmentVM = viewModel()
 ) {
+  val cScope = rememberCoroutineScope()
+  val tempShipmentCargo: TempShipmentCargo = createCargoShipmentVM.tempShipmentCargo
+
   // Map variables
   val context = LocalContext.current
   val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
@@ -92,17 +97,12 @@ fun CreateShipmentScreen(
   val origin = remember { mutableStateOf(liveAddress) }
   val dest = remember { mutableStateOf("") }
 
-  val cargoList: List<Pair<Int, String>> = listOf(
-    R.drawable.image to "100001",
-    R.drawable.image to "100002",
-  )
-
   // Validations
   val allFieldsNotEmpty = name.value.isNotBlank()
       && contact.value.isNotBlank()
       && origin.value.isNotBlank()
       && dest.value.isNotBlank()
-      && (cargoList.size >= 1)
+      && (tempShipmentCargo.cargoList.isNotEmpty())
 
   val originOrDest = origin.value.isNotBlank() && dest.value.isNotBlank()
 
@@ -381,11 +381,13 @@ fun CreateShipmentScreen(
 
       Spacer(modifier = Modifier.height(10.dp))
 
-      cargoList.forEachIndexed { _, (imageId, id) ->
+      tempShipmentCargo.cargoList.forEach { tempCargo ->
         SimpleCargoBox(
-          navCtrl = navCtrl,
-          image = painterResource(id = imageId),
-          cargoId = id.toInt()
+          image = tempCargo.image,
+          cargoId = tempCargo.id,
+          onRemove = {
+            createCargoShipmentVM.removeCargo(tempCargo)
+          }
         )
       }
 
@@ -393,7 +395,7 @@ fun CreateShipmentScreen(
 
       Button(
         onClick = {
-          navCtrl.navigate("CreateCargo?cargoId=")
+          navCtrl.navigate("CreateCargo?cargoId=&shipmentId=$shipmentId")
         },
         modifier = Modifier
           .fillMaxWidth(),
@@ -420,6 +422,8 @@ fun CreateShipmentScreen(
     ) {
       Button(
         onClick = {
+          createCargoShipmentVM.placeShipment(tempShipmentCargo)
+
           onBack()
           navCtrl.navigate(UserRoutes.Shipment.routes) {
             launchSingleTop = true
@@ -429,7 +433,7 @@ fun CreateShipmentScreen(
           .weight(0.35f),
         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
         shape = RoundedCornerShape(5.dp),
-        enabled = allFieldsNotEmpty // && cargoListNotEmpty
+        enabled = allFieldsNotEmpty
       ) {
         Text(
           text = "Place",

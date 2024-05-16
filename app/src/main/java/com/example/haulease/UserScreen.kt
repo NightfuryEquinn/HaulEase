@@ -153,7 +153,7 @@ fun UserNavHost(navCtrl: NavHostController) {
         navArgument("shipmentId") {
           type = NavType.StringType
           nullable = true
-        }
+        },
       )
     ) { backStackEntry ->
       val shipmentId = backStackEntry.arguments?.getString("shipmentId")
@@ -163,24 +163,19 @@ fun UserNavHost(navCtrl: NavHostController) {
         onBack = {
           navCtrl.popBackStack()
         },
-        shipmentId = shipmentId!!.toInt()
+        shipmentId = shipmentId!!.toInt(),
       )
     }
 
     composable(
-      route = "CreateCargo?cargoId={cargoId}&shipmentId={shipmentId}",
+      route = "CreateCargo?shipmentId={shipmentId}",
       arguments = listOf(
-        navArgument("cargoId") {
-          type = NavType.StringType
-          nullable = true
-        },
         navArgument("shipmentId") {
           type = NavType.StringType
           nullable = true
         }
       )
     ) { backStackEntry ->
-      val cargoId = backStackEntry.arguments?.getString("cargoId")
       val shipmentId = backStackEntry.arguments?.getString("shipmentId")
 
       CreateCargoScreen(
@@ -188,7 +183,6 @@ fun UserNavHost(navCtrl: NavHostController) {
         onBack = {
           navCtrl.popBackStack()
         },
-        cargoId = cargoId!!.toInt(),
         shipmentId = shipmentId!!.toInt()
       )
     }
