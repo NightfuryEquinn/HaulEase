@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +46,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.haulease.R
 import com.example.haulease.models.Cargo
-import com.example.haulease.models.TempShipmentCargo
 import com.example.haulease.navigations.routes.UserInnerRoutes
 import com.example.haulease.ui.components.SimpleTextField
 import com.example.haulease.validations.InputValidation.isValidInt
@@ -56,18 +54,15 @@ import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.list.ListDialog
 import com.maxkeppeler.sheets.list.models.ListOption
 import com.maxkeppeler.sheets.list.models.ListSelection
-import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateCargoScreen(
   navCtrl: NavHostController,
   onBack: () -> Unit,
-  tempShipmentCargo: TempShipmentCargo,
   createCargoShipmentVM: CreateCargoShipmentVM
 ) {
   val context = LocalContext.current
-  val cScope = rememberCoroutineScope()
 
   // State variables
   var type by remember { mutableStateOf("") }
@@ -281,7 +276,7 @@ fun CreateCargoScreen(
         onValueChange = { newValue ->
           desc.value = newValue
         },
-        label = "Description (optional)",
+        label = "Description",
         maxLines = 5
       )
     }

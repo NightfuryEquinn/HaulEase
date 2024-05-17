@@ -1,5 +1,6 @@
 package com.example.haulease.viewmodels.user
 
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -53,21 +54,33 @@ class DashboardVM: ViewModel() {
   // Get the details of latest unpaid shipment
   private suspend fun getLatestUnpaidShipments(): Boolean {
     val res = repository.getShipmentPayment(consignorSessionId)
-
+    Log.d("Result", res.body().toString())
     res.body()?.let {
       if (res.isSuccessful && it.isNotEmpty()) {
         for (sp in it.reversed()) {
-          if (sp.payment.first == 0.0 || sp.payment.second == 0.0 || sp.payment.final == 0.0) {
-            latestUnpaidShipment = sp
+          val paymentRes = repository.getPayment(sp.payment.id)
+
+          paymentRes.body()?.let { payment ->
+            if (paymentRes.isSuccessful) {
+              if (payment.first == 0.0 || payment.second == 0.0 || payment.final == 0.0) {
+                latestUnpaidShipment = sp
+              }
+            }
+          }
+
+          if (latestUnpaidShipment != null) {
             break
           }
         }
 
         // Get total spent
-        for (sp in it) {
-          if (sp.payment.first != null && sp.payment.second != null && sp.payment.final != null) {
-            val eachSpend = sp.payment.first?.plus(sp.payment.second!!)?.plus(sp.payment.final!!)
-            totalSpend += eachSpend ?: 0.0
+        val allPaymentRes = repository.getPayments()
+
+        allPaymentRes.body()?.let { payments ->
+          for (payment in payments) {
+            if (payment.first != null && payment.second != null && payment.final != null) {
+              totalSpend += payment.first?.plus(payment.second!!)?.plus(payment.final!!) ?: 0.0
+            }
           }
         }
       }
@@ -96,11 +109,11 @@ class DashboardVM: ViewModel() {
                 totalWeight += cargo.weight
               }
             }
+
+            return shipRes.isSuccessful && cargoRes.isSuccessful
           }
         }
       }
-
-      return shipRes.isSuccessful
     }
 
     return false

@@ -52,12 +52,12 @@ fun DashboardScreen(
 ) {
   val context = LocalContext.current
   val cScope = rememberCoroutineScope()
-  var latestShipment: Shipment? = null
-  var latestUnpaidShipment: ShipmentPayment? = null
-  var totalShipments: Int = 0;
-  var totalCargo: Int = 0;
-  var totalWeight: Double = 0.0;
-  var totalSpend: Double = 0.0;
+  val latestShipment: Shipment? = dashboardVM.latestShipment
+  val latestUnpaidShipment: ShipmentPayment? = dashboardVM.latestUnpaidShipment
+  val totalShipments: Int = dashboardVM.totalShipments
+  val totalCargo: Int = dashboardVM.totalCargo
+  val totalWeight: Double = dashboardVM.totalWeight
+  val totalSpend: Double = dashboardVM.totalSpend
 
   // Observer
   val dashboardState by dashboardVM.dashboardState.collectAsState()
@@ -120,8 +120,8 @@ fun DashboardScreen(
               rowModifier = Modifier
                 .fillMaxSize(),
               image = painterResource(id = R.drawable.shipment_placeholder),
-              shipmentId = latestShipment?.id,
-              status = latestShipment?.status
+              shipmentId = latestShipment.id,
+              status = latestShipment.status
             )
           } else {
             SimpleEmptyBox(
@@ -160,8 +160,8 @@ fun DashboardScreen(
               rowModifier = Modifier
                 .fillMaxSize(),
               image = painterResource(id = R.drawable.shipment_placeholder),
-              shipmentId = latestUnpaidShipment?.shipment?.id,
-              status = latestUnpaidShipment?.shipment?.status
+              shipmentId = latestUnpaidShipment.shipment.id,
+              status = latestUnpaidShipment.shipment.status
             )
           } else {
             SimpleEmptyBox(
@@ -261,12 +261,6 @@ fun DashboardScreen(
   DisposableEffect(Unit) {
     val job = cScope.launch {
       dashboardVM.getAnalysis(context)
-      latestShipment = dashboardVM.latestShipment
-      latestUnpaidShipment = dashboardVM.latestUnpaidShipment
-      totalShipments = dashboardVM.totalShipments
-      totalCargo = dashboardVM.totalCargo
-      totalWeight = dashboardVM.totalWeight
-      totalSpend = dashboardVM.totalSpend
     }
 
     onDispose {

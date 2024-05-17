@@ -46,8 +46,8 @@ fun LoginScreen(
   val context = LocalContext.current
 
   // State variables
-  val email = remember { mutableStateOf("") }
-  val password = remember { mutableStateOf("") }
+  val email = remember { mutableStateOf("xianzyip8@gmail.com") }
+  val password = remember { mutableStateOf("Qwer1234") }
 
   // Validations
   val allFieldsNotEmpty = email.value.isNotBlank() && password.value.isNotBlank()

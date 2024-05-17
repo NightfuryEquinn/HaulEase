@@ -35,7 +35,7 @@ import com.example.haulease.R
 @Composable
 fun SimpleCargoBox(
   image: String,
-  cargoId: Int,
+  cargoCount: Int,
   onRemove: () -> Unit
 ) {
   Column(
@@ -79,7 +79,7 @@ fun SimpleCargoBox(
           .fillMaxWidth()
       ) {
         Text(
-          text = "ID: $cargoId",
+          text = "Cargo $cargoCount",
           style = TextStyle(
             fontFamily = FontFamily(Font(R.font.libre)),
             fontSize = 16.sp

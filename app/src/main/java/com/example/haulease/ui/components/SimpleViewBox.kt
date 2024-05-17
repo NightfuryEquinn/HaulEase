@@ -89,8 +89,8 @@ fun SimpleViewBox(
       ) {
         Text(
           text = when {
-            cargoId != null -> "ID: $cargoId"
-            shipmentId != null -> "ID: $shipmentId"
+            cargoId != 0 -> "ID: $cargoId"
+            shipmentId != 0 -> "ID: $shipmentId"
             else -> "Name: $name"
           },
           style = TextStyle(

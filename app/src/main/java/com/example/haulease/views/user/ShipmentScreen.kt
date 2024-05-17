@@ -61,10 +61,10 @@ fun ShipmentScreen(
 ) {
   val context = LocalContext.current
   val cScope = rememberCoroutineScope()
-  var pickupShipment: List<Shipment> = emptyList()
-  var harbourShipment: List<Shipment> = emptyList()
-  var enrouteShipment: List<Shipment> = emptyList()
-  var arrivedShipment: List<Shipment> = emptyList()
+  val pickupShipment: List<Shipment> = shipmentVM.pickupShipment
+  val harbourShipment: List<Shipment> = shipmentVM.harbourShipment
+  val enrouteShipment: List<Shipment> = shipmentVM.enrouteShipment
+  val arrivedShipment: List<Shipment> = shipmentVM.arrivedShipment
 
   var selectedTabIndex by remember { mutableIntStateOf(0) }
   val pagerState = rememberPagerState {
@@ -138,11 +138,72 @@ fun ShipmentScreen(
             .fillMaxWidth()
             .weight(1f)
         ) {
+
           when (selectedTabIndex) {
-            0 -> SimpleTabCol(navCtrl, pickupShipment)
-            1 -> SimpleTabCol(navCtrl, harbourShipment)
-            2 -> SimpleTabCol(navCtrl, enrouteShipment)
-            3 -> SimpleTabCol(navCtrl, arrivedShipment)
+            0 -> if (pickupShipment.isNotEmpty()) {
+              SimpleTabCol(navCtrl, pickupShipment)
+            } else {
+              SimpleEmptyBox(
+                modifier = Modifier
+                  .clip(shape = RoundedCornerShape(5.dp))
+                  .height(150.dp)
+                  .fillMaxSize()
+                  .background(Color(0xFFE5E5E5))
+                  .weight(1f),
+                colModifier = Modifier
+                  .fillMaxSize(),
+                image = painterResource(id = R.drawable.close),
+                name = "No Information Found"
+              )
+            }
+            1 -> if (harbourShipment.isNotEmpty()) {
+              SimpleTabCol(navCtrl, harbourShipment)
+            } else {
+              SimpleEmptyBox(
+                modifier = Modifier
+                  .clip(shape = RoundedCornerShape(5.dp))
+                  .height(150.dp)
+                  .fillMaxSize()
+                  .background(Color(0xFFE5E5E5))
+                  .weight(1f),
+                colModifier = Modifier
+                  .fillMaxSize(),
+                image = painterResource(id = R.drawable.close),
+                name = "No Information Found"
+              )
+            }
+            2 -> if (enrouteShipment.isNotEmpty()) {
+              SimpleTabCol(navCtrl, enrouteShipment)
+            } else {
+              SimpleEmptyBox(
+                modifier = Modifier
+                  .clip(shape = RoundedCornerShape(5.dp))
+                  .height(150.dp)
+                  .fillMaxSize()
+                  .background(Color(0xFFE5E5E5))
+                  .weight(1f),
+                colModifier = Modifier
+                  .fillMaxSize(),
+                image = painterResource(id = R.drawable.close),
+                name = "No Information Found"
+              )
+            }
+            3 -> if (arrivedShipment.isNotEmpty()) {
+              SimpleTabCol(navCtrl, arrivedShipment)
+            } else {
+              SimpleEmptyBox(
+                modifier = Modifier
+                  .clip(shape = RoundedCornerShape(5.dp))
+                  .height(150.dp)
+                  .fillMaxSize()
+                  .background(Color(0xFFE5E5E5))
+                  .weight(1f),
+                colModifier = Modifier
+                  .fillMaxSize(),
+                image = painterResource(id = R.drawable.close),
+                name = "No Information Found"
+              )
+            }
           }
         }
       }
@@ -208,11 +269,6 @@ fun ShipmentScreen(
   DisposableEffect(Unit) {
     val job = cScope.launch {
       shipmentVM.loadShipments(context)
-
-      pickupShipment = shipmentVM.pickupShipment
-      harbourShipment = shipmentVM.harbourShipment
-      enrouteShipment = shipmentVM.enrouteShipment
-      arrivedShipment = shipmentVM.arrivedShipment
     }
 
     onDispose {

@@ -21,7 +21,7 @@ class ProfileVM: ViewModel() {
   private var consignorSessionId: Int = Sessions.sessionToken?.toInt()!!
   private val _profileState = MutableStateFlow<ProfileState>(ProfileState.INITIAL)
 
-  private var theUserProfile: Consignor? = null
+  var theUserProfile: Consignor? = null
 
   // Set observer value
   val profileState: MutableStateFlow<ProfileState> = _profileState

@@ -46,7 +46,6 @@ import androidx.navigation.NavHostController
 import com.example.haulease.R
 import com.example.haulease.models.Sessions
 import com.example.haulease.models.Shipment
-import com.example.haulease.models.TempShipmentCargo
 import com.example.haulease.navigations.routes.UserInnerRoutes
 import com.example.haulease.navigations.routes.UserRoutes
 import com.example.haulease.ui.components.SimpleCargoBox
@@ -73,10 +72,10 @@ import kotlinx.coroutines.launch
 fun CreateShipmentScreen(
   navCtrl: NavHostController,
   onBack: () -> Unit,
-  tempShipmentCargo: TempShipmentCargo,
   createCargoShipmentVM: CreateCargoShipmentVM
 ) {
   val cScope = rememberCoroutineScope()
+  val tempShipmentCargo = createCargoShipmentVM.tempShipmentCargo.value
 
   // Map variables
   val context = LocalContext.current
@@ -94,8 +93,8 @@ fun CreateShipmentScreen(
   var destAddress by remember { mutableStateOf<Address?>(null) }
 
   // State variables
-  val name = remember { mutableStateOf("") }
-  val contact = remember { mutableStateOf("") }
+  val name = remember { mutableStateOf(tempShipmentCargo.receiverName) }
+  val contact = remember { mutableStateOf(tempShipmentCargo.receiverContact) }
   val origin = remember { mutableStateOf(liveAddress) }
   val dest = remember { mutableStateOf("") }
 
@@ -199,6 +198,7 @@ fun CreateShipmentScreen(
               val liveArr: List<Address> = liveRes
 
               liveAddress = liveArr[0].getAddressLine(0)
+              origin.value = liveAddress
               userOrigin.value = liveAddress
               originAddress = liveArr[0]
 
@@ -276,6 +276,7 @@ fun CreateShipmentScreen(
         inputText = name,
         onValueChange = { newValue ->
           name.value = newValue
+          tempShipmentCargo.receiverName = newValue
         },
         label = "Receiver Name",
         isSingle = true
@@ -290,9 +291,11 @@ fun CreateShipmentScreen(
         inputText = contact,
         onValueChange = { newValue ->
           contact.value = newValue
+          tempShipmentCargo.receiverContact = newValue
         },
         label = "Receiver Contact",
-        isSingle = true
+        isSingle = true,
+        onlyNumber = true
       )
 
       Spacer(modifier = Modifier.height(8.dp))
@@ -383,12 +386,15 @@ fun CreateShipmentScreen(
 
       Spacer(modifier = Modifier.height(10.dp))
 
-      tempShipmentCargo.cargoList.forEach { tempCargo ->
+      tempShipmentCargo.cargoList.forEachIndexed { index, tempCargo ->
         SimpleCargoBox(
           image = tempCargo.image,
-          cargoId = tempCargo.id,
+          cargoCount = index + 1,
           onRemove = {
             createCargoShipmentVM.removeCargo(tempCargo)
+            navCtrl.navigate(UserInnerRoutes.CreateShipment.routes) {
+              launchSingleTop = true
+            }
           }
         )
       }
@@ -425,24 +431,28 @@ fun CreateShipmentScreen(
       Button(
         onClick = {
           cScope.launch {
-            originAddress?.let {
-              createCargoShipmentVM.placeShipment(
-                Shipment(
-                  id = 0,
-                  status = CargoStatus.status1.titleText,
-                  origin = origin.value,
-                  destination = dest.value,
-                  receiverName = name.value,
-                  receiverContact = contact.value,
-                  consignorId = Sessions.sessionToken?.toInt(),
-                  paymentId = 0,
-                  trackingId = 0,
-                  truckId = 0
-                ),
-                tempShipmentCargo,
-                it,
-                context
-              )
+            try {
+              if (originAddress != null) {
+                createCargoShipmentVM.placeShipment(
+                  Shipment(
+                    id = 0,
+                    status = CargoStatus.status1.titleText,
+                    origin = origin.value,
+                    destination = dest.value,
+                    receiverName = name.value,
+                    receiverContact = contact.value,
+                    consignorId = Sessions.sessionToken?.toInt(),
+                    paymentId = 0,
+                    trackingId = 0,
+                    truckId = 0
+                  ),
+                  tempShipmentCargo,
+                  originAddress!!,
+                  context
+                )
+              }
+            } catch (e: Exception) {
+              Toast.makeText(context, e.message.toString(), Toast.LENGTH_SHORT).show()
             }
           }
 

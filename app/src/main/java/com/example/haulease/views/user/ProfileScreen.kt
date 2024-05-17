@@ -56,7 +56,7 @@ fun ProfileScreen(
 ) {
   val context = LocalContext.current
   val cScope = rememberCoroutineScope()
-  var theUserProfile: Consignor? = null
+  var theUserProfile: Consignor? = profileVM.theUserProfile
 
   // Observer
   val profileState by profileVM.profileState.collectAsState()

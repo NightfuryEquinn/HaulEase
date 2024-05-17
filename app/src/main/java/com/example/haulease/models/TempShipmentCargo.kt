@@ -1,8 +1,7 @@
 package com.example.haulease.models
 
-import java.util.UUID
-
 data class TempShipmentCargo(
-  var id: UUID,
+  var receiverName: String,
+  var receiverContact: String,
   var cargoList: MutableList<Cargo>
 )

@@ -8,14 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navigation
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.haulease.navigations.BottomNavBar
@@ -36,13 +35,17 @@ import com.example.haulease.views.user.inner.ShipmentDetailScreen
 @Composable
 fun UserScreen() {
   val navCtrl = rememberNavController()
+  val backStackEntry by navCtrl.currentBackStackEntryAsState()
+  val currentRoute = backStackEntry?.destination?.route
 
   Scaffold(
     content = {
       UserNavHost(navCtrl = navCtrl)
     },
     bottomBar = {
-      BottomNavBar(navCtrl = navCtrl)
+      if (currentRoute != "MainScreen") {
+        BottomNavBar(navCtrl = navCtrl)
+      }
     }
   )
 }
@@ -50,7 +53,7 @@ fun UserScreen() {
 @Composable
 fun UserNavHost(navCtrl: NavHostController) {
   // Shared view model between create cargo and shipment screen
-  val createCargoShipmentVM = viewModel<CreateCargoShipmentVM>()
+  val createCargoShipmentVM: CreateCargoShipmentVM = viewModel()
 
   NavHost(
     navController = navCtrl,
@@ -156,37 +159,24 @@ fun UserNavHost(navCtrl: NavHostController) {
       )
     }
 
-    navigation(
-      startDestination = "CreateShipment",
-      route = "start"
-    ) {
-      composable(UserInnerRoutes.CreateShipment.routes) { entry ->
-        val viewModel = entry.sharedViewModel<CreateCargoShipmentVM>(navCtrl)
-        val state by viewModel.tempShipmentCargo.collectAsStateWithLifecycle()
+    composable(UserInnerRoutes.CreateShipment.routes) {
+      CreateShipmentScreen(
+        navCtrl = navCtrl,
+        onBack = {
+          navCtrl.popBackStack()
+        },
+        createCargoShipmentVM = createCargoShipmentVM
+      )
+    }
 
-        CreateShipmentScreen(
-          navCtrl = navCtrl,
-          onBack = {
-            navCtrl.popBackStack()
-          },
-          tempShipmentCargo = state,
-          createCargoShipmentVM = createCargoShipmentVM
-        )
-      }
-
-      composable(UserInnerRoutes.CreateCargo.routes) { entry ->
-        val viewModel = entry.sharedViewModel<CreateCargoShipmentVM>(navCtrl)
-        val state by viewModel.tempShipmentCargo.collectAsStateWithLifecycle()
-
-        CreateCargoScreen(
-          navCtrl = navCtrl,
-          onBack = {
-            navCtrl.popBackStack()
-          },
-          tempShipmentCargo = state,
-          createCargoShipmentVM = createCargoShipmentVM
-        )
-      }
+    composable(UserInnerRoutes.CreateCargo.routes) {
+      CreateCargoScreen(
+        navCtrl = navCtrl,
+        onBack = {
+          navCtrl.popBackStack()
+        },
+        createCargoShipmentVM = createCargoShipmentVM
+      )
     }
 
 //    composable(

@@ -31,36 +31,21 @@ fun SimpleTabCol(
       .padding(vertical = 8.dp)
       .verticalScroll(rememberScrollState()),
   ) {
-    if (datas.isEmpty()) {
-      SimpleEmptyBox(
+    datas.forEach { data ->
+      SimpleViewBox(
+        navCtrl = navCtrl,
         modifier = Modifier
           .clip(shape = RoundedCornerShape(5.dp))
-          .height(150.dp)
           .fillMaxSize()
-          .background(Color(0xFFE5E5E5))
-          .weight(1f),
-        colModifier = Modifier
+          .background(Color(0xFFE5E5E5)),
+        rowModifier = Modifier
           .fillMaxSize(),
-        image = painterResource(id = R.drawable.close),
-        name = "No Information Found"
+        image = painterResource(id = R.drawable.shipment_placeholder),
+        shipmentId = data.id,
+        status = data.status
       )
-    } else {
-      datas.forEach { data ->
-        SimpleViewBox(
-          navCtrl = navCtrl,
-          modifier = Modifier
-            .clip(shape = RoundedCornerShape(5.dp))
-            .fillMaxSize()
-            .background(Color(0xFFE5E5E5)),
-          rowModifier = Modifier
-            .fillMaxSize(),
-          image = painterResource(id = R.drawable.shipment_placeholder),
-          shipmentId = data.id,
-          status = data.status
-        )
 
-        Spacer(modifier = Modifier.height(10.dp))
-      }
+      Spacer(modifier = Modifier.height(10.dp))
     }
   }
 }
