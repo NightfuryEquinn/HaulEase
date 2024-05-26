@@ -185,7 +185,7 @@ fun CreateCargoScreen(
         onValueChange = { newValue ->
           weight.value = newValue
         },
-        label = "Weight in estimation",
+        label = "Weight in estimation (kg)",
         onlyNumber = true
       )
 
@@ -199,7 +199,7 @@ fun CreateCargoScreen(
         onValueChange = { newValue ->
           length.value = newValue
         },
-        label = "Length in estimation",
+        label = "Length in estimation (m)",
         onlyNumber = true
       )
 
@@ -213,7 +213,7 @@ fun CreateCargoScreen(
         onValueChange = { newValue ->
           width.value = newValue
         },
-        label = "Width in estimation",
+        label = "Width in estimation (m)",
         onlyNumber = true
       )
 
@@ -227,7 +227,7 @@ fun CreateCargoScreen(
         onValueChange = { newValue ->
           height.value = newValue
         },
-        label = "Height in estimation",
+        label = "Height in estimation (m)",
         onlyNumber = true
       )
 

@@ -5,10 +5,12 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.haulease.navigations.AdminBottomNavBar
@@ -26,13 +28,17 @@ import com.example.haulease.views.admin.inner.AdminShipmentDetailScreen
 @Composable
 fun AdminScreen() {
   val navCtrl = rememberNavController()
+  val backStackEntry by navCtrl.currentBackStackEntryAsState()
+  val currentRoute = backStackEntry?.destination?.route
 
   Scaffold (
     content = {
       AdminNavHost(navCtrl = navCtrl)
     },
     bottomBar = {
-      AdminBottomNavBar(navCtrl = navCtrl)
+      if (currentRoute != "MainScreen") {
+        AdminBottomNavBar(navCtrl = navCtrl)
+      }
     }
   )
 }
@@ -112,6 +118,7 @@ fun AdminNavHost(navCtrl: NavHostController) {
       )
     }
 
+    // Parsing argument to pass data between screens
     composable(
       route = "EditCargo?type={type}&weight={weight}&length={length}&width={width}&height={height}",
       arguments = listOf(
@@ -148,12 +155,16 @@ fun AdminNavHost(navCtrl: NavHostController) {
         onBack = {
           navCtrl.popBackStack()
         },
-        cargoType = "ASDAS",
+        cargoType = cargoType!!,
         cargoWeight = cargoWeight!!,
         cargoLength = cargoLength!!,
         cargoWidth = cargoWidth!!,
         cargoHeight = cargoHeight!!,
       )
+    }
+
+    composable("MainScreen") {
+      MainScreen()
     }
   }
 }

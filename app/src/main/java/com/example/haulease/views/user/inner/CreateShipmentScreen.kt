@@ -388,7 +388,7 @@ fun CreateShipmentScreen(
 
       tempShipmentCargo.cargoList.forEachIndexed { index, tempCargo ->
         SimpleCargoBox(
-          image = tempCargo.image,
+          cargo = tempCargo,
           cargoCount = index + 1,
           onRemove = {
             createCargoShipmentVM.removeCargo(tempCargo)

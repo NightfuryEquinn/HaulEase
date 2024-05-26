@@ -6,10 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -52,7 +49,7 @@ fun UserScreen() {
 
 @Composable
 fun UserNavHost(navCtrl: NavHostController) {
-  // Shared view model between create cargo and shipment screen
+  // Shared view model between create cargo screen and create shipment screen
   val createCargoShipmentVM: CreateCargoShipmentVM = viewModel()
 
   NavHost(
@@ -113,6 +110,7 @@ fun UserNavHost(navCtrl: NavHostController) {
     }
 
     // User Inner Routes
+    // Parsing argument to pass data between screens
     composable(
       route = "ShipmentDetail?shipmentId={shipmentId}",
       arguments = listOf(
@@ -133,6 +131,7 @@ fun UserNavHost(navCtrl: NavHostController) {
       )
     }
 
+    // Parsing argument to pass data between screens
     composable(
       route = "CargoDetail?cargoId={cargoId}&shipmentId={shipmentId}",
       arguments = listOf(
@@ -159,6 +158,7 @@ fun UserNavHost(navCtrl: NavHostController) {
       )
     }
 
+    // Shared view model to pass data between screens
     composable(UserInnerRoutes.CreateShipment.routes) {
       CreateShipmentScreen(
         navCtrl = navCtrl,
@@ -169,6 +169,7 @@ fun UserNavHost(navCtrl: NavHostController) {
       )
     }
 
+    // Shared view model to pass data between screens
     composable(UserInnerRoutes.CreateCargo.routes) {
       CreateCargoScreen(
         navCtrl = navCtrl,
@@ -179,48 +180,7 @@ fun UserNavHost(navCtrl: NavHostController) {
       )
     }
 
-//    composable(
-//      route = "CreateShipment?shipmentId={shipmentId}",
-//      arguments = listOf(
-//        navArgument("shipmentId") {
-//          type = NavType.StringType
-//          nullable = true
-//        },
-//      )
-//    ) { backStackEntry ->
-//      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
-//
-//      CreateShipmentScreen(
-//        navCtrl = navCtrl,
-//        onBack = {
-//          navCtrl.popBackStack()
-//        },
-//        shipmentId = shipmentId?.toIntOrNull(),
-//        createCargoShipmentVM = createCargoShipmentVM,
-//      )
-//    }
-//
-//    composable(
-//      route = "CreateCargo?shipmentId={shipmentId}",
-//      arguments = listOf(
-//        navArgument("shipmentId") {
-//          type = NavType.StringType
-//          nullable = true
-//        }
-//      )
-//    ) { backStackEntry ->
-//      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
-//
-//      CreateCargoScreen(
-//        navCtrl = navCtrl,
-//        onBack = {
-//          navCtrl.popBackStack()
-//        },
-//        shipmentId = shipmentId?.toIntOrNull(),
-//        createCargoShipmentVM = createCargoShipmentVM
-//      )
-//    }
-
+    // Parsing argument to pass data between screens
     composable(
       route = "Payment?paymentId={paymentId}&shipmentId={shipmentId}",
       arguments = listOf(
@@ -251,15 +211,4 @@ fun UserNavHost(navCtrl: NavHostController) {
       MainScreen()
     }
   }
-}
-
-@Composable
-inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(
-  navCtrl: NavHostController
-): T {
-  val navGraphRoute = destination.parent?.route ?: return viewModel()
-  val parentEntry = remember(this) {
-    navCtrl.getBackStackEntry(navGraphRoute)
-  }
-  return viewModel(parentEntry)
 }

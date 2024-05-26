@@ -31,10 +31,11 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.haulease.R
+import com.example.haulease.models.Cargo
 
 @Composable
 fun SimpleCargoBox(
-  image: String,
+  cargo: Cargo,
   cargoCount: Int,
   onRemove: () -> Unit
 ) {
@@ -49,10 +50,10 @@ fun SimpleCargoBox(
         .fillMaxWidth()
         .padding(12.dp),
     ) {
-      if (image.isNotEmpty()) {
+      if (cargo.image.isNotEmpty()) {
         AsyncImage(
           model = ImageRequest.Builder(LocalContext.current)
-            .data(image)
+            .data(cargo.image)
             .crossfade(true)
             .build(),
           contentDescription = null,
@@ -114,6 +115,39 @@ fun SimpleCargoBox(
           }
         }
       }
+    }
+
+    Column(
+      modifier = Modifier
+        .fillMaxWidth()
+    ) {
+      Text(
+        text = "Dimensions: ${cargo.length}m x ${cargo.width}m x ${cargo.height}m",
+        style = TextStyle(
+          fontFamily = FontFamily(Font(R.font.libre)),
+          fontSize = 12.sp
+        )
+      )
+
+      Spacer(modifier = Modifier.width(10.dp))
+
+      Text(
+        text = "Type: ${cargo.type}",
+        style = TextStyle(
+          fontFamily = FontFamily(Font(R.font.libre)),
+          fontSize = 12.sp
+        )
+      )
+
+      Spacer(modifier = Modifier.width(10.dp))
+
+      Text(
+        text = "Description: ${cargo.description}",
+        style = TextStyle(
+          fontFamily = FontFamily(Font(R.font.libre)),
+          fontSize = 12.sp
+        )
+      )
     }
   }
 
