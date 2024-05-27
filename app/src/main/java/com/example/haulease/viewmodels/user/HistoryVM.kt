@@ -31,9 +31,13 @@ class HistoryVM: ViewModel() {
   private suspend fun getShipmentsHistory(): Boolean {
     val res = repository.getShipmentsByConsignor(consignorSessionId)
 
-    res.body()?.let {
+    res.body()?.let { shipments ->
       if (res.isSuccessful) {
-        theShipmentsHistory = it.toMutableList()
+        for (shipment in shipments) {
+          if (shipment.status.startsWith("Completed")) {
+            theShipmentsHistory.add(shipment)
+          }
+        }
       }
 
       return res.isSuccessful

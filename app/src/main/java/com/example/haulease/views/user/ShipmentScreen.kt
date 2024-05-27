@@ -138,7 +138,6 @@ fun ShipmentScreen(
             .fillMaxWidth()
             .weight(1f)
         ) {
-
           when (selectedTabIndex) {
             0 -> if (pickupShipment.isNotEmpty()) {
               SimpleTabCol(navCtrl, pickupShipment)

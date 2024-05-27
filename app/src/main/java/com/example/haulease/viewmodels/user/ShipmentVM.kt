@@ -73,7 +73,7 @@ class ShipmentVM: ViewModel() {
     return false
   }
 
-  // Get all shipments for logged in consignor
+  // Load all shipments for logged in consignor
   fun loadShipments(
     context: android.content.Context
   ) {

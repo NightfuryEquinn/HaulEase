@@ -1,9 +1,13 @@
 package com.example.haulease.viewmodels.admin
 
 import androidx.lifecycle.ViewModel
-import com.example.haulease.api.Repository
+import com.example.haulease.models.Sessions
 
 class AdminProfileVM: ViewModel() {
-  private val repository: Repository = Repository()
-
+  // Clear sessions and log out
+  fun logoutAdmin() {
+    Sessions.sessionToken = null
+    Sessions.sessionEmail = null
+    Sessions.sessionRole = null
+  }
 }

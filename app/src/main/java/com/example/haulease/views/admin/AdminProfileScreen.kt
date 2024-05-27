@@ -1,6 +1,5 @@
 package com.example.haulease.views.admin
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,13 +29,16 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.haulease.R
 import com.example.haulease.ui.components.SimpleLabelDesc
+import com.example.haulease.viewmodels.admin.AdminProfileVM
 
 @Composable
 fun AdminProfileScreen(
-  navCtrl: NavHostController
+  navCtrl: NavHostController,
+  adminProfileVM: AdminProfileVM = viewModel()
 ) {
   Column(
     modifier = Modifier
@@ -97,7 +99,10 @@ fun AdminProfileScreen(
 
       Button(
         onClick = {
-          Log.d("Admin Profile", "Log Out")
+          adminProfileVM.logoutAdmin()
+          navCtrl.navigate("MainScreen") {
+            launchSingleTop = true
+          }
         },
         modifier = Modifier
           .fillMaxWidth(0.5f)
