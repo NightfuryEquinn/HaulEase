@@ -14,7 +14,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.haulease.navigations.AdminBottomNavBar
-import com.example.haulease.navigations.routes.AdminInnerRoutes
 import com.example.haulease.navigations.routes.AdminRoutes
 import com.example.haulease.views.admin.AdminDashboardScreen
 import com.example.haulease.views.admin.AdminHistoryScreen
@@ -103,25 +102,72 @@ fun AdminNavHost(navCtrl: NavHostController) {
     }
 
     // Admin Inner Routes
-    composable(AdminInnerRoutes.AdminShipmentDetail.routes) {
-      AdminShipmentDetailScreen(
-        navCtrl = navCtrl
+    // Parsing argument to pass data between screens
+    composable(
+      route = "AdminShipmentDetail?shipmentId={shipmentId}&consignorId={consignorId}",
+      arguments = listOf(
+        navArgument("shipmentId") {
+          type = NavType.StringType
+          nullable = true
+        },
+        navArgument("consignorId") {
+          type = NavType.StringType
+          nullable = true
+        }
       )
-    }
+    ) { backStackEntry ->
+      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
+      val consignorId = backStackEntry.arguments?.getString("consignorId")
 
-    composable(AdminInnerRoutes.AdminCargoDetail.routes) {
-      AdminCargoDetailScreen(
+      AdminShipmentDetailScreen(
         navCtrl = navCtrl,
         onBack = {
           navCtrl.popBackStack()
-        }
+        },
+        shipmentId = shipmentId!!.toInt(),
+        consignorId = consignorId!!.toInt()
       )
     }
 
     // Parsing argument to pass data between screens
     composable(
-      route = "EditCargo?type={type}&weight={weight}&length={length}&width={width}&height={height}",
+      route = "AdminCargoDetail?cargoId={cargoId}&shipmentId={shipmentId}",
       arguments = listOf(
+        navArgument("cargoId") {
+          type = NavType.StringType
+          nullable = true
+        },
+        navArgument("shipmentId") {
+          type = NavType.StringType
+          nullable = true
+        }
+      )
+    ) { backStackEntry ->
+      val cargoId = backStackEntry.arguments?.getString("cargoId")
+      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
+
+      AdminCargoDetailScreen(
+        navCtrl = navCtrl,
+        onBack = {
+          navCtrl.popBackStack()
+        },
+        cargoId = cargoId!!.toInt(),
+        shipmentId = shipmentId!!.toInt()
+      )
+    }
+
+    // Parsing argument to pass data between screens
+    composable(
+      route = "EditCargo?cargoId={cargoId}&shipmentId={shipmentId}&type={type}&weight={weight}&length={length}&width={width}&height={height}",
+      arguments = listOf(
+        navArgument("cargoId") {
+          type = NavType.StringType
+          nullable = true
+        },
+        navArgument("shipmentId") {
+          type = NavType.StringType
+          nullable = true
+        },
         navArgument("type") {
           type = NavType.StringType
           nullable = true
@@ -144,6 +190,8 @@ fun AdminNavHost(navCtrl: NavHostController) {
         },
       )
     ) { backStackEntry ->
+      val cargoId = backStackEntry.arguments?.getString("cargoId")
+      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
       val cargoType = backStackEntry.arguments?.getString("type")
       val cargoWeight = backStackEntry.arguments?.getString("weight")
       val cargoLength = backStackEntry.arguments?.getString("length")
@@ -155,6 +203,8 @@ fun AdminNavHost(navCtrl: NavHostController) {
         onBack = {
           navCtrl.popBackStack()
         },
+        cargoId = cargoId!!.toInt(),
+        shipmentId = shipmentId!!.toInt(),
         cargoType = cargoType!!,
         cargoWeight = cargoWeight!!,
         cargoLength = cargoLength!!,

@@ -1,6 +1,8 @@
 package com.example.haulease.views.admin.inner
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,12 +19,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -30,16 +39,40 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.haulease.R
-import com.example.haulease.navigations.routes.AdminInnerRoutes
+import com.example.haulease.models.Cargo
+import com.example.haulease.ui.components.SimpleEmptyBox
 import com.example.haulease.ui.components.SimpleLabelDesc
+import com.example.haulease.viewmodels.admin.inner.AdminCargoDetailVM
+import com.example.haulease.viewmodels.admin.inner.AdminCargoState
+import kotlinx.coroutines.launch
 
 @Composable
 fun AdminCargoDetailScreen(
   navCtrl: NavHostController,
-  onBack: () -> Unit
+  onBack: () -> Unit,
+  cargoId: Int = 0,
+  shipmentId: Int,
+  adminCargoDetailVM: AdminCargoDetailVM = viewModel()
 ) {
+  val context = LocalContext.current
+  val cScope = rememberCoroutineScope()
+  var theCargoDetail: Cargo? = null
+
+  // Observer
+  val adminCargoState by adminCargoDetailVM.adminCargoState.collectAsState()
+
+  BackHandler {
+    onBack()
+    navCtrl.navigate("AdminShipmentDetail?shipmentId=$shipmentId") {
+      launchSingleTop = true
+    }
+  }
+
   Column(
     modifier = Modifier
       .fillMaxWidth()
@@ -75,47 +108,89 @@ fun AdminCargoDetailScreen(
         .verticalScroll(rememberScrollState())
         .weight(1f)
     ) {
-      Image(
-        painterResource(id = R.drawable.image),
-        contentDescription = null,
-        modifier = Modifier
-          .clip(shape = RoundedCornerShape(5.dp))
-          .fillMaxSize()
-          .height(200.dp)
-          .aspectRatio(1.0f)
-      )
+      when (adminCargoState) {
+        is AdminCargoState.SUCCESS -> {
+          if (theCargoDetail != null) {
+            if (theCargoDetail!!.image.isNotEmpty()) {
+              AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                  .data(theCargoDetail?.image)
+                  .crossfade(true)
+                  .build(),
+                contentDescription = null,
+                modifier = Modifier
+                  .clip(shape = RoundedCornerShape(5.dp))
+                  .fillMaxSize()
+                  .height(200.dp)
+                  .aspectRatio(1.0f),
+                contentScale = ContentScale.Crop
+              )
+            } else {
+              Image(
+                painterResource(id = R.drawable.image),
+                contentDescription = null,
+                modifier = Modifier
+                  .clip(shape = RoundedCornerShape(5.dp))
+                  .fillMaxSize()
+                  .height(200.dp)
+                  .aspectRatio(1.0f)
+              )
+            }
+          }
 
-      Spacer(modifier = Modifier.height(20.dp))
+          Spacer(modifier = Modifier.height(20.dp))
 
-      SimpleLabelDesc(
-        label = "Type",
-        desc = "Small"
-      )
+          SimpleLabelDesc(
+            label = "Type",
+            desc = theCargoDetail?.type ?: ""
+          )
 
-      SimpleLabelDesc(
-        label = "Weight (in kg)",
-        desc = "0.1"
-      )
+          SimpleLabelDesc(
+            label = "Weight (in kg)",
+            desc = (theCargoDetail?.weight ?: "").toString()
+          )
 
-      SimpleLabelDesc(
-        label = "Length (in m)",
-        desc = "0.1"
-      )
+          SimpleLabelDesc(
+            label = "Length (in m)",
+            desc = (theCargoDetail?.length ?: "").toString()
+          )
 
-      SimpleLabelDesc(
-        label = "Width (in m)",
-        desc = "0.1"
-      )
+          SimpleLabelDesc(
+            label = "Width (in m)",
+            desc = (theCargoDetail?.width ?: "").toString()
+          )
 
-      SimpleLabelDesc(
-        label = "Height (in m)",
-        desc = "0.1"
-      )
+          SimpleLabelDesc(
+            label = "Height (in m)",
+            desc = (theCargoDetail?.height ?: "").toString()
+          )
 
-      SimpleLabelDesc(
-        label = "Description",
-        desc = "Lorem ipsum dolor sit actum this book is very good and very fragile"
-      )
+          SimpleLabelDesc(
+            label = "Description",
+            desc = "Lorem ipsum dolor sit actum this book is very good and very fragile"
+          )
+        }
+        is AdminCargoState.LOADING -> {
+          LinearProgressIndicator(
+            modifier = Modifier
+              .align(Alignment.CenterHorizontally)
+          )
+        }
+        is AdminCargoState.INITIAL -> {
+          SimpleEmptyBox(
+            modifier = Modifier
+              .clip(shape = RoundedCornerShape(5.dp))
+              .height(150.dp)
+              .fillMaxSize()
+              .background(Color(0xFFE5E5E5))
+              .weight(1f),
+            colModifier = Modifier
+              .fillMaxSize(),
+            image = painterResource(id = R.drawable.close),
+            name = "Unable to Load Information"
+          )
+        }
+      }
     }
 
     Spacer(modifier = Modifier.height(10.dp))
@@ -127,7 +202,9 @@ fun AdminCargoDetailScreen(
     ) {
       Button(
         onClick = {
-          navCtrl.navigate("EditCargo?type=&weight=&length=&width=&height=")
+          if (theCargoDetail != null) {
+            navCtrl.navigate("EditCargo?cargoId=$cargoId&shipmentId=$shipmentId&type=${theCargoDetail!!.type}&weight=${theCargoDetail!!.weight}&length=${theCargoDetail!!.length}&width=${theCargoDetail!!.width}&height=${theCargoDetail!!.height}")
+          }
         },
         modifier = Modifier
           .weight(0.35f),
@@ -149,7 +226,7 @@ fun AdminCargoDetailScreen(
       Button(
         onClick = {
           onBack()
-          navCtrl.navigate(AdminInnerRoutes.AdminShipmentDetail.routes) {
+          navCtrl.navigate("AdminShipmentDetail?shipmentId=$shipmentId") {
             launchSingleTop = true
           }
         },
@@ -169,5 +246,20 @@ fun AdminCargoDetailScreen(
     }
 
     Spacer(modifier = Modifier.padding(bottom = 60.dp))
+  }
+
+  DisposableEffect(Unit) {
+    val job = cScope.launch {
+      adminCargoDetailVM.loadCargoDetail(
+        cargoId,
+        context
+      )
+      theCargoDetail = adminCargoDetailVM.theCargoDetail
+    }
+
+    onDispose {
+      job.cancel()
+      adminCargoDetailVM.clearCargoDetail()
+    }
   }
 }

@@ -1,5 +1,6 @@
 package com.example.haulease.views.admin.inner
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,8 +17,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,11 +35,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.haulease.R
-import com.example.haulease.navigations.routes.AdminInnerRoutes
 import com.example.haulease.ui.components.SimpleTextField
 import com.example.haulease.validations.InputValidation
+import com.example.haulease.viewmodels.admin.inner.AdminEditCargoVM
+import com.example.haulease.viewmodels.admin.inner.AdminEditState
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.list.ListDialog
 import com.maxkeppeler.sheets.list.models.ListOption
@@ -47,12 +52,25 @@ import com.maxkeppeler.sheets.list.models.ListSelection
 fun AdminEditCargoScreen(
   navCtrl: NavHostController,
   onBack: () -> Unit,
+  cargoId: Int,
+  shipmentId: Int,
   cargoType: String = "",
   cargoWeight: String = "",
   cargoLength: String = "",
   cargoWidth: String = "",
   cargoHeight: String = "",
+  adminEditCargoVM: AdminEditCargoVM = viewModel()
 ) {
+  // Observer
+  val adminEditState by adminEditCargoVM.adminEditState.collectAsState()
+
+  BackHandler {
+    onBack()
+    navCtrl.navigate("AdminCargoDetail?cargoId=$cargoId&shipmentId=$shipmentId") {
+      launchSingleTop = true
+    }
+  }
+
   // State variables
   var type by remember { mutableStateOf(cargoType) }
   val weight = remember { mutableStateOf(cargoWeight) }
@@ -117,96 +135,111 @@ fun AdminEditCargoScreen(
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .verticalScroll(rememberScrollState())
-        .weight(1f)
-    ) {
-      Button(
-        onClick = {
-          listOptionState.show()
-        },
-        modifier = Modifier
-          .fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(Color(0xFF14213D)),
-        shape = RoundedCornerShape(5.dp),
-      ) {
-        Text(
-          text = when {
-            displayOption.isNotBlank() -> displayOption
-            cargoType.isNotBlank() -> cargoType
-            else -> " - Select Cargo Type - "
-          },
-          style = TextStyle(
-            color = Color(0xFFE5E5E5),
-            fontFamily = FontFamily(Font(R.font.librebold))
-          )
+    when (adminEditState) {
+      is AdminEditState.SUCCESS -> {
+        navCtrl.navigate("AdminCargoDetail?cargoId=$cargoId&shipmentId=$shipmentId") {
+          launchSingleTop = true
+        }
+      }
+      is AdminEditState.LOADING -> {
+        LinearProgressIndicator(
+          modifier = Modifier
+            .align(Alignment.CenterHorizontally)
         )
       }
+      is AdminEditState.INITIAL -> {
+        Column(
+          modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .weight(1f)
+        ) {
+          Button(
+            onClick = {
+              listOptionState.show()
+            },
+            modifier = Modifier
+              .fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(Color(0xFF14213D)),
+            shape = RoundedCornerShape(5.dp),
+          ) {
+            Text(
+              text = when {
+                displayOption.isNotBlank() -> displayOption
+                cargoType.isNotBlank() -> cargoType
+                else -> " - Select Cargo Type - "
+              },
+              style = TextStyle(
+                color = Color(0xFFE5E5E5),
+                fontFamily = FontFamily(Font(R.font.librebold))
+              )
+            )
+          }
 
-      Text(
-        text = "Type",
-        style = TextStyle.Default.copy(
-          fontFamily = FontFamily(Font(R.font.libre))
-        )
-      )
+          Text(
+            text = "Type",
+            style = TextStyle.Default.copy(
+              fontFamily = FontFamily(Font(R.font.libre))
+            )
+          )
 
-      Spacer(modifier = Modifier.height(8.dp))
+          Spacer(modifier = Modifier.height(8.dp))
 
-      SimpleTextField(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(vertical = 8.dp),
-        inputText = weight,
-        onValueChange = { newValue ->
-          weight.value = newValue
-        },
-        label = "Weight in estimation",
-        onlyNumber = true
-      )
+          SimpleTextField(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(vertical = 8.dp),
+            inputText = weight,
+            onValueChange = { newValue ->
+              weight.value = newValue
+            },
+            label = "Weight in estimation",
+            onlyNumber = true
+          )
 
-      Spacer(modifier = Modifier.height(8.dp))
+          Spacer(modifier = Modifier.height(8.dp))
 
-      SimpleTextField(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(vertical = 8.dp),
-        inputText = length,
-        onValueChange = { newValue ->
-          length.value = newValue
-        },
-        label = "Length in estimation",
-        onlyNumber = true
-      )
+          SimpleTextField(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(vertical = 8.dp),
+            inputText = length,
+            onValueChange = { newValue ->
+              length.value = newValue
+            },
+            label = "Length in estimation",
+            onlyNumber = true
+          )
 
-      Spacer(modifier = Modifier.height(8.dp))
+          Spacer(modifier = Modifier.height(8.dp))
 
-      SimpleTextField(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(vertical = 8.dp),
-        inputText = width,
-        onValueChange = { newValue ->
-          width.value = newValue
-        },
-        label = "Width in estimation",
-        onlyNumber = true
-      )
+          SimpleTextField(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(vertical = 8.dp),
+            inputText = width,
+            onValueChange = { newValue ->
+              width.value = newValue
+            },
+            label = "Width in estimation",
+            onlyNumber = true
+          )
 
-      Spacer(modifier = Modifier.height(8.dp))
+          Spacer(modifier = Modifier.height(8.dp))
 
-      SimpleTextField(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(vertical = 8.dp),
-        inputText = height,
-        onValueChange = { newValue ->
-          height.value = newValue
-        },
-        label = "Height in estimation",
-        onlyNumber = true
-      )
+          SimpleTextField(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(vertical = 8.dp),
+            inputText = height,
+            onValueChange = { newValue ->
+              height.value = newValue
+            },
+            label = "Height in estimation",
+            onlyNumber = true
+          )
+        }
+      }
     }
 
     Spacer(modifier = Modifier.height(20.dp))
@@ -218,10 +251,7 @@ fun AdminEditCargoScreen(
     ) {
       Button(
         onClick = {
-          onBack()
-          navCtrl.navigate(AdminInnerRoutes.AdminCargoDetail.routes) {
-            launchSingleTop = true
-          }
+          // TODO
         },
         modifier = Modifier
           .weight(0.35f),
@@ -244,7 +274,7 @@ fun AdminEditCargoScreen(
       Button(
         onClick = {
           onBack()
-          navCtrl.navigate(AdminInnerRoutes.AdminCargoDetail.routes) {
+          navCtrl.navigate("AdminCargoDetail?cargoId=$cargoId&shipmentId=$shipmentId") {
             launchSingleTop = true
           }
         },

@@ -1,6 +1,5 @@
 package com.example.haulease.viewmodels.user
 
-import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,10 +25,10 @@ class DashboardVM: ViewModel() {
 
   var latestShipment: Shipment? = null
   var latestUnpaidShipment: ShipmentPayment? = null
-  var totalShipments: Int = 0;
-  var totalCargo: Int = 0;
-  var totalWeight: Double = 0.0;
-  var totalSpend: Double = 0.0;
+  var totalShipments: Int = 0
+  var totalCargo: Int = 0
+  var totalWeight: Double = 0.0
+  var totalSpend: Double = 0.0
 
   // Set observer value
   val dashboardState: StateFlow<DashboardState> = _dashboardState
@@ -54,7 +53,7 @@ class DashboardVM: ViewModel() {
   // Get the details of latest unpaid shipment
   private suspend fun getLatestUnpaidShipments(): Boolean {
     val res = repository.getShipmentPayment(consignorSessionId)
-    Log.d("Result", res.body().toString())
+
     res.body()?.let {
       if (res.isSuccessful && it.isNotEmpty()) {
         for (sp in it.reversed()) {

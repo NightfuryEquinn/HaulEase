@@ -44,6 +44,7 @@ fun SimpleViewBox(
   imageSize: Int? = 125,
   fromDatabase: Boolean = false,
   imageFromDatabase: String = "",
+  consignorId: Int? = 0,
   shipmentId: Int? = 0,
   cargoId: Int? = 0,
   name: String? = null,
@@ -124,8 +125,11 @@ fun SimpleViewBox(
           UserRoutes.Shipment.routes -> {
             navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId")
           }
+          AdminInnerRoutes.AdminShipmentDetail.routes -> {
+            navCtrl.navigate("AdminCargoDetail?cargoId=$cargoId&shipmentId=$shipmentId")
+          }
           else -> {
-            navCtrl.navigate(AdminInnerRoutes.AdminShipmentDetail.routes)
+            navCtrl.navigate("AdminShipmentDetail?shipmentId=$shipmentId&consignorId=$consignorId")
           }
         }
       },

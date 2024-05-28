@@ -3,8 +3,8 @@ package com.example.haulease.views.admin.inner
 import android.Manifest
 import android.annotation.SuppressLint
 import android.location.Address
-import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -27,12 +27,16 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,10 +51,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.haulease.R
+import com.example.haulease.models.Cargo
+import com.example.haulease.models.ShipmentPayment
+import com.example.haulease.models.ShipmentTracking
+import com.example.haulease.models.ShipmentTruck
+import com.example.haulease.navigations.routes.AdminRoutes
+import com.example.haulease.ui.components.SimpleEmptyBox
 import com.example.haulease.ui.components.SimpleViewBox
 import com.example.haulease.validations.CargoStatus
+import com.example.haulease.viewmodels.admin.inner.AdminShipmentDetailState
+import com.example.haulease.viewmodels.admin.inner.AdminShipmentDetailVM
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -68,6 +81,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -75,8 +89,18 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminShipmentDetailScreen(
-  navCtrl: NavHostController
+  navCtrl: NavHostController,
+  onBack: () -> Unit,
+  shipmentId: Int = 0,
+  consignorId: Int = 0,
+  adminShipmentDetailVM: AdminShipmentDetailVM = viewModel()
 ) {
+  val cScope = rememberCoroutineScope()
+  var theShipmentDetail: ShipmentPayment? = null
+  var theShipmentTracking: ShipmentTracking? = null
+  var theShipmentTruck: ShipmentTruck? = null
+  var theShipmentCargos: List<Cargo> = emptyList()
+
   // Map variables
   val context = LocalContext.current
   val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
@@ -86,9 +110,22 @@ fun AdminShipmentDetailScreen(
   var shipmentMarker: Marker? by remember { mutableStateOf(null) }
   var updateTime by remember { mutableStateOf("") }
 
-  val trackingCoordinates by remember { mutableStateOf(LatLng(2.9975, 101.3749)) }
-  val originAddress by remember { mutableStateOf<Address?>(null) }
-  val destAddress by remember { mutableStateOf<Address?>(null) }
+  val trackingCoordinates by remember { mutableStateOf(LatLng(theShipmentTracking?.tracking?.latitude!!, theShipmentTracking?.tracking?.longitude!!)) }
+  val originAddress by remember { mutableStateOf(
+    adminShipmentDetailVM.getAddressFromString(
+      theShipmentTracking?.shipment?.origin!!,
+      context
+    )
+  ) }
+  val destAddress by remember { mutableStateOf(
+    adminShipmentDetailVM.getAddressFromString(
+      theShipmentTracking?.shipment?.destination!!,
+      context
+    )
+  ) }
+
+  // Observer
+  val adminShipmentDetailState by adminShipmentDetailVM.adminShipmentDetailState.collectAsState()
 
   // Add markers on map
   fun addMarkers(latLng: LatLng) {
@@ -161,9 +198,24 @@ fun AdminShipmentDetailScreen(
       }
     }
 
+  BackHandler {
+    onBack()
+    navCtrl.navigate(AdminRoutes.AdminShipment.routes) {
+      launchSingleTop = true
+    }
+  }
+
   // Option dialog for shipment status
   var displayOption by remember { mutableStateOf("") }
-  val listOptionState = rememberUseCaseState(onFinishedRequest = { Log.d("Dialog", "Change Status")})
+  val listOptionState = rememberUseCaseState(onFinishedRequest = {
+    cScope.launch {
+      adminShipmentDetailVM.updateShipmentStatus(
+        shipmentId,
+        displayOption,
+        context
+      )
+    }
+  })
 
   val options = listOf(
     CargoStatus.status1,
@@ -215,190 +267,222 @@ fun AdminShipmentDetailScreen(
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .verticalScroll(rememberScrollState())
-        .weight(1f)
-    ) {
-      Column(
-        modifier = Modifier
-          .clip(shape = RoundedCornerShape(5.dp))
-          .fillMaxWidth()
-          .background(Color(0xFFE5E5E5))
-          .padding(12.dp),
-      ) {
-        Text(
-          text = "Truck & Driver Details",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.squada)),
-            fontSize = 20.sp,
-            color = Color(0xFFFCA111)
-          )
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Text(
-          text = "ID: 100001",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.libre)),
-            fontSize = 12.sp
-          )
-        )
-
-        Spacer(modifier = Modifier.height(5.dp))
-
-        Text(
-          text = "Driver Name: Jason Doe",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.libre)),
-            fontSize = 12.sp
-          )
-        )
-
-        Spacer(modifier = Modifier.height(5.dp))
-
-        Text(
-          text = "License Plate: VEE 7913",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.libre)),
-            fontSize = 12.sp
-          )
-        )
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        Text(
-          text = "Status",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.squada)),
-            fontSize = 20.sp,
-            color = Color(0xFFFCA111)
-          )
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Text(
-          text = "Arrived at harbor near destination, waiting to unload",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.libre)),
-            fontSize = 12.sp
-          )
-        )
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        Text(
-          text = "Origin to Destination",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.squada)),
-            fontSize = 20.sp,
-            color = Color(0xFFFCA111)
-          )
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Text(
-          text = "C-27-07, Parkhill Residence, MRANTI Park, 57000 Bukit Jalil, Kuala Lumpur",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.libre)),
-            fontSize = 12.sp,
-          )
-        )
-
-        Spacer(modifier = Modifier.height(5.dp))
-
-        Icon(
-          imageVector = Icons.Filled.ArrowDownward,
-          contentDescription = null,
-          tint = Color(0xFF14213D),
+    when (adminShipmentDetailState) {
+      is AdminShipmentDetailState.SUCCESS -> {
+        Column(
           modifier = Modifier
-            .size(36.dp)
             .fillMaxWidth()
-            .align(Alignment.CenterHorizontally)
-        )
+            .verticalScroll(rememberScrollState())
+            .weight(1f)
+        ) {
+          Column(
+            modifier = Modifier
+              .clip(shape = RoundedCornerShape(5.dp))
+              .fillMaxWidth()
+              .background(Color(0xFFE5E5E5))
+              .padding(12.dp),
+          ) {
+            Text(
+              text = "Truck & Driver Details",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.squada)),
+                fontSize = 20.sp,
+                color = Color(0xFFFCA111)
+              )
+            )
 
-        Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-        Text(
-          text = "138 Cecil Street #12-01 Cecil Court, Singapore 069538",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.libre)),
-            fontSize = 12.sp,
-          )
-        )
-      }
+            Text(
+              text = "ID: 100001",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.libre)),
+                fontSize = 12.sp
+              )
+            )
 
-      Spacer(modifier = Modifier.height(25.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
-      Text(
-        text = "Tracking Map",
-        style = TextStyle(
-          fontFamily = FontFamily(Font(R.font.squada)),
-          fontSize = 28.sp,
-        )
-      )
+            Text(
+              text = "Driver Name: Jason Doe",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.libre)),
+                fontSize = 12.sp
+              )
+            )
 
-      Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
-      Text(
-        text = "Last updated at $updateTime",
-        style = TextStyle(
-          fontFamily = FontFamily(Font(R.font.libre)),
-          fontSize = 12.sp,
-        )
-      )
+            Text(
+              text = "License Plate: VEE 7913",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.libre)),
+                fontSize = 12.sp
+              )
+            )
 
-      Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
-      AndroidView(
-        modifier = Modifier
-          .fillMaxWidth()
-          .height(400.dp)
-          .clip(shape = RoundedCornerShape(5.dp)),
-        factory = { ctx ->
-          MapView(ctx).apply {
-            onCreate(null)
-            getMapAsync { googleMap ->
-              map = googleMap
-              requestPermissionLaunch.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-            }
+            Text(
+              text = "Status",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.squada)),
+                fontSize = 20.sp,
+                color = Color(0xFFFCA111)
+              )
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+              text = "Arrived at harbor near destination, waiting to unload",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.libre)),
+                fontSize = 12.sp
+              )
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Text(
+              text = "Origin to Destination",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.squada)),
+                fontSize = 20.sp,
+                color = Color(0xFFFCA111)
+              )
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+              text = "C-27-07, Parkhill Residence, MRANTI Park, 57000 Bukit Jalil, Kuala Lumpur",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.libre)),
+                fontSize = 12.sp,
+              )
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Icon(
+              imageVector = Icons.Filled.ArrowDownward,
+              contentDescription = null,
+              tint = Color(0xFF14213D),
+              modifier = Modifier
+                .size(36.dp)
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally)
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Text(
+              text = "138 Cecil Street #12-01 Cecil Court, Singapore 069538",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.libre)),
+                fontSize = 12.sp,
+              )
+            )
           }
-        },
-        update = { mapView ->
-          mapView.getMapAsync { googleMap ->
-            map = googleMap
+
+          Spacer(modifier = Modifier.height(25.dp))
+
+          Text(
+            text = "Tracking Map",
+            style = TextStyle(
+              fontFamily = FontFamily(Font(R.font.squada)),
+              fontSize = 28.sp,
+            )
+          )
+
+          Spacer(modifier = Modifier.height(5.dp))
+
+          Text(
+            text = "Last updated at $updateTime",
+            style = TextStyle(
+              fontFamily = FontFamily(Font(R.font.libre)),
+              fontSize = 12.sp,
+            )
+          )
+
+          Spacer(modifier = Modifier.height(10.dp))
+
+          AndroidView(
+            modifier = Modifier
+              .fillMaxWidth()
+              .height(400.dp)
+              .clip(shape = RoundedCornerShape(5.dp)),
+            factory = { ctx ->
+              MapView(ctx).apply {
+                onCreate(null)
+                getMapAsync { googleMap ->
+                  map = googleMap
+                  requestPermissionLaunch.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                }
+              }
+            },
+            update = { mapView ->
+              mapView.getMapAsync { googleMap ->
+                map = googleMap
+              }
+            }
+          )
+
+          Spacer(modifier = Modifier.height(25.dp))
+
+          Text(
+            text = "List of Cargos",
+            style = TextStyle(
+              fontFamily = FontFamily(Font(R.font.squada)),
+              fontSize = 28.sp,
+            )
+          )
+
+          Spacer(modifier = Modifier.height(10.dp))
+
+          theShipmentCargos.forEach {
+            SimpleViewBox(
+              navCtrl = navCtrl,
+              modifier = Modifier
+                .clip(shape = RoundedCornerShape(5.dp))
+                .fillMaxSize()
+                .background(Color(0xFFE5E5E5)),
+              rowModifier = Modifier
+                .fillMaxSize(),
+              fromDatabase = true,
+              imageFromDatabase = it.image,
+              imageSize = 50,
+              shipmentId = shipmentId,
+              cargoId = it.id,
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
           }
         }
-      )
-
-      Spacer(modifier = Modifier.height(25.dp))
-
-      Text(
-        text = "List of Cargos",
-        style = TextStyle(
-          fontFamily = FontFamily(Font(R.font.squada)),
-          fontSize = 28.sp,
+      }
+      is AdminShipmentDetailState.LOADING -> {
+        LinearProgressIndicator(
+          modifier = Modifier
+            .align(Alignment.CenterHorizontally)
         )
-      )
+      }
+      is AdminShipmentDetailState.INITIAL -> {
+        SimpleEmptyBox(
+          modifier = Modifier
+            .clip(shape = RoundedCornerShape(5.dp))
+            .height(150.dp)
+            .fillMaxSize()
+            .background(Color(0xFFE5E5E5))
+            .weight(1f),
+          colModifier = Modifier
+            .fillMaxSize(),
+          image = painterResource(id = R.drawable.close),
+          name = "Unable to Load Information"
+        )
 
-      Spacer(modifier = Modifier.height(10.dp))
-
-      SimpleViewBox(
-        navCtrl = navCtrl,
-        modifier = Modifier
-          .clip(shape = RoundedCornerShape(5.dp))
-          .fillMaxSize()
-          .background(Color(0xFFE5E5E5)),
-        rowModifier = Modifier
-          .fillMaxSize(),
-        image = painterResource(id = R.drawable.image),
-        imageSize = 50,
-        cargoId = 100001,
-      )
+        Spacer(modifier = Modifier.padding(bottom = 60.dp))
+      }
     }
 
     Spacer(modifier = Modifier.height(10.dp))
@@ -443,5 +527,24 @@ fun AdminShipmentDetailScreen(
       .flowOn(Dispatchers.IO)
       .onEach { updateShipmentLocation() }
       .launchIn(this)
+  }
+
+  DisposableEffect(Unit) {
+    val job = cScope.launch {
+      adminShipmentDetailVM.checkShipmentDetail(
+        shipmentId,
+        consignorId,
+        context
+      )
+      theShipmentDetail = adminShipmentDetailVM.theShipmentDetail
+      theShipmentTracking = adminShipmentDetailVM.theShipmentTracking
+      theShipmentTruck = adminShipmentDetailVM.theShipmentTruck
+      theShipmentCargos = adminShipmentDetailVM.theShipmentCargos
+    }
+
+    onDispose {
+      job.cancel()
+      adminShipmentDetailVM.clearShipmentDetail()
+    }
   }
 }

@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.haulease.R
+import com.example.haulease.models.Sessions
 import com.example.haulease.models.Shipment
 
 @Composable
@@ -32,6 +33,12 @@ fun SimpleTabCol(
       .verticalScroll(rememberScrollState()),
   ) {
     datas.forEach { data ->
+      val theConsignorId = if (Sessions.sessionRole == "Admin") {
+        data.consignorId
+      } else {
+        Sessions.sessionToken?.toInt()
+      }
+
       SimpleViewBox(
         navCtrl = navCtrl,
         modifier = Modifier
@@ -41,6 +48,7 @@ fun SimpleTabCol(
         rowModifier = Modifier
           .fillMaxSize(),
         image = painterResource(id = R.drawable.shipment_placeholder),
+        consignorId = theConsignorId,
         shipmentId = data.id,
         status = data.status
       )
