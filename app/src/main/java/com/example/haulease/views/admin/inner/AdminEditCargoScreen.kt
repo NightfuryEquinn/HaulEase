@@ -1,5 +1,6 @@
 package com.example.haulease.views.admin.inner
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -24,10 +25,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -38,14 +41,16 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.haulease.R
+import com.example.haulease.models.Cargo
 import com.example.haulease.ui.components.SimpleTextField
-import com.example.haulease.validations.InputValidation
+import com.example.haulease.validations.InputValidation.isValidInt
 import com.example.haulease.viewmodels.admin.inner.AdminEditCargoVM
 import com.example.haulease.viewmodels.admin.inner.AdminEditState
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.list.ListDialog
 import com.maxkeppeler.sheets.list.models.ListOption
 import com.maxkeppeler.sheets.list.models.ListSelection
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,8 +64,13 @@ fun AdminEditCargoScreen(
   cargoLength: String = "",
   cargoWidth: String = "",
   cargoHeight: String = "",
+  cargoImage: String = "",
+  cargoDesc: String = "",
   adminEditCargoVM: AdminEditCargoVM = viewModel()
 ) {
+  val context = LocalContext.current
+  val cScope = rememberCoroutineScope()
+
   // Observer
   val adminEditState by adminEditCargoVM.adminEditState.collectAsState()
 
@@ -80,10 +90,10 @@ fun AdminEditCargoScreen(
 
   // Validations
   val allFieldsNotEmpty = type.isNotBlank()
-      && weight.value.isNotBlank() && InputValidation.isValidInt(weight.value)
-      && length.value.isNotBlank() && InputValidation.isValidInt(length.value)
-      && width.value.isNotBlank() && InputValidation.isValidInt(width.value)
-      && height.value.isNotBlank() && InputValidation.isValidInt(height.value)
+      && weight.value.isNotBlank() && isValidInt(weight.value)
+      && length.value.isNotBlank() && isValidInt(length.value)
+      && width.value.isNotBlank() && isValidInt(width.value)
+      && height.value.isNotBlank() && isValidInt(height.value)
 
   // Option dialog for priority
   val listOptionState = rememberUseCaseState()
@@ -251,7 +261,31 @@ fun AdminEditCargoScreen(
     ) {
       Button(
         onClick = {
-          // TODO
+          cScope.launch {
+            try {
+              adminEditCargoVM.updateCargoDetail(
+                Cargo(
+                  id = cargoId,
+                  type = type,
+                  weight = weight.value.toDouble(),
+                  length = length.value.toDouble(),
+                  width = width.value.toDouble(),
+                  height = height.value.toDouble(),
+                  image = cargoImage,
+                  description = cargoDesc,
+                  shipmentId = shipmentId
+                ),
+                context
+              )
+            } catch (e: Exception) {
+              Toast.makeText(context, e.message.toString(), Toast.LENGTH_SHORT).show()
+            }
+          }
+
+          onBack()
+          navCtrl.navigate("AdminCargoDetail?cargoId=$cargoId&shipmentId=$shipmentId") {
+            launchSingleTop = true
+          }
         },
         modifier = Modifier
           .weight(0.35f),

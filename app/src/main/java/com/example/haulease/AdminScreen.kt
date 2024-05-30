@@ -158,7 +158,7 @@ fun AdminNavHost(navCtrl: NavHostController) {
 
     // Parsing argument to pass data between screens
     composable(
-      route = "EditCargo?cargoId={cargoId}&shipmentId={shipmentId}&type={type}&weight={weight}&length={length}&width={width}&height={height}",
+      route = "EditCargo?cargoId={cargoId}&shipmentId={shipmentId}&type={type}&weight={weight}&length={length}&width={width}&height={height}&image={image}&desc={desc}",
       arguments = listOf(
         navArgument("cargoId") {
           type = NavType.StringType
@@ -188,6 +188,14 @@ fun AdminNavHost(navCtrl: NavHostController) {
           type = NavType.StringType
           nullable = true
         },
+        navArgument("image") {
+          type = NavType.StringType
+          nullable = true
+        },
+        navArgument("desc") {
+          type = NavType.StringType
+          nullable = true
+        }
       )
     ) { backStackEntry ->
       val cargoId = backStackEntry.arguments?.getString("cargoId")
@@ -197,6 +205,8 @@ fun AdminNavHost(navCtrl: NavHostController) {
       val cargoLength = backStackEntry.arguments?.getString("length")
       val cargoWidth = backStackEntry.arguments?.getString("width")
       val cargoHeight = backStackEntry.arguments?.getString("height")
+      val cargoImage = backStackEntry.arguments?.getString("image")
+      val cargoDesc = backStackEntry.arguments?.getString("desc")
 
       AdminEditCargoScreen(
         navCtrl = navCtrl,
@@ -210,6 +220,8 @@ fun AdminNavHost(navCtrl: NavHostController) {
         cargoLength = cargoLength!!,
         cargoWidth = cargoWidth!!,
         cargoHeight = cargoHeight!!,
+        cargoImage = cargoImage!!,
+        cargoDesc = cargoDesc!!
       )
     }
 
