@@ -56,8 +56,8 @@ fun PaymentScreen(
 ) {
   val context = LocalContext.current
   val cScope = rememberCoroutineScope()
-  var thePaymentDetail: Payment? = null
-  var totalCargoFees: Double = 0.0
+  val thePaymentDetail: Payment? = paymentVM.thePaymentDetail
+  val totalCargoFees: Double = paymentVM.totalCargoFees
 
   // Observer
   val paymentState by paymentVM.paymentState.collectAsState()
@@ -257,8 +257,6 @@ fun PaymentScreen(
         paymentId,
         context
       )
-      thePaymentDetail = paymentVM.thePaymentDetail
-      totalCargoFees = paymentVM.totalCargoFees
     }
 
     onDispose {

@@ -31,6 +31,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.haulease.R
+import com.example.haulease.models.Sessions
 import com.example.haulease.navigations.routes.AdminInnerRoutes
 import com.example.haulease.navigations.routes.UserInnerRoutes
 import com.example.haulease.navigations.routes.UserRoutes
@@ -118,18 +119,26 @@ fun SimpleViewBox(
 
     Button(
       onClick = {
-        when (currentRoute) {
-          UserInnerRoutes.ShipmentDetail.routes -> {
-            navCtrl.navigate("CargoDetail?cargoId=$cargoId&shipmentId=$shipmentId")
+        if (Sessions.sessionRole != "Admin") {
+          when (currentRoute) {
+            UserRoutes.Dashboard.routes -> {
+              navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId")
+            }
+            UserInnerRoutes.ShipmentDetail.routes -> {
+              navCtrl.navigate("CargoDetail?cargoId=$cargoId&shipmentId=$shipmentId")
+            }
+            UserRoutes.Shipment.routes -> {
+              navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId")
+            }
           }
-          UserRoutes.Shipment.routes -> {
-            navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId")
-          }
-          AdminInnerRoutes.AdminShipmentDetail.routes -> {
-            navCtrl.navigate("AdminCargoDetail?cargoId=$cargoId&shipmentId=$shipmentId")
-          }
-          else -> {
-            navCtrl.navigate("AdminShipmentDetail?shipmentId=$shipmentId&consignorId=$consignorId")
+        } else {
+          when (currentRoute) {
+            AdminInnerRoutes.AdminShipmentDetail.routes -> {
+              navCtrl.navigate("AdminCargoDetail?cargoId=$cargoId&shipmentId=$shipmentId&consignorId=$consignorId")
+            }
+            else -> {
+              navCtrl.navigate("AdminShipmentDetail?shipmentId=$shipmentId&consignorId=$consignorId")
+            }
           }
         }
       },

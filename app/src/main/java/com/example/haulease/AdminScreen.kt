@@ -14,6 +14,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.haulease.navigations.AdminBottomNavBar
+import com.example.haulease.navigations.routes.AdminInnerRoutes
 import com.example.haulease.navigations.routes.AdminRoutes
 import com.example.haulease.views.admin.AdminDashboardScreen
 import com.example.haulease.views.admin.AdminHistoryScreen
@@ -104,124 +105,121 @@ fun AdminNavHost(navCtrl: NavHostController) {
     // Admin Inner Routes
     // Parsing argument to pass data between screens
     composable(
-      route = "AdminShipmentDetail?shipmentId={shipmentId}&consignorId={consignorId}",
+      route = AdminInnerRoutes.AdminShipmentDetail.routes,
       arguments = listOf(
         navArgument("shipmentId") {
           type = NavType.StringType
-          nullable = true
         },
         navArgument("consignorId") {
           type = NavType.StringType
-          nullable = true
         }
       )
     ) { backStackEntry ->
-      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
-      val consignorId = backStackEntry.arguments?.getString("consignorId")
+      val shipmentId = backStackEntry.arguments?.getString("shipmentId") ?: ""
+      val consignorId = backStackEntry.arguments?.getString("consignorId") ?: ""
 
       AdminShipmentDetailScreen(
         navCtrl = navCtrl,
         onBack = {
           navCtrl.popBackStack()
         },
-        shipmentId = shipmentId!!.toInt(),
-        consignorId = consignorId!!.toInt()
+        shipmentId = shipmentId.toInt(),
+        consignorId = consignorId.toInt()
       )
     }
 
     // Parsing argument to pass data between screens
     composable(
-      route = "AdminCargoDetail?cargoId={cargoId}&shipmentId={shipmentId}",
+      route = AdminInnerRoutes.AdminCargoDetail.routes,
       arguments = listOf(
         navArgument("cargoId") {
           type = NavType.StringType
-          nullable = true
         },
         navArgument("shipmentId") {
           type = NavType.StringType
-          nullable = true
+        },
+        navArgument("consignorId") {
+          type = NavType.StringType
         }
       )
     ) { backStackEntry ->
-      val cargoId = backStackEntry.arguments?.getString("cargoId")
-      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
+      val cargoId = backStackEntry.arguments?.getString("cargoId") ?: ""
+      val shipmentId = backStackEntry.arguments?.getString("shipmentId") ?: ""
+      val consignorId = backStackEntry.arguments?.getString("consignorId") ?: ""
 
       AdminCargoDetailScreen(
         navCtrl = navCtrl,
         onBack = {
           navCtrl.popBackStack()
         },
-        cargoId = cargoId!!.toInt(),
-        shipmentId = shipmentId!!.toInt()
+        cargoId = cargoId.toInt(),
+        shipmentId = shipmentId.toInt(),
+        consignorId = consignorId.toInt()
       )
     }
 
     // Parsing argument to pass data between screens
     composable(
-      route = "EditCargo?cargoId={cargoId}&shipmentId={shipmentId}&type={type}&weight={weight}&length={length}&width={width}&height={height}&image={image}&desc={desc}",
+      route = AdminInnerRoutes.AdminEditCargo.routes,
       arguments = listOf(
         navArgument("cargoId") {
           type = NavType.StringType
-          nullable = true
         },
         navArgument("shipmentId") {
           type = NavType.StringType
-          nullable = true
+        },
+        navArgument("consignorId") {
+          type = NavType.StringType
         },
         navArgument("type") {
           type = NavType.StringType
-          nullable = true
         },
         navArgument("weight") {
           type = NavType.StringType
-          nullable = true
         },
         navArgument("length") {
           type = NavType.StringType
-          nullable = true
         },
         navArgument("width") {
           type = NavType.StringType
-          nullable = true
         },
         navArgument("height") {
           type = NavType.StringType
-          nullable = true
         },
         navArgument("image") {
           type = NavType.StringType
-          nullable = true
         },
         navArgument("desc") {
           type = NavType.StringType
-          nullable = true
         }
       )
     ) { backStackEntry ->
-      val cargoId = backStackEntry.arguments?.getString("cargoId")
-      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
-      val cargoType = backStackEntry.arguments?.getString("type")
-      val cargoWeight = backStackEntry.arguments?.getString("weight")
-      val cargoLength = backStackEntry.arguments?.getString("length")
-      val cargoWidth = backStackEntry.arguments?.getString("width")
-      val cargoHeight = backStackEntry.arguments?.getString("height")
-      val cargoImage = backStackEntry.arguments?.getString("image")
-      val cargoDesc = backStackEntry.arguments?.getString("desc")
+      val cargoId = backStackEntry.arguments?.getString("cargoId") ?: ""
+      val shipmentId = backStackEntry.arguments?.getString("shipmentId") ?: ""
+      val consignorId = backStackEntry.arguments?.getString("consignorId") ?: ""
+      val cargoType = backStackEntry.arguments?.getString("type") ?: ""
+      val cargoWeight = backStackEntry.arguments?.getString("weight") ?: ""
+      val cargoLength = backStackEntry.arguments?.getString("length") ?: ""
+      val cargoWidth = backStackEntry.arguments?.getString("width") ?: ""
+      val cargoHeight = backStackEntry.arguments?.getString("height") ?: ""
+      val cargoImage = backStackEntry.arguments?.getString("image") ?: ""
+      val cargoDesc = backStackEntry.arguments?.getString("desc") ?: ""
 
       AdminEditCargoScreen(
         navCtrl = navCtrl,
         onBack = {
           navCtrl.popBackStack()
         },
-        cargoId = cargoId!!.toInt(),
-        shipmentId = shipmentId!!.toInt(),
-        cargoType = cargoType!!,
-        cargoWeight = cargoWeight!!,
-        cargoLength = cargoLength!!,
-        cargoWidth = cargoWidth!!,
-        cargoHeight = cargoHeight!!,
-        cargoImage = cargoImage!!,
-        cargoDesc = cargoDesc!!
+        cargoId = cargoId.toInt(),
+        shipmentId = shipmentId.toInt(),
+        consignorId = consignorId.toInt(),
+        cargoType = cargoType,
+        cargoWeight = cargoWeight,
+        cargoLength = cargoLength,
+        cargoWidth = cargoWidth,
+        cargoHeight = cargoHeight,
+        cargoImage = cargoImage,
+        cargoDesc = cargoDesc
       )
     }
 

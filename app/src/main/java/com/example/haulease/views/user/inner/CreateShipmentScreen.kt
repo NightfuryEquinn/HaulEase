@@ -437,8 +437,8 @@ fun CreateShipmentScreen(
                   Shipment(
                     id = 0,
                     status = CargoStatus.status1.titleText,
-                    origin = origin.value,
-                    destination = dest.value,
+                    origin = userOrigin.value,
+                    destination = userDest.value,
                     receiverName = name.value,
                     receiverContact = contact.value,
                     consignorId = Sessions.sessionToken?.toInt(),

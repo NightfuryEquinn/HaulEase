@@ -120,6 +120,7 @@ fun SimpleCargoBox(
     Column(
       modifier = Modifier
         .fillMaxWidth()
+        .padding(12.dp),
     ) {
       Text(
         text = "Dimensions: ${cargo.length}m x ${cargo.width}m x ${cargo.height}m",
@@ -129,7 +130,7 @@ fun SimpleCargoBox(
         )
       )
 
-      Spacer(modifier = Modifier.width(10.dp))
+      Spacer(modifier = Modifier.height(5.dp))
 
       Text(
         text = "Type: ${cargo.type}",
@@ -139,7 +140,7 @@ fun SimpleCargoBox(
         )
       )
 
-      Spacer(modifier = Modifier.width(10.dp))
+      Spacer(modifier = Modifier.height(5.dp))
 
       Text(
         text = "Description: ${cargo.description}",

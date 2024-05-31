@@ -112,49 +112,46 @@ fun UserNavHost(navCtrl: NavHostController) {
     // User Inner Routes
     // Parsing argument to pass data between screens
     composable(
-      route = "ShipmentDetail?shipmentId={shipmentId}",
+      route = UserInnerRoutes.ShipmentDetail.routes,
       arguments = listOf(
         navArgument("shipmentId") {
           type = NavType.StringType
-          nullable = true
         }
       )
     ) { backStackEntry ->
-      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
+      val shipmentId = backStackEntry.arguments?.getString("shipmentId") ?: ""
 
       ShipmentDetailScreen(
         navCtrl = navCtrl,
         onBack = {
           navCtrl.popBackStack()
         },
-        shipmentId = shipmentId!!.toInt()
+        shipmentId = shipmentId.toInt()
       )
     }
 
     // Parsing argument to pass data between screens
     composable(
-      route = "CargoDetail?cargoId={cargoId}&shipmentId={shipmentId}",
+      route = UserInnerRoutes.CargoDetail.routes,
       arguments = listOf(
         navArgument("cargoId") {
           type = NavType.StringType
-          nullable = true
         },
         navArgument("shipmentId") {
           type = NavType.StringType
-          nullable = true
         }
       )
     ) { backStackEntry ->
-      val cargoId = backStackEntry.arguments?.getString("cargoId")
-      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
+      val cargoId = backStackEntry.arguments?.getString("cargoId") ?: ""
+      val shipmentId = backStackEntry.arguments?.getString("shipmentId") ?: ""
 
       CargoDetailScreen(
         navCtrl = navCtrl,
         onBack = {
           navCtrl.popBackStack()
         },
-        cargoId = cargoId!!.toInt(),
-        shipmentId = shipmentId!!.toInt()
+        cargoId = cargoId.toInt(),
+        shipmentId = shipmentId.toInt()
       )
     }
 
@@ -182,28 +179,26 @@ fun UserNavHost(navCtrl: NavHostController) {
 
     // Parsing argument to pass data between screens
     composable(
-      route = "Payment?paymentId={paymentId}&shipmentId={shipmentId}",
+      route = UserInnerRoutes.Payment.routes,
       arguments = listOf(
         navArgument("paymentId") {
           type = NavType.StringType
-          nullable = true
         },
         navArgument("shipmentId") {
           type = NavType.StringType
-          nullable = true
         }
       )
     ) { backStackEntry ->
-      val paymentId = backStackEntry.arguments?.getString("paymentId")
-      val shipmentId = backStackEntry.arguments?.getString("shipmentId")
+      val paymentId = backStackEntry.arguments?.getString("paymentId") ?: ""
+      val shipmentId = backStackEntry.arguments?.getString("shipmentId") ?: ""
 
       PaymentScreen(
         navCtrl = navCtrl,
         onBack = {
           navCtrl.popBackStack()
         },
-        paymentId = paymentId!!.toInt(),
-        shipmentId = shipmentId!!.toInt()
+        paymentId = paymentId.toInt(),
+        shipmentId = shipmentId.toInt()
       )
     }
 

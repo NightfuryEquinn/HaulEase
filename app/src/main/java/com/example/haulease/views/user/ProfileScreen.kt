@@ -131,18 +131,40 @@ fun ProfileScreen(
 
           SimpleLabelDesc(
             label = "Company Name",
-            desc = theUserProfile?.company ?: "none"
+            desc = if (theUserProfile?.company.isNullOrBlank()) "None" else theUserProfile?.company
           )
 
           SimpleLabelDesc(
             label = "Company Email",
-            desc = theUserProfile?.companyEmail ?: "none"
+            desc = if (theUserProfile?.companyEmail.isNullOrBlank()) "None" else theUserProfile?.companyEmail
           )
 
           SimpleLabelDesc(
             label = "Company Address",
-            desc = theUserProfile?.companyAddress ?: "none"
+            desc = if (theUserProfile?.companyAddress.isNullOrBlank()) "None" else theUserProfile?.companyAddress
           )
+
+          Button(
+            onClick = {
+              profileVM.logoutConsignor()
+              navCtrl.navigate("MainScreen") {
+                launchSingleTop = true
+              }
+            },
+            modifier = Modifier
+              .fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
+            shape = RoundedCornerShape(5.dp),
+          ) {
+            Text(
+              text = "Log Out",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.squada)),
+                fontSize = 24.sp,
+                color = Color(0xFFE5E5E5)
+              )
+            )
+          }
         }
         is ProfileState.LOADING -> {
           LinearProgressIndicator(
@@ -164,28 +186,6 @@ fun ProfileScreen(
             name = "Unable to Load Information"
           )
         }
-      }
-
-      Button(
-        onClick = {
-          profileVM.logoutConsignor()
-          navCtrl.navigate("MainScreen") {
-            launchSingleTop = true
-          }
-        },
-        modifier = Modifier
-          .fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
-        shape = RoundedCornerShape(5.dp),
-      ) {
-        Text(
-          text = "Log Out",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.squada)),
-            fontSize = 24.sp,
-            color = Color(0xFFE5E5E5)
-          )
-        )
       }
     }
 

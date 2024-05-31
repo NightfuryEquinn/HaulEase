@@ -47,6 +47,7 @@ import androidx.navigation.NavHostController
 import com.example.haulease.R
 import com.example.haulease.models.Shipment
 import com.example.haulease.navigations.TabBar
+import com.example.haulease.navigations.routes.UserInnerRoutes
 import com.example.haulease.ui.components.SimpleEmptyBox
 import com.example.haulease.ui.components.SimpleTabCol
 import com.example.haulease.viewmodels.user.ShipmentState
@@ -205,6 +206,26 @@ fun ShipmentScreen(
             }
           }
         }
+
+        Button(
+          onClick = {
+            navCtrl.navigate(UserInnerRoutes.CreateShipment.routes)
+          },
+          modifier = Modifier
+            .fillMaxWidth()
+            .align(Alignment.CenterHorizontally),
+          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
+          shape = RoundedCornerShape(5.dp),
+        ) {
+          Text(
+            text = "Create Shipment",
+            style = TextStyle(
+              fontFamily = FontFamily(Font(R.font.squada)),
+              fontSize = 24.sp,
+              color = Color(0xFFE5E5E5)
+            )
+          )
+        }
       }
       is ShipmentState.LOADING -> {
         LinearProgressIndicator(
@@ -228,26 +249,6 @@ fun ShipmentScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
       }
-    }
-
-    Button(
-      onClick = {
-        navCtrl.navigate("CreateShipment?shipmentId=")
-      },
-      modifier = Modifier
-        .fillMaxWidth()
-        .align(Alignment.CenterHorizontally),
-      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
-      shape = RoundedCornerShape(5.dp),
-    ) {
-      Text(
-        text = "Create Shipment",
-        style = TextStyle(
-          fontFamily = FontFamily(Font(R.font.squada)),
-          fontSize = 24.sp,
-          color = Color(0xFFE5E5E5)
-        )
-      )
     }
 
     Spacer(modifier = Modifier.padding(bottom = 52.dp))

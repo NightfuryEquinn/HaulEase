@@ -61,6 +61,7 @@ import com.example.haulease.models.ShipmentTruck
 import com.example.haulease.navigations.routes.UserRoutes
 import com.example.haulease.ui.components.SimpleEmptyBox
 import com.example.haulease.ui.components.SimpleViewBox
+import com.example.haulease.validations.CargoStatus
 import com.example.haulease.viewmodels.user.inner.ShipmentDetailState
 import com.example.haulease.viewmodels.user.inner.ShipmentDetailVM
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -90,10 +91,10 @@ fun ShipmentDetailScreen(
   shipmentDetailVM: ShipmentDetailVM = viewModel()
 ) {
   val cScope = rememberCoroutineScope()
-  var theShipmentDetail: ShipmentPayment? = null
-  var theShipmentTracking: ShipmentTracking? = null
-  var theShipmentTruck: ShipmentTruck? = null
-  var theShipmentCargos: List<Cargo> = emptyList()
+  val theShipmentDetail: ShipmentPayment? = shipmentDetailVM.theShipmentDetail
+  val theShipmentTracking: ShipmentTracking? = shipmentDetailVM.theShipmentTracking
+  val theShipmentTruck: ShipmentTruck? = shipmentDetailVM.theShipmentTruck
+  val theShipmentCargos: List<Cargo> = shipmentDetailVM.theShipmentCargos
 
   // Map variables
   val context = LocalContext.current
@@ -104,19 +105,11 @@ fun ShipmentDetailScreen(
   var shipmentMarker: Marker? by remember { mutableStateOf(null) }
   var updateTime by remember { mutableStateOf("") }
 
-  val trackingCoordinates by remember { mutableStateOf(LatLng(theShipmentTracking?.tracking?.latitude!!, theShipmentTracking?.tracking?.longitude!!)) }
-  val originAddress by remember { mutableStateOf(
-    shipmentDetailVM.getAddressFromString(
-      theShipmentTracking?.shipment?.origin!!,
-      context
-    ))
-  }
-  val destAddress by remember { mutableStateOf(
-    shipmentDetailVM.getAddressFromString(
-      theShipmentTracking?.shipment?.destination!!,
-      context
-    ))
-  }
+  val trackingCoordinates by remember { mutableStateOf(
+    LatLng(0.0, 0.0)
+  )}
+  val originAddress by remember { mutableStateOf<Address?>(null)}
+  val destAddress by remember { mutableStateOf<Address?>(null)}
 
   // Observer
   val shipmentDetailState by shipmentDetailVM.shipmentDetailState.collectAsState()
@@ -285,6 +278,37 @@ fun ShipmentDetailScreen(
             Spacer(modifier = Modifier.height(15.dp))
 
             Text(
+              text = "Receiver Details",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.squada)),
+                fontSize = 20.sp,
+                color = Color(0xFFFCA111)
+              )
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+              text = "Receiver Name: ${theShipmentDetail?.shipment?.receiverName}",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.libre)),
+                fontSize = 12.sp
+              )
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Text(
+              text = "Receiver Contact: ${theShipmentDetail?.shipment?.receiverContact}",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.libre)),
+                fontSize = 12.sp
+              )
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Text(
               text = "Status",
               style = TextStyle(
                 fontFamily = FontFamily(Font(R.font.squada)),
@@ -296,7 +320,7 @@ fun ShipmentDetailScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-              text = theShipmentDetail?.shipment?.status!!,
+              text = theShipmentDetail?.shipment?.status.toString(),
               style = TextStyle(
                 fontFamily = FontFamily(Font(R.font.libre)),
                 fontSize = 12.sp
@@ -317,7 +341,7 @@ fun ShipmentDetailScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-              text = theShipmentDetail?.shipment?.origin!!,
+              text = theShipmentDetail?.shipment?.origin.toString(),
               style = TextStyle(
                 fontFamily = FontFamily(Font(R.font.libre)),
                 fontSize = 12.sp,
@@ -339,7 +363,7 @@ fun ShipmentDetailScreen(
             Spacer(modifier = Modifier.height(5.dp))
 
             Text(
-              text = theShipmentDetail?.shipment?.destination!!,
+              text = theShipmentDetail?.shipment?.destination.toString(),
               style = TextStyle(
                 fontFamily = FontFamily(Font(R.font.libre)),
                 fontSize = 12.sp,
@@ -421,6 +445,78 @@ fun ShipmentDetailScreen(
             Spacer(modifier = Modifier.height(5.dp))
           }
         }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Row(
+          modifier = Modifier
+            .fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+          if (theShipmentDetail?.shipment?.status != CargoStatus.status9.titleText) {
+            Button(
+              onClick = {
+                navCtrl.navigate("Payment?paymentId=${theShipmentDetail?.payment?.id}&shipmentId=$shipmentId")
+              },
+              modifier = Modifier
+                .weight(0.35f),
+              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
+              shape = RoundedCornerShape(5.dp),
+            ) {
+              Text(
+                text = "Payment",
+                style = TextStyle(
+                  fontFamily = FontFamily(Font(R.font.squada)),
+                  fontSize = 24.sp,
+                  color = Color(0xFFE5E5E5)
+                )
+              )
+            }
+          } else {
+            Button(
+              onClick = {
+                // TODO()
+                navCtrl.navigate(UserRoutes.Shipment.routes)
+              },
+              modifier = Modifier
+                .weight(0.35f),
+              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
+              shape = RoundedCornerShape(5.dp),
+            ) {
+              Text(
+                text = "Delivered?",
+                style = TextStyle(
+                  fontFamily = FontFamily(Font(R.font.squada)),
+                  fontSize = 24.sp,
+                  color = Color(0xFFE5E5E5)
+                )
+              )
+            }
+          }
+
+          Spacer(modifier = Modifier.width(20.dp))
+
+          Button(
+            onClick = {
+              onBack()
+              navCtrl.navigate(UserRoutes.Shipment.routes) {
+                launchSingleTop = true
+              }
+            },
+            modifier = Modifier
+              .weight(0.35f),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA111)),
+            shape = RoundedCornerShape(5.dp),
+          ) {
+            Text(
+              text = "Back",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.squada)),
+                fontSize = 24.sp,
+              )
+            )
+          }
+        }
       }
       is ShipmentDetailState.LOADING -> {
         LinearProgressIndicator(
@@ -446,56 +542,6 @@ fun ShipmentDetailScreen(
       }
     }
 
-    Spacer(modifier = Modifier.height(10.dp))
-
-    Row(
-      modifier = Modifier
-        .fillMaxWidth(),
-      horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-      Button(
-        onClick = {
-          navCtrl.navigate("Payment?paymentId=${theShipmentDetail?.payment?.id}&shipmentId=$shipmentId")
-        },
-        modifier = Modifier
-          .weight(0.35f),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
-        shape = RoundedCornerShape(5.dp),
-      ) {
-        Text(
-          text = "Payment",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.squada)),
-            fontSize = 24.sp,
-            color = Color(0xFFE5E5E5)
-          )
-        )
-      }
-
-      Spacer(modifier = Modifier.width(20.dp))
-
-      Button(
-        onClick = {
-          onBack()
-          navCtrl.navigate(UserRoutes.Shipment.routes) {
-            launchSingleTop = true
-          }
-        },
-        modifier = Modifier
-          .weight(0.35f),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA111)),
-        shape = RoundedCornerShape(5.dp),
-      ) {
-        Text(
-          text = "Back",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.squada)),
-            fontSize = 24.sp,
-          )
-        )
-      }
-    }
-
     Spacer(modifier = Modifier.padding(bottom = 52.dp))
   }
 
@@ -515,7 +561,9 @@ fun ShipmentDetailScreen(
       }
     }
       .flowOn(Dispatchers.IO)
-      .onEach { updateShipmentLocation() }
+      .onEach {
+        updateShipmentLocation()
+      }
       .launchIn(this)
   }
 
@@ -525,10 +573,6 @@ fun ShipmentDetailScreen(
         shipmentId,
         context
       )
-      theShipmentDetail = shipmentDetailVM.theShipmentDetail
-      theShipmentTracking = shipmentDetailVM.theShipmentTracking
-      theShipmentTruck = shipmentDetailVM.theShipmentTruck
-      theShipmentCargos = shipmentDetailVM.theShipmentCargos
     }
 
     onDispose {

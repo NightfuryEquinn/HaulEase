@@ -57,18 +57,19 @@ fun AdminCargoDetailScreen(
   onBack: () -> Unit,
   cargoId: Int = 0,
   shipmentId: Int,
+  consignorId: Int,
   adminCargoDetailVM: AdminCargoDetailVM = viewModel()
 ) {
   val context = LocalContext.current
   val cScope = rememberCoroutineScope()
-  var theCargoDetail: Cargo? = null
+  val theCargoDetail: Cargo? = adminCargoDetailVM.theCargoDetail
 
   // Observer
   val adminCargoState by adminCargoDetailVM.adminCargoState.collectAsState()
 
   BackHandler {
     onBack()
-    navCtrl.navigate("AdminShipmentDetail?shipmentId=$shipmentId") {
+    navCtrl.navigate("AdminShipmentDetail?shipmentId=$shipmentId&consignorId=$consignorId") {
       launchSingleTop = true
     }
   }
@@ -111,10 +112,10 @@ fun AdminCargoDetailScreen(
       when (adminCargoState) {
         is AdminCargoState.SUCCESS -> {
           if (theCargoDetail != null) {
-            if (theCargoDetail!!.image.isNotEmpty()) {
+            if (theCargoDetail.image.isNotEmpty()) {
               AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                  .data(theCargoDetail?.image)
+                  .data(theCargoDetail.image)
                   .crossfade(true)
                   .build(),
                 contentDescription = null,
@@ -167,8 +168,60 @@ fun AdminCargoDetailScreen(
 
           SimpleLabelDesc(
             label = "Description",
-            desc = "Lorem ipsum dolor sit actum this book is very good and very fragile"
+            desc = theCargoDetail?.description ?: ""
           )
+
+          Spacer(modifier = Modifier.height(10.dp))
+
+          Row(
+            modifier = Modifier
+              .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+          ) {
+            Button(
+              onClick = {
+                if (theCargoDetail != null) {
+                  navCtrl.navigate("EditCargo?cargoId=$cargoId&shipmentId=$shipmentId&consignorId=$consignorId&type=${theCargoDetail.type}&weight=${theCargoDetail.weight}&length=${theCargoDetail.length}&width=${theCargoDetail.width}&height=${theCargoDetail.height}&image=${theCargoDetail.image}&desc=${theCargoDetail.description}")
+                }
+              },
+              modifier = Modifier
+                .weight(0.35f),
+              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
+              shape = RoundedCornerShape(5.dp),
+            ) {
+              Text(
+                text = "Edit",
+                style = TextStyle(
+                  fontFamily = FontFamily(Font(R.font.squada)),
+                  fontSize = 24.sp,
+                  color = Color(0xFFE5E5E5)
+                )
+              )
+            }
+
+            Spacer(modifier = Modifier.width(20.dp))
+
+            Button(
+              onClick = {
+                onBack()
+                navCtrl.navigate("AdminShipmentDetail?shipmentId=$shipmentId&consignorId=$consignorId") {
+                  launchSingleTop = true
+                }
+              },
+              modifier = Modifier
+                .weight(0.35f),
+              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA111)),
+              shape = RoundedCornerShape(5.dp),
+            ) {
+              Text(
+                text = "Back",
+                style = TextStyle(
+                  fontFamily = FontFamily(Font(R.font.squada)),
+                  fontSize = 24.sp,
+                )
+              )
+            }
+          }
         }
         is AdminCargoState.LOADING -> {
           LinearProgressIndicator(
@@ -193,58 +246,6 @@ fun AdminCargoDetailScreen(
       }
     }
 
-    Spacer(modifier = Modifier.height(10.dp))
-
-    Row(
-      modifier = Modifier
-        .fillMaxWidth(),
-      horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-      Button(
-        onClick = {
-          if (theCargoDetail != null) {
-            navCtrl.navigate("EditCargo?cargoId=$cargoId&shipmentId=$shipmentId&type=${theCargoDetail!!.type}&weight=${theCargoDetail!!.weight}&length=${theCargoDetail!!.length}&width=${theCargoDetail!!.width}&height=${theCargoDetail!!.height}")
-          }
-        },
-        modifier = Modifier
-          .weight(0.35f),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
-        shape = RoundedCornerShape(5.dp),
-      ) {
-        Text(
-          text = "Edit",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.squada)),
-            fontSize = 24.sp,
-            color = Color(0xFFE5E5E5)
-          )
-        )
-      }
-
-      Spacer(modifier = Modifier.width(20.dp))
-
-      Button(
-        onClick = {
-          onBack()
-          navCtrl.navigate("AdminShipmentDetail?shipmentId=$shipmentId") {
-            launchSingleTop = true
-          }
-        },
-        modifier = Modifier
-          .weight(0.35f),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA111)),
-        shape = RoundedCornerShape(5.dp),
-      ) {
-        Text(
-          text = "Back",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.squada)),
-            fontSize = 24.sp,
-          )
-        )
-      }
-    }
-
     Spacer(modifier = Modifier.padding(bottom = 60.dp))
   }
 
@@ -254,7 +255,6 @@ fun AdminCargoDetailScreen(
         cargoId,
         context
       )
-      theCargoDetail = adminCargoDetailVM.theCargoDetail
     }
 
     onDispose {

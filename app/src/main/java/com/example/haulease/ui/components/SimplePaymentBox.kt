@@ -1,5 +1,6 @@
 package com.example.haulease.ui.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.haulease.R
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun SimplePaymentBox(
   originTruckTravelFees: Double? = null,
@@ -38,9 +40,7 @@ fun SimplePaymentBox(
   onPayClick: () -> Unit,
   isPaid: Boolean
 ) {
-  var totalPayable: Double = 0.0
-
-  totalPayable = if (originTruckTravelFees != null && originTruckLoadingFees != null && harborMeasurementFees != null && harborLoadingFees != null) {
+  val totalPayable: Double = if (originTruckTravelFees != null && originTruckLoadingFees != null && harborMeasurementFees != null && harborLoadingFees != null) {
     originTruckTravelFees + originTruckLoadingFees + harborMeasurementFees + harborLoadingFees
   } else if (totalCargoFees != null) {
     val customFees = 0.1 * totalCargoFees
@@ -48,6 +48,8 @@ fun SimplePaymentBox(
   } else {
     harborUnloadingFees!! + destTruckLoadingFees!! + destTruckTravelFees!!
   }
+
+  val totalPayableRounded = String.format("%.2f", totalPayable)
 
   Column(
     modifier = Modifier
@@ -149,7 +151,10 @@ fun SimplePaymentBox(
     }
 
     if (totalCargoFees != null) {
+      val totalCargoFeesRounded = String.format("%.2f", totalCargoFees)
+
       val customFees: Double = 0.1 * totalCargoFees.toDouble()
+      val customFeesRounded = String.format("%.2f", customFees)
 
       Text(
         buildAnnotatedString {
@@ -167,7 +172,7 @@ fun SimplePaymentBox(
               fontSize = 12.sp,
             )
           ) {
-            append("RM $totalCargoFees")
+            append("RM $totalCargoFeesRounded")
           }
         }
       )
@@ -198,7 +203,7 @@ fun SimplePaymentBox(
               fontSize = 12.sp,
             )
           ) {
-            append("RM $customFees")
+            append("RM $customFeesRounded")
           }
         }
       )
@@ -276,7 +281,7 @@ fun SimplePaymentBox(
     Spacer(modifier = Modifier.height(20.dp))
 
     Text(
-      text = "Total Payable: RM $totalPayable",
+      text = "Total Payable: RM $totalPayableRounded",
       style = TextStyle(
         fontFamily = FontFamily(Font(R.font.squada)),
         fontSize = 24.sp,

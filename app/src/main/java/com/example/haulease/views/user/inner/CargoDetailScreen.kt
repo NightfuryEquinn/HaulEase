@@ -60,7 +60,7 @@ fun CargoDetailScreen(
 ) {
   val context = LocalContext.current
   val cScope = rememberCoroutineScope()
-  var theCargoDetail: Cargo? = null
+  val theCargoDetail: Cargo? = cargoDetailVM.theCargoDetail
 
   // Observer
   val cargoState by cargoDetailVM.cargoState.collectAsState()
@@ -110,10 +110,10 @@ fun CargoDetailScreen(
       when (cargoState) {
         is CargoState.SUCCESS -> {
           if (theCargoDetail != null) {
-            if (theCargoDetail!!.image.isNotEmpty()) {
+            if (theCargoDetail.image.isNotEmpty()) {
               AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                  .data(theCargoDetail?.image)
+                  .data(theCargoDetail.image)
                   .crossfade(true)
                   .build(),
                 contentDescription = null,
@@ -225,7 +225,6 @@ fun CargoDetailScreen(
         cargoId,
         context
       )
-      theCargoDetail = cargoDetailVM.theCargoDetail
     }
 
     onDispose {

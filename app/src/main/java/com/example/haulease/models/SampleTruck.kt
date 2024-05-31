@@ -3,39 +3,64 @@ package com.example.haulease.models
 object SampleTruck {
   val SampleTrucks: List<Truck> = listOf(
     Truck(
-      id = 1,
-      driverName = "John Doe",
-      licensePlate = "ABC123"
+      id = 8,
+      driverName = "Alice Aries",
+      licensePlate = "AA123"
     ),
     Truck(
-      id = 2,
-      driverName = "Jane Smith",
-      licensePlate = "DEF456"
+      id = 9,
+      driverName = "Ben Taurus",
+      licensePlate = "BT456"
     ),
     Truck(
-      id = 3,
-      driverName = "David Johnson",
-      licensePlate = "GHI789"
+      id = 10,
+      driverName = "Cara Gemini",
+      licensePlate = "CG789"
     ),
     Truck(
-      id = 4,
-      driverName = "Emily Brown",
-      licensePlate = "JKL012"
+      id = 11,
+      driverName = "Daniel Cancer",
+      licensePlate = "DC321"
     ),
     Truck(
-      id = 5,
-      driverName = "Michael Williams",
-      licensePlate = "MNO345"
+      id = 12,
+      driverName = "Eva Leo",
+      licensePlate = "EL654"
     ),
     Truck(
-      id = 6,
-      driverName = "Emma Jones",
-      licensePlate = "PQR678"
+      id = 13,
+      driverName = "Frank Virgo",
+      licensePlate = "FV987"
     ),
     Truck(
-      id = 7,
-      driverName = "Christopher Miller",
-      licensePlate = "STU901"
+      id = 14,
+      driverName = "Grace Libra",
+      licensePlate = "GL741"
+    ),
+    Truck(
+      id = 15,
+      driverName = "Harry Scorpio",
+      licensePlate = "HS852"
+    ),
+    Truck(
+      id = 16,
+      driverName = "Isla Sagittarius",
+      licensePlate = "IS963"
+    ),
+    Truck(
+      id = 17,
+      driverName = "Jack Capricorn",
+      licensePlate = "JC159"
+    ),
+    Truck(
+      id = 18,
+      driverName = "Kara Aquarius",
+      licensePlate = "KA753"
+    ),
+    Truck(
+      id = 19,
+      driverName = "Liam Pisces",
+      licensePlate = "LP486"
     )
   )
 }

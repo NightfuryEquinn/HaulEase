@@ -105,8 +105,7 @@ fun AdminProfileScreen(
           }
         },
         modifier = Modifier
-          .fillMaxWidth(0.5f)
-          .align(Alignment.End),
+          .fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
         shape = RoundedCornerShape(5.dp),
       ) {

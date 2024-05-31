@@ -49,12 +49,12 @@ fun AdminDashboardScreen(
 ) {
   val context = LocalContext.current
   val cScope = rememberCoroutineScope()
-  var shipmentsReceived: Int = adminDashboardVM.shipmentsReceived
-  var cargosTransported: Int = adminDashboardVM.cargosTransported
-  var weightShipped: Double = adminDashboardVM.weightShipped
-  var totalIncome: Double = adminDashboardVM.totalIncome
-  var totalActiveUsers: Int = adminDashboardVM.totalActiveUsers
-  var totalShipmentsDone: Int = adminDashboardVM.totalShipmentsDone
+  val shipmentsReceived: Int = adminDashboardVM.shipmentsReceived
+  val cargosTransported: Int = adminDashboardVM.cargosTransported
+  val weightShipped: Double = adminDashboardVM.weightShipped
+  val totalIncome: Double = adminDashboardVM.totalIncome
+  val totalActiveUsers: Int = adminDashboardVM.totalActiveUsers - 1
+  val totalShipmentsDone: Int = adminDashboardVM.totalShipmentsDone
 
   // Observer
   val adminDashboardState by adminDashboardVM.adminDashboardState.collectAsState()
@@ -104,14 +104,14 @@ fun AdminDashboardScreen(
             SimpleDataBox(
               image = painterResource(id = R.drawable.ship),
               label = "Shipment Received",
-              dataValue = 30,
+              dataValue = shipmentsReceived,
               backgroundColor = Color(0xFFE5E5E5)
             )
 
             SimpleDataBox(
               image = painterResource(id = R.drawable.container),
               label = "Cargo Transported",
-              dataValue = 324,
+              dataValue = cargosTransported,
             )
           }
 
@@ -125,13 +125,13 @@ fun AdminDashboardScreen(
             SimpleDataBox(
               image = painterResource(id = R.drawable.weight),
               label = "Weight Shipped (kg)",
-              dataValue = 395,
+              dataValue = weightShipped,
             )
 
             SimpleDataBox(
               image = painterResource(id = R.drawable.assets),
               label = "Total Income (RM)",
-              dataValue = 13430,
+              dataValue = totalIncome,
               backgroundColor = Color(0xFFE5E5E5)
             )
           }
@@ -146,14 +146,14 @@ fun AdminDashboardScreen(
             SimpleDataBox(
               image = painterResource(id = R.drawable.active_users),
               label = "Total Active Users",
-              dataValue = 45,
+              dataValue = totalActiveUsers,
               backgroundColor = Color(0xFFE5E5E5)
             )
 
             SimpleDataBox(
               image = painterResource(id = R.drawable.completed),
               label = "Total Shipment Done",
-              dataValue = 243,
+              dataValue = totalShipmentsDone,
             )
           }
 

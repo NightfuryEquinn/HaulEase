@@ -96,10 +96,10 @@ fun AdminShipmentDetailScreen(
   adminShipmentDetailVM: AdminShipmentDetailVM = viewModel()
 ) {
   val cScope = rememberCoroutineScope()
-  var theShipmentDetail: ShipmentPayment? = null
-  var theShipmentTracking: ShipmentTracking? = null
-  var theShipmentTruck: ShipmentTruck? = null
-  var theShipmentCargos: List<Cargo> = emptyList()
+  val theShipmentDetail: ShipmentPayment? = adminShipmentDetailVM.theShipmentDetail
+  val theShipmentTracking: ShipmentTracking? = adminShipmentDetailVM.theShipmentTracking
+  val theShipmentTruck: ShipmentTruck? = adminShipmentDetailVM.theShipmentTruck
+  val theShipmentCargos: List<Cargo> = adminShipmentDetailVM.theShipmentCargos
 
   // Map variables
   val context = LocalContext.current
@@ -110,19 +110,11 @@ fun AdminShipmentDetailScreen(
   var shipmentMarker: Marker? by remember { mutableStateOf(null) }
   var updateTime by remember { mutableStateOf("") }
 
-  val trackingCoordinates by remember { mutableStateOf(LatLng(theShipmentTracking?.tracking?.latitude!!, theShipmentTracking?.tracking?.longitude!!)) }
-  val originAddress by remember { mutableStateOf(
-    adminShipmentDetailVM.getAddressFromString(
-      theShipmentTracking?.shipment?.origin!!,
-      context
-    )
-  ) }
-  val destAddress by remember { mutableStateOf(
-    adminShipmentDetailVM.getAddressFromString(
-      theShipmentTracking?.shipment?.destination!!,
-      context
-    )
-  ) }
+  val trackingCoordinates by remember { mutableStateOf(
+    LatLng(0.0, 0.0)
+  )}
+  val originAddress by remember { mutableStateOf<Address?>(null)}
+  val destAddress by remember { mutableStateOf<Address?>(null)}
 
   // Observer
   val adminShipmentDetailState by adminShipmentDetailVM.adminShipmentDetailState.collectAsState()
@@ -209,11 +201,21 @@ fun AdminShipmentDetailScreen(
   var displayOption by remember { mutableStateOf("") }
   val listOptionState = rememberUseCaseState(onFinishedRequest = {
     cScope.launch {
-      adminShipmentDetailVM.updateShipmentStatus(
-        shipmentId,
-        displayOption,
-        context
-      )
+      // Ignore failure yet updated
+      try {
+        adminShipmentDetailVM.updateShipmentStatus(
+          shipmentId,
+          displayOption,
+          context
+        )
+      } catch (e: Exception) {
+        Toast.makeText(context, "Shipment status updated.", Toast.LENGTH_LONG).show()
+
+        onBack()
+        navCtrl.navigate(AdminRoutes.AdminShipment.routes) {
+          launchSingleTop = true
+        }
+      }
     }
   })
 
@@ -294,7 +296,7 @@ fun AdminShipmentDetailScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-              text = "ID: 100001",
+              text = "Truck ID: ${theShipmentTruck?.truck?.id}",
               style = TextStyle(
                 fontFamily = FontFamily(Font(R.font.libre)),
                 fontSize = 12.sp
@@ -304,7 +306,7 @@ fun AdminShipmentDetailScreen(
             Spacer(modifier = Modifier.height(5.dp))
 
             Text(
-              text = "Driver Name: Jason Doe",
+              text = "Driver Name: ${theShipmentTruck?.truck?.driverName}",
               style = TextStyle(
                 fontFamily = FontFamily(Font(R.font.libre)),
                 fontSize = 12.sp
@@ -314,7 +316,38 @@ fun AdminShipmentDetailScreen(
             Spacer(modifier = Modifier.height(5.dp))
 
             Text(
-              text = "License Plate: VEE 7913",
+              text = "License Plate: ${theShipmentTruck?.truck?.licensePlate}",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.libre)),
+                fontSize = 12.sp
+              )
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Text(
+              text = "Receiver Details",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.squada)),
+                fontSize = 20.sp,
+                color = Color(0xFFFCA111)
+              )
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+              text = "Receiver Name: ${theShipmentDetail?.shipment?.receiverName}",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.libre)),
+                fontSize = 12.sp
+              )
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Text(
+              text = "Receiver Contact: ${theShipmentDetail?.shipment?.receiverContact}",
               style = TextStyle(
                 fontFamily = FontFamily(Font(R.font.libre)),
                 fontSize = 12.sp
@@ -335,7 +368,7 @@ fun AdminShipmentDetailScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-              text = "Arrived at harbor near destination, waiting to unload",
+              text = theShipmentDetail?.shipment?.status.toString(),
               style = TextStyle(
                 fontFamily = FontFamily(Font(R.font.libre)),
                 fontSize = 12.sp
@@ -356,7 +389,7 @@ fun AdminShipmentDetailScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-              text = "C-27-07, Parkhill Residence, MRANTI Park, 57000 Bukit Jalil, Kuala Lumpur",
+              text = theShipmentDetail?.shipment?.origin.toString(),
               style = TextStyle(
                 fontFamily = FontFamily(Font(R.font.libre)),
                 fontSize = 12.sp,
@@ -378,7 +411,7 @@ fun AdminShipmentDetailScreen(
             Spacer(modifier = Modifier.height(5.dp))
 
             Text(
-              text = "138 Cecil Street #12-01 Cecil Court, Singapore 069538",
+              text = theShipmentDetail?.shipment?.destination.toString(),
               style = TextStyle(
                 fontFamily = FontFamily(Font(R.font.libre)),
                 fontSize = 12.sp,
@@ -460,6 +493,27 @@ fun AdminShipmentDetailScreen(
             Spacer(modifier = Modifier.height(5.dp))
           }
         }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Button(
+          onClick = {
+            listOptionState.show()
+          },
+          modifier = Modifier
+            .fillMaxWidth(),
+          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
+          shape = RoundedCornerShape(5.dp),
+        ) {
+          Text(
+            text = "Change Status",
+            style = TextStyle(
+              fontFamily = FontFamily(Font(R.font.squada)),
+              fontSize = 24.sp,
+              color = Color(0xFFE5E5E5)
+            )
+          )
+        }
       }
       is AdminShipmentDetailState.LOADING -> {
         LinearProgressIndicator(
@@ -485,27 +539,6 @@ fun AdminShipmentDetailScreen(
       }
     }
 
-    Spacer(modifier = Modifier.height(10.dp))
-
-    Button(
-      onClick = {
-        listOptionState.show()
-      },
-      modifier = Modifier
-        .fillMaxWidth(),
-      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
-      shape = RoundedCornerShape(5.dp),
-    ) {
-      Text(
-        text = "Change Status",
-        style = TextStyle(
-          fontFamily = FontFamily(Font(R.font.squada)),
-          fontSize = 24.sp,
-          color = Color(0xFFE5E5E5)
-        )
-      )
-    }
-
     Spacer(modifier = Modifier.padding(bottom = 52.dp))
   }
 
@@ -525,7 +558,9 @@ fun AdminShipmentDetailScreen(
       }
     }
       .flowOn(Dispatchers.IO)
-      .onEach { updateShipmentLocation() }
+      .onEach {
+        updateShipmentLocation()
+      }
       .launchIn(this)
   }
 
@@ -536,10 +571,6 @@ fun AdminShipmentDetailScreen(
         consignorId,
         context
       )
-      theShipmentDetail = adminShipmentDetailVM.theShipmentDetail
-      theShipmentTracking = adminShipmentDetailVM.theShipmentTracking
-      theShipmentTruck = adminShipmentDetailVM.theShipmentTruck
-      theShipmentCargos = adminShipmentDetailVM.theShipmentCargos
     }
 
     onDispose {

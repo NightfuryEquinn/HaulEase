@@ -59,6 +59,7 @@ fun AdminEditCargoScreen(
   onBack: () -> Unit,
   cargoId: Int,
   shipmentId: Int,
+  consignorId: Int,
   cargoType: String = "",
   cargoWeight: String = "",
   cargoLength: String = "",
@@ -76,7 +77,7 @@ fun AdminEditCargoScreen(
 
   BackHandler {
     onBack()
-    navCtrl.navigate("AdminCargoDetail?cargoId=$cargoId&shipmentId=$shipmentId") {
+    navCtrl.navigate("AdminCargoDetail?cargoId=$cargoId&shipmentId=$shipmentId&consignorId=$consignorId") {
       launchSingleTop = true
     }
   }
@@ -147,7 +148,7 @@ fun AdminEditCargoScreen(
 
     when (adminEditState) {
       is AdminEditState.SUCCESS -> {
-        navCtrl.navigate("AdminCargoDetail?cargoId=$cargoId&shipmentId=$shipmentId") {
+        navCtrl.navigate("AdminCargoDetail?cargoId=$cargoId&shipmentId=$shipmentId&consignorId=$consignorId") {
           launchSingleTop = true
         }
       }
@@ -248,82 +249,82 @@ fun AdminEditCargoScreen(
             label = "Height in estimation",
             onlyNumber = true
           )
-        }
-      }
-    }
 
-    Spacer(modifier = Modifier.height(20.dp))
+          Spacer(modifier = Modifier.height(20.dp))
 
-    Row(
-      modifier = Modifier
-        .fillMaxWidth(),
-      horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-      Button(
-        onClick = {
-          cScope.launch {
-            try {
-              adminEditCargoVM.updateCargoDetail(
-                Cargo(
-                  id = cargoId,
-                  type = type,
-                  weight = weight.value.toDouble(),
-                  length = length.value.toDouble(),
-                  width = width.value.toDouble(),
-                  height = height.value.toDouble(),
-                  image = cargoImage,
-                  description = cargoDesc,
-                  shipmentId = shipmentId
-                ),
-                context
+          Row(
+            modifier = Modifier
+              .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+          ) {
+            Button(
+              onClick = {
+                cScope.launch {
+                  try {
+                    adminEditCargoVM.updateCargoDetail(
+                      Cargo(
+                        id = cargoId,
+                        type = type,
+                        weight = weight.value.toDouble(),
+                        length = length.value.toDouble(),
+                        width = width.value.toDouble(),
+                        height = height.value.toDouble(),
+                        image = cargoImage,
+                        description = cargoDesc,
+                        shipmentId = shipmentId
+                      ),
+                      context
+                    )
+                  } catch (e: Exception) {
+                    Toast.makeText(context, e.message.toString(), Toast.LENGTH_SHORT).show()
+                  }
+                }
+
+                onBack()
+                navCtrl.navigate("AdminCargoDetail?cargoId=$cargoId&shipmentId=$shipmentId&consignorId=$consignorId") {
+                  launchSingleTop = true
+                }
+              },
+              modifier = Modifier
+                .weight(0.35f),
+              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
+              shape = RoundedCornerShape(5.dp),
+              enabled = allFieldsNotEmpty
+            ) {
+              Text(
+                text = "Save",
+                style = TextStyle(
+                  fontFamily = FontFamily(Font(R.font.squada)),
+                  fontSize = 24.sp,
+                  color = Color(0xFFE5E5E5)
+                )
               )
-            } catch (e: Exception) {
-              Toast.makeText(context, e.message.toString(), Toast.LENGTH_SHORT).show()
+            }
+
+            Spacer(modifier = Modifier.width(20.dp))
+
+            Button(
+              onClick = {
+                onBack()
+                navCtrl.navigate("AdminCargoDetail?cargoId=$cargoId&shipmentId=$shipmentId&consignorId=$consignorId") {
+                  launchSingleTop = true
+                }
+              },
+              modifier = Modifier
+                .weight(0.35f),
+              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA111)),
+              shape = RoundedCornerShape(5.dp),
+            ) {
+              Text(
+                text = "Cancel",
+                style = TextStyle(
+                  fontFamily = FontFamily(Font(R.font.squada)),
+                  fontSize = 24.sp,
+                )
+              )
             }
           }
-
-          onBack()
-          navCtrl.navigate("AdminCargoDetail?cargoId=$cargoId&shipmentId=$shipmentId") {
-            launchSingleTop = true
-          }
-        },
-        modifier = Modifier
-          .weight(0.35f),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
-        shape = RoundedCornerShape(5.dp),
-        enabled = allFieldsNotEmpty
-      ) {
-        Text(
-          text = "Save",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.squada)),
-            fontSize = 24.sp,
-            color = Color(0xFFE5E5E5)
-          )
-        )
-      }
-
-      Spacer(modifier = Modifier.width(20.dp))
-
-      Button(
-        onClick = {
-          onBack()
-          navCtrl.navigate("AdminCargoDetail?cargoId=$cargoId&shipmentId=$shipmentId") {
-            launchSingleTop = true
-          }
-        },
-        modifier = Modifier
-          .weight(0.35f),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA111)),
-        shape = RoundedCornerShape(5.dp),
-      ) {
-        Text(
-          text = "Cancel",
-          style = TextStyle(
-            fontFamily = FontFamily(Font(R.font.squada)),
-            fontSize = 24.sp,
-          )
-        )
+        }
       }
     }
 

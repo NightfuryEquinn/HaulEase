@@ -56,7 +56,7 @@ class DashboardVM: ViewModel() {
 
     res.body()?.let {
       if (res.isSuccessful && it.isNotEmpty()) {
-        for (sp in it.reversed()) {
+        for (sp in it) {
           val paymentRes = repository.getPayment(sp.payment.id)
 
           paymentRes.body()?.let { payment ->
@@ -100,18 +100,20 @@ class DashboardVM: ViewModel() {
           val cargoRes = repository.getCargosByShipment(shipment.id)
 
           cargoRes.body()?.let { cargos ->
-            if (shipRes.isSuccessful && cargoRes.isSuccessful) {
+            if (cargoRes.isSuccessful) {
               totalCargo += cargos.size
 
               // Get the total weight of cargos
               for (cargo in cargos) {
                 totalWeight += cargo.weight
               }
+            } else {
+              return false
             }
-
-            return shipRes.isSuccessful && cargoRes.isSuccessful
           }
         }
+
+        return shipRes.isSuccessful
       }
     }
 
