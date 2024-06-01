@@ -76,13 +76,13 @@ class AdminShipmentDetailVM: ViewModel() {
   }
 
   // Get shipment tracking
-  private suspend fun getShipmentTracking(theShipmentId: Int): Boolean {
-    val res = repository.getShipmentTracking(theShipmentId)
+  private suspend fun getShipmentTracking(theShipmentId: Int, theConsignorId: Int): Boolean {
+    val res = repository.getShipmentTracking(theConsignorId)
 
     res.body()?.let { shipmentTrackings ->
-      if (res.isSuccessful && theShipmentId != 0) {
+      if (res.isSuccessful && theShipmentId != 0 && theConsignorId != 0 && adminSessionRole == "Admin") {
         for (shipmentTracking in shipmentTrackings) {
-          if (shipmentTracking.shipment.id == theShipmentId) {
+          if (shipmentTracking.shipment.consignorId == theConsignorId && shipmentTracking.shipment.id == theShipmentId) {
             theShipmentTracking = shipmentTracking
           }
         }
@@ -95,13 +95,13 @@ class AdminShipmentDetailVM: ViewModel() {
   }
 
   // Get shipment assigned driver
-  private suspend fun getShipmentTruck(theShipmentId: Int): Boolean {
-    val res = repository.getShipmentTruck(theShipmentId)
+  private suspend fun getShipmentTruck(theShipmentId: Int, theConsignorId: Int): Boolean {
+    val res = repository.getShipmentTruck(theConsignorId)
 
     res.body()?.let { shipmentTrucks ->
-      if (res.isSuccessful && theShipmentId != 0) {
+      if (res.isSuccessful && theShipmentId != 0 && theConsignorId != 0 && adminSessionRole == "Admin") {
         for (shipmentTruck in shipmentTrucks) {
-          if (shipmentTruck.shipment.id == theShipmentId) {
+          if (shipmentTruck.shipment.consignorId == theConsignorId && shipmentTruck.shipment.id == theShipmentId) {
             theShipmentTruck = shipmentTruck
           }
         }
@@ -144,7 +144,11 @@ class AdminShipmentDetailVM: ViewModel() {
     _adminShipmentDetailState.value = AdminShipmentDetailState.LOADING
 
     viewModelScope.launch {
-      if (getShipmentDetail(theShipmentId, theConsignorId) && getShipmentTracking(theShipmentId) && getShipmentTruck(theShipmentId) && getShipmentCargo(theShipmentId)) {
+      if (getShipmentDetail(theShipmentId, theConsignorId) &&
+        getShipmentTracking(theShipmentId, theConsignorId) &&
+        getShipmentTruck(theShipmentId, theConsignorId) &&
+        getShipmentCargo(theShipmentId)
+      ) {
         _adminShipmentDetailState.value = AdminShipmentDetailState.SUCCESS
       } else {
         Toast.makeText(context, "Failed to get shipment detail", Toast.LENGTH_LONG).show()

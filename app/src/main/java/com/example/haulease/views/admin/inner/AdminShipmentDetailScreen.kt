@@ -92,7 +92,7 @@ fun AdminShipmentDetailScreen(
   navCtrl: NavHostController,
   onBack: () -> Unit,
   shipmentId: Int = 0,
-  consignorId: Int = 0,
+  consignorId: Int,
   adminShipmentDetailVM: AdminShipmentDetailVM = viewModel()
 ) {
   val cScope = rememberCoroutineScope()
@@ -110,11 +110,9 @@ fun AdminShipmentDetailScreen(
   var shipmentMarker: Marker? by remember { mutableStateOf(null) }
   var updateTime by remember { mutableStateOf("") }
 
-  val trackingCoordinates by remember { mutableStateOf(
-    LatLng(0.0, 0.0)
-  )}
-  val originAddress by remember { mutableStateOf<Address?>(null)}
-  val destAddress by remember { mutableStateOf<Address?>(null)}
+  var trackingCoordinates by remember { mutableStateOf(LatLng(0.0, 0.0))}
+  var originAddress by remember { mutableStateOf<Address?>(null)}
+  var destAddress by remember { mutableStateOf<Address?>(null)}
 
   // Observer
   val adminShipmentDetailState by adminShipmentDetailVM.adminShipmentDetailState.collectAsState()
@@ -210,11 +208,6 @@ fun AdminShipmentDetailScreen(
         )
       } catch (e: Exception) {
         Toast.makeText(context, "Shipment status updated.", Toast.LENGTH_LONG).show()
-
-        onBack()
-        navCtrl.navigate(AdminRoutes.AdminShipment.routes) {
-          launchSingleTop = true
-        }
       }
     }
   })
@@ -486,6 +479,7 @@ fun AdminShipmentDetailScreen(
               fromDatabase = true,
               imageFromDatabase = it.image,
               imageSize = 50,
+              consignorId = consignorId,
               shipmentId = shipmentId,
               cargoId = it.id,
             )
@@ -542,6 +536,14 @@ fun AdminShipmentDetailScreen(
     Spacer(modifier = Modifier.padding(bottom = 52.dp))
   }
 
+  LaunchedEffect(theShipmentTracking) {
+    if (theShipmentTracking != null) {
+      trackingCoordinates = LatLng(theShipmentTracking.tracking.latitude, theShipmentTracking.tracking.longitude)
+      originAddress = adminShipmentDetailVM.getAddressFromString(theShipmentTracking.shipment.origin, context)
+      destAddress = adminShipmentDetailVM.getAddressFromString(theShipmentTracking.shipment.destination, context)
+    }
+  }
+
   LaunchedEffect(true) {
     requestPermissionLaunch.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
@@ -571,6 +573,12 @@ fun AdminShipmentDetailScreen(
         consignorId,
         context
       )
+
+      if (theShipmentTracking != null) {
+        trackingCoordinates = LatLng(theShipmentTracking.tracking.latitude, theShipmentTracking.tracking.longitude)
+        originAddress = adminShipmentDetailVM.getAddressFromString(theShipmentTracking.shipment.origin, context)
+        destAddress = adminShipmentDetailVM.getAddressFromString(theShipmentTracking.shipment.destination, context)
+      }
     }
 
     onDispose {

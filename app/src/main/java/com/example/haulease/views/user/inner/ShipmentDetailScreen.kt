@@ -105,11 +105,9 @@ fun ShipmentDetailScreen(
   var shipmentMarker: Marker? by remember { mutableStateOf(null) }
   var updateTime by remember { mutableStateOf("") }
 
-  val trackingCoordinates by remember { mutableStateOf(
-    LatLng(0.0, 0.0)
-  )}
-  val originAddress by remember { mutableStateOf<Address?>(null)}
-  val destAddress by remember { mutableStateOf<Address?>(null)}
+  var trackingCoordinates by remember { mutableStateOf(LatLng(0.0, 0.0))}
+  var originAddress by remember { mutableStateOf<Address?>(null)}
+  var destAddress by remember { mutableStateOf<Address?>(null)}
 
   // Observer
   val shipmentDetailState by shipmentDetailVM.shipmentDetailState.collectAsState()
@@ -453,10 +451,15 @@ fun ShipmentDetailScreen(
             .fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween
         ) {
-          if (theShipmentDetail?.shipment?.status != CargoStatus.status9.titleText) {
+          if (
+            theShipmentDetail?.shipment?.status != CargoStatus.status9.titleText &&
+            (theShipmentDetail?.payment?.first == 0.0 ||
+            theShipmentDetail?.payment?.second == 0.0 ||
+            theShipmentDetail?.payment?.final == 0.0)
+          ) {
             Button(
               onClick = {
-                navCtrl.navigate("Payment?paymentId=${theShipmentDetail?.payment?.id}&shipmentId=$shipmentId")
+                navCtrl.navigate("Payment?paymentId=${theShipmentDetail.payment.id}&shipmentId=$shipmentId")
               },
               modifier = Modifier
                 .weight(0.35f),
@@ -475,7 +478,12 @@ fun ShipmentDetailScreen(
           } else {
             Button(
               onClick = {
-                // TODO()
+                if (theShipmentDetail != null) {
+                  cScope.launch {
+                    shipmentDetailVM.confirmShipment(theShipmentDetail.shipment, context)
+                  }
+                }
+
                 navCtrl.navigate(UserRoutes.Shipment.routes)
               },
               modifier = Modifier
@@ -543,6 +551,14 @@ fun ShipmentDetailScreen(
     }
 
     Spacer(modifier = Modifier.padding(bottom = 52.dp))
+  }
+
+  LaunchedEffect(theShipmentTracking) {
+    if (theShipmentTracking != null) {
+      trackingCoordinates = LatLng(theShipmentTracking.tracking.latitude, theShipmentTracking.tracking.longitude)
+      originAddress = shipmentDetailVM.getAddressFromString(theShipmentTracking.shipment.origin, context)
+      destAddress = shipmentDetailVM.getAddressFromString(theShipmentTracking.shipment.destination, context)
+    }
   }
 
   LaunchedEffect(true) {

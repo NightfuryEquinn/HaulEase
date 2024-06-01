@@ -8,12 +8,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.haulease.api.Repository
 import com.example.haulease.models.Cargo
 import com.example.haulease.models.Sessions
+import com.example.haulease.models.Shipment
 import com.example.haulease.models.ShipmentPayment
 import com.example.haulease.models.ShipmentTracking
 import com.example.haulease.models.ShipmentTruck
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 // Shipment detail status
 sealed class ShipmentDetailState {
@@ -73,13 +76,13 @@ class ShipmentDetailVM: ViewModel() {
   }
 
   // Get shipment tracking
-  private suspend fun getShipmentTracking(theShipmentId: Int): Boolean {
-    val res = repository.getShipmentTracking(theShipmentId)
+  private suspend fun getShipmentTracking(theShipmentId: Int, theConsignorId: Int): Boolean {
+    val res = repository.getShipmentTracking(theConsignorId)
 
     res.body()?.let { shipmentTrackings ->
-      if (res.isSuccessful && theShipmentId != 0) {
+      if (res.isSuccessful && theShipmentId != 0 && theConsignorId != 0) {
         for (shipmentTracking in shipmentTrackings) {
-          if (shipmentTracking.shipment.id == theShipmentId) {
+          if (shipmentTracking.shipment.consignorId == theConsignorId && shipmentTracking.shipment.id == theShipmentId) {
             theShipmentTracking = shipmentTracking
           }
         }
@@ -92,13 +95,13 @@ class ShipmentDetailVM: ViewModel() {
   }
 
   // Get shipment assigned driver
-  private suspend fun getShipmentTruck(theShipmentId: Int): Boolean {
-    val res = repository.getShipmentTruck(theShipmentId)
+  private suspend fun getShipmentTruck(theShipmentId: Int, theConsignorId: Int): Boolean {
+    val res = repository.getShipmentTruck(theConsignorId)
 
     res.body()?.let { shipmentTrucks ->
-      if (res.isSuccessful && theShipmentId != 0) {
+      if (res.isSuccessful && theShipmentId != 0 && theConsignorId != 0) {
         for (shipmentTruck in shipmentTrucks) {
-          if (shipmentTruck.shipment.id == theShipmentId) {
+          if (shipmentTruck.shipment.consignorId == theConsignorId && shipmentTruck.shipment.id == theShipmentId) {
             theShipmentTruck = shipmentTruck
           }
         }
@@ -110,6 +113,22 @@ class ShipmentDetailVM: ViewModel() {
     return false
   }
 
+  // Confirm shipment delivered
+  suspend fun confirmShipment(
+    theShipment: Shipment,
+    context: android.content.Context
+  ) {
+    theShipment.status = "Completed at ${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}"
+
+    val res = repository.putShipment(theShipment.id, theShipment)
+
+    if (res.code() == 200) {
+      Toast.makeText(context, "Confirm shipment delivered.", Toast.LENGTH_SHORT).show()
+    } else {
+      Toast.makeText(context, "Failed to confirm shipment.", Toast.LENGTH_SHORT).show()
+    }
+  }
+
   // Check shipment detail available
   fun checkShipmentDetail(
     theShipmentId: Int,
@@ -118,7 +137,11 @@ class ShipmentDetailVM: ViewModel() {
     _shipmentDetailState.value = ShipmentDetailState.LOADING
 
     viewModelScope.launch {
-      if (getShipmentDetail(theShipmentId) && getShipmentTracking(theShipmentId) && getShipmentTruck(theShipmentId) && getShipmentCargo(theShipmentId)) {
+      if (getShipmentDetail(theShipmentId) &&
+        getShipmentTracking(theShipmentId, consignorSessionId) &&
+        getShipmentTruck(theShipmentId, consignorSessionId) &&
+        getShipmentCargo(theShipmentId)
+      ) {
         _shipmentDetailState.value = ShipmentDetailState.SUCCESS
       } else {
         Toast.makeText(context, "Failed to get shipment detail", Toast.LENGTH_LONG).show()
