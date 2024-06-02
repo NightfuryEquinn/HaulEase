@@ -1,5 +1,6 @@
 package com.example.haulease.viewmodels.admin
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -54,6 +55,7 @@ class AdminDashboardVM: ViewModel() {
   }
 
   // Get total cargo transported
+  @SuppressLint("DefaultLocale")
   private suspend fun getCargosTransported(): Boolean {
     val res = repository.getCargos()
 
@@ -65,6 +67,8 @@ class AdminDashboardVM: ViewModel() {
         for (cargo in cargos) {
           weightShipped += cargo.weight
         }
+
+        weightShipped = String.format("%.2f", weightShipped).toDouble()
       }
 
       return res.isSuccessful
@@ -74,6 +78,7 @@ class AdminDashboardVM: ViewModel() {
   }
 
   // Get total income
+  @SuppressLint("DefaultLocale")
   private suspend fun getTotalIncome(): Boolean {
     val res = repository.getPayments()
 
@@ -83,6 +88,8 @@ class AdminDashboardVM: ViewModel() {
           val total = payment.first?.plus(payment.second!!)?.plus(payment.final!!) ?: 0.0
           totalIncome += total
         }
+
+        totalIncome = String.format("%.2f", totalIncome).toDouble()
       }
 
       return res.isSuccessful

@@ -251,7 +251,7 @@ fun AdminShipmentDetailScreen(
       )
 
       Text(
-        text = "Shipment Detail",
+        text = "Shipment Details",
         style = TextStyle(
           fontFamily = FontFamily(Font(R.font.squada)),
           fontSize = 48.sp,
@@ -310,6 +310,47 @@ fun AdminShipmentDetailScreen(
 
             Text(
               text = "License Plate: ${theShipmentTruck?.truck?.licensePlate}",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.libre)),
+                fontSize = 12.sp
+              )
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Text(
+              text = "Payment Details",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.squada)),
+                fontSize = 20.sp,
+                color = Color(0xFFFCA111)
+              )
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+              text = "First: ${theShipmentDetail?.payment?.first}",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.libre)),
+                fontSize = 12.sp
+              )
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Text(
+              text = "Second: ${theShipmentDetail?.payment?.second}",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.libre)),
+                fontSize = 12.sp
+              )
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Text(
+              text = "Final: ${theShipmentDetail?.payment?.final}",
               style = TextStyle(
                 fontFamily = FontFamily(Font(R.font.libre)),
                 fontSize = 12.sp
@@ -482,6 +523,7 @@ fun AdminShipmentDetailScreen(
               consignorId = consignorId,
               shipmentId = shipmentId,
               cargoId = it.id,
+              desc = it.description
             )
 
             Spacer(modifier = Modifier.height(5.dp))

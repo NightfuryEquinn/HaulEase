@@ -27,11 +27,11 @@ class AdminEditCargoVM: ViewModel() {
 
   // Update cargo details
   suspend fun updateCargoDetail(
-    updatedCargo: Cargo,
+    updatedCargo: Cargo?,
     context: android.content.Context
   ) {
     viewModelScope.launch {
-      if (adminSessionRole == "Admin") {
+      if (updatedCargo != null && adminSessionRole == "Admin") {
         val res = repository.putCargo(updatedCargo.id, updatedCargo)
 
         if (res.code() == 200) {

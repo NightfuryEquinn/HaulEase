@@ -92,7 +92,7 @@ fun AdminCargoDetailScreen(
       )
 
       Text(
-        text = "Cargo Detail",
+        text = "Cargo Details",
         style = TextStyle(
           fontFamily = FontFamily(Font(R.font.squada)),
           fontSize = 48.sp,

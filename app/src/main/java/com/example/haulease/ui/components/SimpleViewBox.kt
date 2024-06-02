@@ -49,6 +49,7 @@ fun SimpleViewBox(
   shipmentId: Int? = 0,
   cargoId: Int? = 0,
   name: String? = null,
+  desc: String? = null,
   status: String? = null,
 ) {
   val currentRoute = navCtrl.currentBackStackEntryAsState().value?.destination?.route
@@ -103,6 +104,18 @@ fun SimpleViewBox(
 
         Spacer(modifier = Modifier.height(10.dp))
 
+        if (desc != null) {
+          Text(
+            text = "Description: $desc",
+            style = TextStyle(
+              fontFamily = FontFamily(Font(R.font.libre)),
+              fontSize = 12.sp
+            )
+          )
+
+          Spacer(modifier = Modifier.height(10.dp))
+        }
+
         if (status != null) {
           Text(
             text = status,
@@ -145,7 +158,7 @@ fun SimpleViewBox(
           }
         }
       },
-      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
+      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
       shape = RoundedCornerShape(5.dp),
       modifier = Modifier
         .fillMaxWidth()
@@ -155,6 +168,7 @@ fun SimpleViewBox(
         style = TextStyle(
           fontFamily = FontFamily(Font(R.font.squada)),
           fontSize = 20.sp,
+          color = Color(0xFFFFFFFF)
         )
       )
     }

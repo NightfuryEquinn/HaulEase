@@ -269,7 +269,7 @@ fun AdminEditCargoScreen(
                         length = length.value.toDouble(),
                         width = width.value.toDouble(),
                         height = height.value.toDouble(),
-                        image = cargoImage,
+                        image = "",
                         description = cargoDesc,
                         shipmentId = shipmentId
                       ),

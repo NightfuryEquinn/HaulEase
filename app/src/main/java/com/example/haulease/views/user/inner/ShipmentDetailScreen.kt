@@ -447,6 +447,7 @@ fun ShipmentDetailScreen(
               imageSize = 50,
               shipmentId = shipmentId,
               cargoId = it.id,
+              desc = it.description,
             )
 
             Spacer(modifier = Modifier.height(5.dp))
@@ -461,58 +462,67 @@ fun ShipmentDetailScreen(
           horizontalArrangement = Arrangement.SpaceBetween
         ) {
           if (
-            (theShipmentDetail?.shipment?.status != CargoStatus.status9.titleText) ||
-            (theShipmentDetail.payment.first == 0.0 ||
-            theShipmentDetail.payment.second == 0.0 ||
-            theShipmentDetail.payment.final == 0.0)
+            theShipmentDetail?.shipment?.status == CargoStatus.status6.titleText ||
+            theShipmentDetail?.shipment?.status == CargoStatus.status7.titleText ||
+            theShipmentDetail?.shipment?.status == CargoStatus.status8.titleText ||
+            theShipmentDetail?.shipment?.status == CargoStatus.status9.titleText ||
+            theShipmentDetail?.shipment?.status?.startsWith("Completed") == true
           ) {
-            Button(
-              onClick = {
-                navCtrl.navigate("Payment?paymentId=${theShipmentDetail?.payment?.id}&shipmentId=$shipmentId")
-              },
-              modifier = Modifier
-                .weight(0.35f),
-              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
-              shape = RoundedCornerShape(5.dp),
+            if (
+              theShipmentDetail.shipment.status.startsWith("Completed") ||
+              theShipmentDetail.payment.first == 0.0 ||
+              theShipmentDetail.payment.second == 0.0 ||
+              theShipmentDetail.payment.final == 0.0
             ) {
-              Text(
-                text = "Payment",
-                style = TextStyle(
-                  fontFamily = FontFamily(Font(R.font.squada)),
-                  fontSize = 24.sp,
-                  color = Color(0xFFE5E5E5)
+              Button(
+                onClick = {
+                  navCtrl.navigate("Payment?paymentId=${theShipmentDetail.payment.id}&shipmentId=$shipmentId")
+                },
+                modifier = Modifier
+                  .weight(0.35f),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
+                shape = RoundedCornerShape(5.dp),
+              ) {
+                Text(
+                  text = "Payment",
+                  style = TextStyle(
+                    fontFamily = FontFamily(Font(R.font.squada)),
+                    fontSize = 24.sp,
+                    color = Color(0xFFE5E5E5)
+                  )
                 )
-              )
-            }
-          } else {
-            Button(
-              onClick = {
-                cScope.launch {
-                  shipmentDetailVM.confirmShipment(context)
-                }
+              }
+            } else {
+              Button(
+                onClick = {
+                  cScope.launch {
+                    shipmentDetailVM.confirmShipment(context)
+                  }
 
-                onBack()
-                navCtrl.navigate(UserRoutes.Shipment.routes) {
-                  launchSingleTop = true
-                }
-              },
-              modifier = Modifier
-                .weight(0.35f),
-              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
-              shape = RoundedCornerShape(5.dp),
-            ) {
-              Text(
-                text = "Delivered?",
-                style = TextStyle(
-                  fontFamily = FontFamily(Font(R.font.squada)),
-                  fontSize = 24.sp,
-                  color = Color(0xFFE5E5E5)
+                  onBack()
+                  navCtrl.navigate(UserRoutes.Shipment.routes) {
+                    launchSingleTop = true
+                  }
+                },
+                modifier = Modifier
+                  .weight(0.35f),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
+                shape = RoundedCornerShape(5.dp),
+              ) {
+                Text(
+                  text = "Delivered?",
+                  style = TextStyle(
+                    fontFamily = FontFamily(Font(R.font.squada)),
+                    fontSize = 24.sp,
+                    color = Color(0xFFE5E5E5)
+                  )
                 )
-              )
+              }
             }
+
+            Spacer(modifier = Modifier.width(20.dp))
           }
 
-          Spacer(modifier = Modifier.width(20.dp))
 
           Button(
             onClick = {
