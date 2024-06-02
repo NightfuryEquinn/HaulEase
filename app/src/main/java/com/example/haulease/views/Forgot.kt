@@ -52,9 +52,8 @@ fun ForgotScreen(
   val confirmNewPassword = remember { mutableStateOf("") }
 
   // Validations
-  val passwordsMatch = newPassword == confirmNewPassword
+  val passwordsMatch = newPassword.value == confirmNewPassword.value
   val allFieldsNotEmpty = email.value.isNotBlank() && newPassword.value.isNotBlank() && confirmNewPassword.value.isNotBlank()
-  val isPasswordValid by remember { mutableStateOf(false) }
 
   // Observer
   val forgotState by forgotVM.forgotState.collectAsState()
@@ -177,7 +176,7 @@ fun ForgotScreen(
             .padding(horizontal = 80.dp),
           colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA311)),
           shape = RoundedCornerShape(5.dp),
-          enabled = passwordsMatch && allFieldsNotEmpty && isPasswordValid,
+          enabled = passwordsMatch && allFieldsNotEmpty,
         ) {
           Text(
             text = "Reset",

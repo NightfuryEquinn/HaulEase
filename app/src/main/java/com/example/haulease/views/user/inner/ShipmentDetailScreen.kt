@@ -184,9 +184,16 @@ fun ShipmentDetailScreen(
     }
 
   BackHandler {
-    onBack()
-    navCtrl.navigate(UserRoutes.Shipment.routes) {
-      launchSingleTop = true
+    if (theShipmentDetail?.shipment?.status?.startsWith("Completed") == true) {
+      onBack()
+      navCtrl.navigate(UserRoutes.History.routes) {
+        launchSingleTop = true
+      }
+    } else {
+      onBack()
+      navCtrl.navigate(UserRoutes.Shipment.routes) {
+        launchSingleTop = true
+      }
     }
   }
 
@@ -371,48 +378,50 @@ fun ShipmentDetailScreen(
 
           Spacer(modifier = Modifier.height(25.dp))
 
-          Text(
-            text = "Tracking Map",
-            style = TextStyle(
-              fontFamily = FontFamily(Font(R.font.squada)),
-              fontSize = 28.sp,
+          if (theShipmentDetail?.shipment?.status?.startsWith("Completed") == false) {
+            Text(
+              text = "Tracking Map",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.squada)),
+                fontSize = 28.sp,
+              )
             )
-          )
 
-          Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
-          Text(
-            text = "Last updated at $updateTime",
-            style = TextStyle(
-              fontFamily = FontFamily(Font(R.font.libre)),
-              fontSize = 12.sp,
+            Text(
+              text = "Last updated at $updateTime",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.libre)),
+                fontSize = 12.sp,
+              )
             )
-          )
 
-          Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-          AndroidView(
-            modifier = Modifier
-              .fillMaxWidth()
-              .height(400.dp)
-              .clip(shape = RoundedCornerShape(5.dp)),
-            factory = { ctx ->
-              MapView(ctx).apply {
-                onCreate(null)
-                getMapAsync { googleMap ->
+            AndroidView(
+              modifier = Modifier
+                .fillMaxWidth()
+                .height(400.dp)
+                .clip(shape = RoundedCornerShape(5.dp)),
+              factory = { ctx ->
+                MapView(ctx).apply {
+                  onCreate(null)
+                  getMapAsync { googleMap ->
+                    map = googleMap
+                    requestPermissionLaunch.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                  }
+                }
+              },
+              update = { mapView ->
+                mapView.getMapAsync { googleMap ->
                   map = googleMap
-                  requestPermissionLaunch.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                 }
               }
-            },
-            update = { mapView ->
-              mapView.getMapAsync { googleMap ->
-                map = googleMap
-              }
-            }
-          )
+            )
 
-          Spacer(modifier = Modifier.height(25.dp))
+            Spacer(modifier = Modifier.height(25.dp))
+          }
 
           Text(
             text = "List of Cargos",
@@ -452,14 +461,14 @@ fun ShipmentDetailScreen(
           horizontalArrangement = Arrangement.SpaceBetween
         ) {
           if (
-            theShipmentDetail?.shipment?.status != CargoStatus.status9.titleText &&
-            (theShipmentDetail?.payment?.first == 0.0 ||
-            theShipmentDetail?.payment?.second == 0.0 ||
-            theShipmentDetail?.payment?.final == 0.0)
+            (theShipmentDetail?.shipment?.status != CargoStatus.status9.titleText) ||
+            (theShipmentDetail.payment.first == 0.0 ||
+            theShipmentDetail.payment.second == 0.0 ||
+            theShipmentDetail.payment.final == 0.0)
           ) {
             Button(
               onClick = {
-                navCtrl.navigate("Payment?paymentId=${theShipmentDetail.payment.id}&shipmentId=$shipmentId")
+                navCtrl.navigate("Payment?paymentId=${theShipmentDetail?.payment?.id}&shipmentId=$shipmentId")
               },
               modifier = Modifier
                 .weight(0.35f),
@@ -478,13 +487,14 @@ fun ShipmentDetailScreen(
           } else {
             Button(
               onClick = {
-                if (theShipmentDetail != null) {
-                  cScope.launch {
-                    shipmentDetailVM.confirmShipment(theShipmentDetail.shipment, context)
-                  }
+                cScope.launch {
+                  shipmentDetailVM.confirmShipment(context)
                 }
 
-                navCtrl.navigate(UserRoutes.Shipment.routes)
+                onBack()
+                navCtrl.navigate(UserRoutes.Shipment.routes) {
+                  launchSingleTop = true
+                }
               },
               modifier = Modifier
                 .weight(0.35f),
@@ -506,9 +516,16 @@ fun ShipmentDetailScreen(
 
           Button(
             onClick = {
-              onBack()
-              navCtrl.navigate(UserRoutes.Shipment.routes) {
-                launchSingleTop = true
+              if (theShipmentDetail?.shipment?.status?.startsWith("Completed") == true) {
+                onBack()
+                navCtrl.navigate(UserRoutes.History.routes) {
+                  launchSingleTop = true
+                }
+              } else {
+                onBack()
+                navCtrl.navigate(UserRoutes.Shipment.routes) {
+                  launchSingleTop = true
+                }
               }
             },
             modifier = Modifier

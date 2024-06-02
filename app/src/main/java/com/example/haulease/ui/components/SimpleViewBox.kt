@@ -130,6 +130,9 @@ fun SimpleViewBox(
             UserRoutes.Shipment.routes -> {
               navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId")
             }
+            else -> {
+              navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId")
+            }
           }
         } else {
           when (currentRoute) {

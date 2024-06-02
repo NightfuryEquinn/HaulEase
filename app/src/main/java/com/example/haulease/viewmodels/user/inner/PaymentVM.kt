@@ -12,7 +12,6 @@ sealed class PaymentState {
   data object INITIAL : PaymentState()
   data object LOADING : PaymentState()
   data object SUCCESS : PaymentState()
-  data object PAIDSUCCESS : PaymentState()
 }
 
 class PaymentVM: ViewModel() {
@@ -108,7 +107,6 @@ class PaymentVM: ViewModel() {
 
       if (updatePaymentDetail(thePaymentId, updatedPaymentDetail)) {
         Toast.makeText(context, "Payment successful", Toast.LENGTH_LONG).show()
-        _paymentState.value = PaymentState.PAIDSUCCESS
       } else {
         Toast.makeText(context, "Failed to make payment", Toast.LENGTH_LONG).show()
       }

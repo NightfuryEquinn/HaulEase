@@ -50,7 +50,7 @@ fun HistoryScreen(
 ) {
   val context = LocalContext.current
   val cScope = rememberCoroutineScope()
-  var shipmentsHistory: List<Shipment> = emptyList()
+  val shipmentsHistory: List<Shipment> = historyVM.theShipmentsHistory
 
   // Observer
   val historyState by historyVM.historyState.collectAsState()
@@ -152,7 +152,7 @@ fun HistoryScreen(
 
   DisposableEffect(Unit) {
     val job = cScope.launch {
-      shipmentsHistory = historyVM.loadShipmentsHistory(context)
+      historyVM.loadShipmentsHistory(context)
     }
 
     onDispose {

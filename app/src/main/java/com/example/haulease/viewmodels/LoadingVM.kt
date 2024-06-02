@@ -17,7 +17,7 @@ class LoadingVM: ViewModel() {
     viewModelScope.launch {
       for (progress in 0..100) {
         loadingProgress.value = progress / 100.0f
-        delay(50)
+        delay(10)
       }
     }
   }

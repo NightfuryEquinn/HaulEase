@@ -1,5 +1,6 @@
 package com.example.haulease.viewmodels.user
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -51,6 +52,7 @@ class DashboardVM: ViewModel() {
   }
 
   // Get the details of latest unpaid shipment
+  @SuppressLint("DefaultLocale")
   private suspend fun getLatestUnpaidShipments(): Boolean {
     val res = repository.getShipmentPayment(consignorSessionId)
 
@@ -81,6 +83,8 @@ class DashboardVM: ViewModel() {
               totalSpend += payment.first?.plus(payment.second!!)?.plus(payment.final!!) ?: 0.0
             }
           }
+
+          totalSpend = String.format("%.2f", totalSpend).toDouble()
         }
       }
 
@@ -91,6 +95,7 @@ class DashboardVM: ViewModel() {
   }
 
   // Get the total cargos
+  @SuppressLint("DefaultLocale")
   private suspend fun getTotalCargos(): Boolean {
     val shipRes = repository.getShipmentsByConsignor(consignorSessionId)
 
@@ -107,6 +112,8 @@ class DashboardVM: ViewModel() {
               for (cargo in cargos) {
                 totalWeight += cargo.weight
               }
+
+              totalWeight = String.format("%.2f", totalWeight).toDouble()
             } else {
               return false
             }
@@ -134,6 +141,14 @@ class DashboardVM: ViewModel() {
         _dashboardState.value = DashboardState.INITIAL
       }
     }
+  }
+
+  // Clear all analytics
+  fun clearAnalytics() {
+    totalShipments = 0
+    totalCargo = 0
+    totalWeight = 0.0
+    totalSpend = 0.0
   }
 
   // Clear all shipments

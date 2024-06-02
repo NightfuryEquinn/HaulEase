@@ -131,6 +131,11 @@ fun PaymentScreen(
                   context
                 )
               }
+
+              onBack()
+              navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId") {
+                launchSingleTop = true
+              }
             },
             isPaid = thePaymentDetail?.first != 0.0
           )
@@ -158,6 +163,11 @@ fun PaymentScreen(
                   totalCargoFees,
                   context
                 )
+              }
+
+              onBack()
+              navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId") {
+                launchSingleTop = true
               }
             },
             isPaid = thePaymentDetail?.second != 0.0
@@ -189,15 +199,39 @@ fun PaymentScreen(
                   context
                 )
               }
+
+              onBack()
+              navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId") {
+                launchSingleTop = true
+              }
             },
             isPaid = thePaymentDetail?.final != 0.0
           )
         }
-      }
-      is PaymentState.PAIDSUCCESS -> {
-        onBack()
-        navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId") {
-          launchSingleTop = true
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        Button(
+          onClick = {
+            onBack()
+            navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId") {
+              launchSingleTop = true
+            }
+          },
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 160.dp),
+          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
+          shape = RoundedCornerShape(5.dp)
+        ) {
+          Text(
+            text = "Back",
+            style = TextStyle(
+              fontFamily = FontFamily(Font(R.font.squada)),
+              fontSize = 24.sp,
+              color = Color(0xFFE5E5E5)
+            )
+          )
         }
       }
       is PaymentState.LOADING -> {
@@ -220,31 +254,6 @@ fun PaymentScreen(
           name = "Unable to Load Information"
         )
       }
-    }
-
-    Spacer(modifier = Modifier.height(30.dp))
-
-    Button(
-      onClick = {
-        onBack()
-        navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId") {
-          launchSingleTop = true
-        }
-      },
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = 160.dp),
-      colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
-      shape = RoundedCornerShape(5.dp)
-    ) {
-      Text(
-        text = "Back",
-        style = TextStyle(
-          fontFamily = FontFamily(Font(R.font.squada)),
-          fontSize = 24.sp,
-          color = Color(0xFFE5E5E5)
-        )
-      )
     }
 
     Spacer(modifier = Modifier.padding(bottom = 60.dp))

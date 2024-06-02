@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.haulease.api.Repository
 import com.example.haulease.models.Cargo
 import com.example.haulease.models.Sessions
-import com.example.haulease.models.Shipment
 import com.example.haulease.models.ShipmentPayment
 import com.example.haulease.models.ShipmentTracking
 import com.example.haulease.models.ShipmentTruck
@@ -115,17 +114,21 @@ class ShipmentDetailVM: ViewModel() {
 
   // Confirm shipment delivered
   suspend fun confirmShipment(
-    theShipment: Shipment,
     context: android.content.Context
   ) {
-    theShipment.status = "Completed at ${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}"
+    if (theShipmentDetail != null) {
+      val updatedShipment = theShipmentDetail?.shipment
+      updatedShipment?.status = "Completed at ${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}"
 
-    val res = repository.putShipment(theShipment.id, theShipment)
+      if (updatedShipment != null) {
+        val res = repository.putShipment(updatedShipment.id, updatedShipment)
 
-    if (res.code() == 200) {
-      Toast.makeText(context, "Confirm shipment delivered.", Toast.LENGTH_SHORT).show()
-    } else {
-      Toast.makeText(context, "Failed to confirm shipment.", Toast.LENGTH_SHORT).show()
+        if (res.code() == 200) {
+          Toast.makeText(context, "Confirm shipment delivered.", Toast.LENGTH_SHORT).show()
+        } else {
+          Toast.makeText(context, "Failed to confirm shipment.", Toast.LENGTH_SHORT).show()
+        }
+      }
     }
   }
 

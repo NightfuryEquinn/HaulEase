@@ -21,8 +21,9 @@ class HistoryVM: ViewModel() {
   private val repository: Repository = Repository()
 
   private var consignorSessionId: Int = Sessions.sessionToken?.toInt()!!
-  private var theShipmentsHistory: MutableList<Shipment> = mutableListOf()
   private val _historyState = MutableStateFlow<HistoryState>(HistoryState.INITIAL)
+
+  var theShipmentsHistory: MutableList<Shipment> = mutableListOf()
 
   // Set observer value
   val historyState: StateFlow<HistoryState> = _historyState
@@ -49,7 +50,7 @@ class HistoryVM: ViewModel() {
   // Load past shipment orders
   fun loadShipmentsHistory(
     context: android.content.Context
-  ): List<Shipment> {
+  ) {
     _historyState.value = HistoryState.LOADING
 
     viewModelScope.launch {
@@ -60,8 +61,6 @@ class HistoryVM: ViewModel() {
         _historyState.value = HistoryState.INITIAL
       }
     }
-
-    return theShipmentsHistory
   }
 
   // Clear past shipment orders

@@ -266,6 +266,7 @@ fun DashboardScreen(
     onDispose {
       job.cancel()
       dashboardVM.clearShipments()
+      dashboardVM.clearAnalytics()
     }
   }
 }

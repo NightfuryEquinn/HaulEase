@@ -1,6 +1,7 @@
 package com.example.haulease.ui.components
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -40,6 +42,8 @@ fun SimplePaymentBox(
   onPayClick: () -> Unit,
   isPaid: Boolean
 ) {
+  val context = LocalContext.current
+
   val totalPayable: Double = if (originTruckTravelFees != null && originTruckLoadingFees != null && harborMeasurementFees != null && harborLoadingFees != null) {
     originTruckTravelFees + originTruckLoadingFees + harborMeasurementFees + harborLoadingFees
   } else if (totalCargoFees != null) {
@@ -294,7 +298,11 @@ fun SimplePaymentBox(
   if (!isPaid) {
     Button(
       onClick = {
-        onPayClick()
+        try {
+          onPayClick()
+        } catch (e: Exception) {
+          Toast.makeText(context, e.message.toString(), Toast.LENGTH_LONG).show()
+        }
       },
       modifier = Modifier
         .fillMaxWidth()
