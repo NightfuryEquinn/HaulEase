@@ -21,6 +21,7 @@ class PaymentVM: ViewModel() {
 
   var thePaymentDetail: Payment? = null
   var totalCargoFees: Double = 0.0
+  var theShipmentStatus: String = ""
 
   // Set observer value
   val paymentState: MutableStateFlow<PaymentState> = _paymentState
@@ -83,6 +84,17 @@ class PaymentVM: ViewModel() {
     return false
   }
 
+  // Get shipment status detail
+  private suspend fun getShipmentStatus(theShipmentId: Int) {
+    val res = repository.getShipment(theShipmentId)
+
+    res.body()?.let {
+      if (res.isSuccessful) {
+        theShipmentStatus = it.status
+      }
+    }
+  }
+
   // Make payment request
   suspend fun makePaymentRequest(
     thePaymentId: Int,
@@ -123,6 +135,7 @@ class PaymentVM: ViewModel() {
 
     viewModelScope.launch {
       if (getPaymentDetails(thePaymentId) && calculateCargoPrice(theShipmentId)) {
+        getShipmentStatus(theShipmentId)
         _paymentState.value = PaymentState.SUCCESS
       } else {
         Toast.makeText(context, "Failed to get payment detail", Toast.LENGTH_LONG).show()

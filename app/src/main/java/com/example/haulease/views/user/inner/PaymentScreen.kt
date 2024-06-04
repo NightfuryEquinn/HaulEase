@@ -42,6 +42,7 @@ import com.example.haulease.R
 import com.example.haulease.models.Payment
 import com.example.haulease.ui.components.SimpleEmptyBox
 import com.example.haulease.ui.components.SimplePaymentBox
+import com.example.haulease.validations.CargoStatus
 import com.example.haulease.viewmodels.user.inner.PaymentState
 import com.example.haulease.viewmodels.user.inner.PaymentVM
 import kotlinx.coroutines.launch
@@ -58,6 +59,7 @@ fun PaymentScreen(
   val cScope = rememberCoroutineScope()
   val thePaymentDetail: Payment? = paymentVM.thePaymentDetail
   val totalCargoFees: Double = paymentVM.totalCargoFees
+  val theShipmentStatus: String = paymentVM.theShipmentStatus
 
   // Observer
   val paymentState by paymentVM.paymentState.collectAsState()
@@ -106,107 +108,128 @@ fun PaymentScreen(
             .verticalScroll(rememberScrollState())
             .weight(1f)
         ) {
-          Text(
-            text = if (thePaymentDetail?.first == 0.0) "Shipment First Billing" else "Shipment First Billing (Done)",
-            style = TextStyle(
-              fontFamily = FontFamily(Font(R.font.squada)),
-              fontSize = 24.sp,
-              color = Color(0xFFFCA111)
+          if (
+            theShipmentStatus == CargoStatus.status1.titleText ||
+            theShipmentStatus == CargoStatus.status2.titleText ||
+            theShipmentStatus == CargoStatus.status3.titleText ||
+            theShipmentStatus == CargoStatus.status4.titleText ||
+            theShipmentStatus.startsWith("Completed")
+          ) {
+            Text(
+              text = if (thePaymentDetail?.first == 0.0) "Shipment First Billing" else "Shipment First Billing (Done)",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.squada)),
+                fontSize = 24.sp,
+                color = Color(0xFFFCA111)
+              )
             )
-          )
 
-          Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-          SimplePaymentBox(
-            originTruckTravelFees = 25.90,
-            originTruckLoadingFees = 15.90,
-            harborMeasurementFees = 14.90,
-            harborLoadingFees = 25.90,
-            onPayClick = {
-              cScope.launch {
-                paymentVM.makePaymentRequest(
-                  paymentId,
-                  1,
-                  (25.90 + 15.90 + 14.90 + 25.90),
-                  context
-                )
-              }
+            SimplePaymentBox(
+              originTruckTravelFees = 25.90,
+              originTruckLoadingFees = 15.90,
+              harborMeasurementFees = 14.90,
+              harborLoadingFees = 25.90,
+              onPayClick = {
+                cScope.launch {
+                  paymentVM.makePaymentRequest(
+                    paymentId,
+                    1,
+                    (25.90 + 15.90 + 14.90 + 25.90),
+                    context
+                  )
+                }
 
-              onBack()
-              navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId") {
-                launchSingleTop = true
-              }
-            },
-            isPaid = thePaymentDetail?.first != 0.0
-          )
-
-          Spacer(modifier = Modifier.height(25.dp))
-
-          Text(
-            text = if (thePaymentDetail?.second == 0.0) "Shipment Second Billing" else "Shipment Second Billing (Done)",
-            style = TextStyle(
-              fontFamily = FontFamily(Font(R.font.squada)),
-              fontSize = 24.sp,
-              color = Color(0xFFFCA111)
+                onBack()
+                navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId") {
+                  launchSingleTop = true
+                }
+              },
+              isPaid = thePaymentDetail?.first != 0.0
             )
-          )
 
-          Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(25.dp))
+          }
 
-          SimplePaymentBox(
-            totalCargoFees = totalCargoFees,
-            onPayClick = {
-              cScope.launch {
-                paymentVM.makePaymentRequest(
-                  paymentId,
-                  2,
-                  totalCargoFees,
-                  context
-                )
-              }
-
-              onBack()
-              navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId") {
-                launchSingleTop = true
-              }
-            },
-            isPaid = thePaymentDetail?.second != 0.0
-          )
-
-          Spacer(modifier = Modifier.height(25.dp))
-
-          Text(
-            text = if (thePaymentDetail?.final == 0.0) "Shipment Third Billing" else "Shipment Third Billing (Done)",
-            style = TextStyle(
-              fontFamily = FontFamily(Font(R.font.squada)),
-              fontSize = 24.sp,
-              color = Color(0xFFFCA111)
+          if (
+            theShipmentStatus == CargoStatus.status5.titleText ||
+            theShipmentStatus == CargoStatus.status6.titleText ||
+            theShipmentStatus == CargoStatus.status7.titleText ||
+            theShipmentStatus == CargoStatus.status8.titleText ||
+            theShipmentStatus.startsWith("Completed")
+          ) {
+            Text(
+              text = if (thePaymentDetail?.second == 0.0) "Shipment Second Billing" else "Shipment Second Billing (Done)",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.squada)),
+                fontSize = 24.sp,
+                color = Color(0xFFFCA111)
+              )
             )
-          )
 
-          Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-          SimplePaymentBox(
-            harborUnloadingFees = 15.90,
-            destTruckLoadingFees = 5.90,
-            destTruckTravelFees = 15.90,
-            onPayClick = {
-              cScope.launch {
-                paymentVM.makePaymentRequest(
-                  paymentId,
-                  3,
-                  (15.90 + 5.90 + 15.90),
-                  context
-                )
-              }
+            SimplePaymentBox(
+              totalCargoFees = totalCargoFees,
+              onPayClick = {
+                cScope.launch {
+                  paymentVM.makePaymentRequest(
+                    paymentId,
+                    2,
+                    totalCargoFees,
+                    context
+                  )
+                }
 
-              onBack()
-              navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId") {
-                launchSingleTop = true
-              }
-            },
-            isPaid = thePaymentDetail?.final != 0.0
-          )
+                onBack()
+                navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId") {
+                  launchSingleTop = true
+                }
+              },
+              isPaid = thePaymentDetail?.second != 0.0
+            )
+
+            Spacer(modifier = Modifier.height(25.dp))
+          }
+
+          if (
+            theShipmentStatus == CargoStatus.status9.titleText ||
+            theShipmentStatus.startsWith("Completed")
+          ) {
+            Text(
+              text = if (thePaymentDetail?.final == 0.0) "Shipment Third Billing" else "Shipment Third Billing (Done)",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.squada)),
+                fontSize = 24.sp,
+                color = Color(0xFFFCA111)
+              )
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            SimplePaymentBox(
+              harborUnloadingFees = 15.90,
+              destTruckLoadingFees = 5.90,
+              destTruckTravelFees = 15.90,
+              onPayClick = {
+                cScope.launch {
+                  paymentVM.makePaymentRequest(
+                    paymentId,
+                    3,
+                    (15.90 + 5.90 + 15.90),
+                    context
+                  )
+                }
+
+                onBack()
+                navCtrl.navigate("ShipmentDetail?shipmentId=$shipmentId") {
+                  launchSingleTop = true
+                }
+              },
+              isPaid = thePaymentDetail?.final != 0.0
+            )
+          }
         }
 
         Spacer(modifier = Modifier.height(30.dp))
