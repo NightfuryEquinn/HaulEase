@@ -189,9 +189,16 @@ fun AdminShipmentDetailScreen(
     }
 
   BackHandler {
-    onBack()
-    navCtrl.navigate(AdminRoutes.AdminShipment.routes) {
-      launchSingleTop = true
+    if (theShipmentDetail?.shipment?.status?.startsWith("Completed") == true) {
+      onBack()
+      navCtrl.navigate(AdminRoutes.AdminHistory.routes) {
+        launchSingleTop = true
+      }
+    } else {
+      onBack()
+      navCtrl.navigate(AdminRoutes.AdminShipment.routes) {
+        launchSingleTop = true
+      }
     }
   }
 
@@ -455,48 +462,50 @@ fun AdminShipmentDetailScreen(
 
           Spacer(modifier = Modifier.height(25.dp))
 
-          Text(
-            text = "Tracking Map",
-            style = TextStyle(
-              fontFamily = FontFamily(Font(R.font.squada)),
-              fontSize = 28.sp,
+          if (theShipmentDetail?.shipment?.status?.startsWith("Completed") == false) {
+            Text(
+              text = "Tracking Map",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.squada)),
+                fontSize = 28.sp,
+              )
             )
-          )
 
-          Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
-          Text(
-            text = "Last updated at $updateTime",
-            style = TextStyle(
-              fontFamily = FontFamily(Font(R.font.libre)),
-              fontSize = 12.sp,
+            Text(
+              text = "Last updated at $updateTime",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.libre)),
+                fontSize = 12.sp,
+              )
             )
-          )
 
-          Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-          AndroidView(
-            modifier = Modifier
-              .fillMaxWidth()
-              .height(400.dp)
-              .clip(shape = RoundedCornerShape(5.dp)),
-            factory = { ctx ->
-              MapView(ctx).apply {
-                onCreate(null)
-                getMapAsync { googleMap ->
+            AndroidView(
+              modifier = Modifier
+                .fillMaxWidth()
+                .height(400.dp)
+                .clip(shape = RoundedCornerShape(5.dp)),
+              factory = { ctx ->
+                MapView(ctx).apply {
+                  onCreate(null)
+                  getMapAsync { googleMap ->
+                    map = googleMap
+                    requestPermissionLaunch.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                  }
+                }
+              },
+              update = { mapView ->
+                mapView.getMapAsync { googleMap ->
                   map = googleMap
-                  requestPermissionLaunch.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                 }
               }
-            },
-            update = { mapView ->
-              mapView.getMapAsync { googleMap ->
-                map = googleMap
-              }
-            }
-          )
+            )
 
-          Spacer(modifier = Modifier.height(25.dp))
+            Spacer(modifier = Modifier.height(25.dp))
+          }
 
           Text(
             text = "List of Cargos",
@@ -532,23 +541,54 @@ fun AdminShipmentDetailScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        Button(
-          onClick = {
-            listOptionState.show()
-          },
-          modifier = Modifier
-            .fillMaxWidth(),
-          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
-          shape = RoundedCornerShape(5.dp),
-        ) {
-          Text(
-            text = "Change Status",
-            style = TextStyle(
-              fontFamily = FontFamily(Font(R.font.squada)),
-              fontSize = 24.sp,
-              color = Color(0xFFE5E5E5)
+        if (theShipmentDetail?.shipment?.status?.startsWith("Completed") == false) {
+          Button(
+            onClick = {
+              listOptionState.show()
+            },
+            modifier = Modifier
+              .fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
+            shape = RoundedCornerShape(5.dp),
+          ) {
+            Text(
+              text = "Change Status",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.squada)),
+                fontSize = 24.sp,
+                color = Color(0xFFE5E5E5)
+              )
             )
-          )
+          }
+        } else {
+          Button(
+            onClick = {
+              if (theShipmentDetail?.shipment?.status?.startsWith("Completed") == true) {
+                onBack()
+                navCtrl.navigate(AdminRoutes.AdminHistory.routes) {
+                  launchSingleTop = true
+                }
+              } else {
+                onBack()
+                navCtrl.navigate(AdminRoutes.AdminShipment.routes) {
+                  launchSingleTop = true
+                }
+              }
+            },
+            modifier = Modifier
+              .fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCA111)),
+            shape = RoundedCornerShape(5.dp),
+          ) {
+            Text(
+              text = "Back",
+              style = TextStyle(
+                fontFamily = FontFamily(Font(R.font.squada)),
+                fontSize = 24.sp,
+                color = Color(0xFFFFFFFF)
+              )
+            )
+          }
         }
       }
       is AdminShipmentDetailState.LOADING -> {

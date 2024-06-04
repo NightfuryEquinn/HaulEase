@@ -21,8 +21,9 @@ class AdminHistoryVM: ViewModel() {
   private val repository: Repository = Repository()
 
   private var adminSessionRole: String? = Sessions.sessionRole
-  private var allShipmentsHistory: MutableList<Shipment> = mutableListOf()
   private var _adminHistoryState = MutableStateFlow<AdminHistoryState>(AdminHistoryState.INITIAL)
+
+  var allShipmentsHistory: MutableList<Shipment> = mutableListOf()
 
   // Set observer value
   val adminHistoryState: StateFlow<AdminHistoryState> = _adminHistoryState

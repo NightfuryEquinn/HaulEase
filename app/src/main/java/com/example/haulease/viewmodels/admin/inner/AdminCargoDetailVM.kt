@@ -22,6 +22,7 @@ class AdminCargoDetailVM: ViewModel() {
   private val _adminCargoState: MutableStateFlow<AdminCargoState> = MutableStateFlow(AdminCargoState.INITIAL)
 
   var theCargoDetail: Cargo? = null
+  var isTheCargoShipmentCompleted: Boolean = false
 
   // Set observer value
   val adminCargoState: MutableStateFlow<AdminCargoState> = _adminCargoState
@@ -43,15 +44,32 @@ class AdminCargoDetailVM: ViewModel() {
     return false
   }
 
+  // Get the shipment where cargo linked
+  private suspend fun checkIsCargoShipmentCompleted(
+    theShipmentId: Int
+  ) {
+    val res = repository.getShipment(theShipmentId)
+
+    res.body()?.let {
+      if (res.isSuccessful && adminSessionRole == "Admin") {
+        if (it.status.startsWith("Completed")) {
+          isTheCargoShipmentCompleted = true
+        }
+      }
+    }
+  }
+
   // Load cargo detail
   fun loadCargoDetail(
     theCargoId: Int,
+    theShipmentId: Int,
     context: android.content.Context
   ) {
     _adminCargoState.value = AdminCargoState.LOADING
 
     viewModelScope.launch {
       if (getCargoDetail(theCargoId)) {
+        checkIsCargoShipmentCompleted(theShipmentId)
         _adminCargoState.value = AdminCargoState.SUCCESS
       } else {
         Toast.makeText(context, "Failed to get cargo detail", Toast.LENGTH_SHORT).show()

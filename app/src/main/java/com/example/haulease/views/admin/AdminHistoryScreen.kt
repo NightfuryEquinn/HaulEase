@@ -50,7 +50,7 @@ fun AdminHistoryScreen(
 ) {
   val context = LocalContext.current
   val cScope = rememberCoroutineScope()
-  var allShipmentsHistory: List<Shipment> = emptyList()
+  var allShipmentsHistory: List<Shipment> = adminHistoryVM.allShipmentsHistory
 
   // Observer
   val adminHistoryState by adminHistoryVM.adminHistoryState.collectAsState()
@@ -117,6 +117,7 @@ fun AdminHistoryScreen(
                   .fillMaxSize(),
                 image = painterResource(id = R.drawable.shipment_placeholder),
                 shipmentId = shipment.id,
+                consignorId = shipment.consignorId,
                 status = shipment.status
               )
 
@@ -152,7 +153,7 @@ fun AdminHistoryScreen(
 
   DisposableEffect(Unit) {
     val job = cScope.launch {
-      allShipmentsHistory = adminHistoryVM.loadAllShipmentsHistory(context)
+      adminHistoryVM.loadAllShipmentsHistory(context)
     }
 
     onDispose {

@@ -120,9 +120,16 @@ class AdminShipmentDetailVM: ViewModel() {
     context: android.content.Context
   ) {
     val updatedShipmentDetail = theShipmentDetail?.shipment
-    updatedShipmentDetail?.status = theStatus
 
     if (updatedShipmentDetail != null) {
+      if (theStatus.isEmpty()) {
+        Toast.makeText(context, "Shipment status retained.", Toast.LENGTH_SHORT).show()
+
+        return
+      }
+
+      updatedShipmentDetail.status = theStatus
+
       val res = repository.putShipment(theShipmentId, updatedShipmentDetail)
 
       if (res.code() == 200) {

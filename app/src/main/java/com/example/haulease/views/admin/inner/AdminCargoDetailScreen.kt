@@ -63,6 +63,7 @@ fun AdminCargoDetailScreen(
   val context = LocalContext.current
   val cScope = rememberCoroutineScope()
   val theCargoDetail: Cargo? = adminCargoDetailVM.theCargoDetail
+  val isTheCargoShipmentCompleted: Boolean = adminCargoDetailVM.isTheCargoShipmentCompleted
 
   // Observer
   val adminCargoState by adminCargoDetailVM.adminCargoState.collectAsState()
@@ -178,28 +179,30 @@ fun AdminCargoDetailScreen(
               .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
           ) {
-            Button(
-              onClick = {
-                if (theCargoDetail != null) {
-                  navCtrl.navigate("EditCargo?cargoId=$cargoId&shipmentId=$shipmentId&consignorId=$consignorId&type=${theCargoDetail.type}&weight=${theCargoDetail.weight}&length=${theCargoDetail.length}&width=${theCargoDetail.width}&height=${theCargoDetail.height}&image=${theCargoDetail.image}&desc=${theCargoDetail.description}")
-                }
-              },
-              modifier = Modifier
-                .weight(0.35f),
-              colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
-              shape = RoundedCornerShape(5.dp),
-            ) {
-              Text(
-                text = "Edit",
-                style = TextStyle(
-                  fontFamily = FontFamily(Font(R.font.squada)),
-                  fontSize = 24.sp,
-                  color = Color(0xFFE5E5E5)
+            if (!isTheCargoShipmentCompleted) {
+              Button(
+                onClick = {
+                  if (theCargoDetail != null) {
+                    navCtrl.navigate("EditCargo?cargoId=$cargoId&shipmentId=$shipmentId&consignorId=$consignorId&type=${theCargoDetail.type}&weight=${theCargoDetail.weight}&length=${theCargoDetail.length}&width=${theCargoDetail.width}&height=${theCargoDetail.height}&image=${theCargoDetail.image}&desc=${theCargoDetail.description}")
+                  }
+                },
+                modifier = Modifier
+                  .weight(0.35f),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF14213D)),
+                shape = RoundedCornerShape(5.dp),
+              ) {
+                Text(
+                  text = "Edit",
+                  style = TextStyle(
+                    fontFamily = FontFamily(Font(R.font.squada)),
+                    fontSize = 24.sp,
+                    color = Color(0xFFE5E5E5)
+                  )
                 )
-              )
-            }
+              }
 
-            Spacer(modifier = Modifier.width(20.dp))
+              Spacer(modifier = Modifier.width(20.dp))
+            }
 
             Button(
               onClick = {
@@ -253,6 +256,7 @@ fun AdminCargoDetailScreen(
     val job = cScope.launch {
       adminCargoDetailVM.loadCargoDetail(
         cargoId,
+        shipmentId,
         context
       )
     }
