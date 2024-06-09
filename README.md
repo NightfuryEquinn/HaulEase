@@ -25,4 +25,4 @@
 
 <hr/>
 
-### 📂 Read documentation: [Here]()
+### 📂 Read documentation: [Here](https://github.com/NightfuryEquinn/HaulEase/blob/main/AMCA%20Individual%20Documentation%20-%20Yip%20Zi%20Xian%20-%20TP059963.pdf)
