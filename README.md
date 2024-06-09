@@ -19,7 +19,7 @@
 
 ### 📌 Assumptions Made:
 1. Users are assumed to use an existing email address as it is required to reset their password.
-2. Users are assumed to not be able to edit their profile to ensure their respective 3.3. shipment details remain the same throughout the shipping and delivery process.
+2. Users are assumed to not be able to edit their profile to ensure their respective shipment details remain the same throughout the shipping and delivery process.
 3. Users are assumed to refresh their page if they did not see any changes after performing an action like creating shipment or removing cargo.
 4. The tracking of shipment location is only a simulation that the function is doable and runnable.
 
