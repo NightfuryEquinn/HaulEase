@@ -109,10 +109,11 @@ fun PaymentScreen(
             .weight(1f)
         ) {
           if (
-            theShipmentStatus == CargoStatus.status1.titleText ||
-            theShipmentStatus == CargoStatus.status2.titleText ||
-            theShipmentStatus == CargoStatus.status3.titleText ||
-            theShipmentStatus == CargoStatus.status4.titleText ||
+            theShipmentStatus != CargoStatus.status5.titleText ||
+            theShipmentStatus != CargoStatus.status6.titleText ||
+            theShipmentStatus != CargoStatus.status7.titleText ||
+            theShipmentStatus != CargoStatus.status8.titleText ||
+            theShipmentStatus != CargoStatus.status9.titleText ||
             theShipmentStatus.startsWith("Completed")
           ) {
             Text(
@@ -153,10 +154,11 @@ fun PaymentScreen(
           }
 
           if (
-            theShipmentStatus == CargoStatus.status5.titleText ||
-            theShipmentStatus == CargoStatus.status6.titleText ||
-            theShipmentStatus == CargoStatus.status7.titleText ||
-            theShipmentStatus == CargoStatus.status8.titleText ||
+            theShipmentStatus != CargoStatus.status1.titleText ||
+            theShipmentStatus != CargoStatus.status2.titleText ||
+            theShipmentStatus != CargoStatus.status3.titleText ||
+            theShipmentStatus != CargoStatus.status4.titleText ||
+            theShipmentStatus != CargoStatus.status9.titleText ||
             theShipmentStatus.startsWith("Completed")
           ) {
             Text(
@@ -194,7 +196,14 @@ fun PaymentScreen(
           }
 
           if (
-            theShipmentStatus == CargoStatus.status9.titleText ||
+            theShipmentStatus != CargoStatus.status1.titleText ||
+            theShipmentStatus != CargoStatus.status2.titleText ||
+            theShipmentStatus != CargoStatus.status3.titleText ||
+            theShipmentStatus != CargoStatus.status4.titleText ||
+            theShipmentStatus != CargoStatus.status5.titleText ||
+            theShipmentStatus != CargoStatus.status6.titleText ||
+            theShipmentStatus != CargoStatus.status7.titleText ||
+            theShipmentStatus != CargoStatus.status8.titleText ||
             theShipmentStatus.startsWith("Completed")
           ) {
             Text(
