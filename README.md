@@ -2,6 +2,8 @@
 ## ⚙️ Platform Used: Android Studio Jellyfish, Oppo Reno 2F on Android 11 (API 30)
 ### 🎥 Demo Video
 
+https://github.com/NightfuryEquinn/HaulEase/assets/86152710/f297806f-5d4b-4ade-880e-c3cdbd29a145
+
 <hr />
 
 ### 🛠 Framework Used:
